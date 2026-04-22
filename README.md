@@ -96,6 +96,7 @@ If you need to upgrade or replace it, keep the version and checksum records in `
 ## Security & Open Source Notes
 
 See `/Docs/Open-Source-Risk-Assessment.md` for risk analysis and release checklist.
+See `/Docs/Release-Guide.md` for CI release packaging and notarization setup.
 
 ## Governance Files
 
