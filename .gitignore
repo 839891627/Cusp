@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Xcode / SwiftPM build outputs
+.DerivedData/
+.build/
+DerivedData/
+
+# Xcode user data
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Swift package user config
+.swiftpm/
+
+# Local runtime/temp artifacts
+tmp/
+temp/
+*.log
+
+# Local tool metadata
+.superpowers/
+.git-ai/
+
+# Ruby/Bundler local vendor cache
+vendor/bundle/
+
+# Binary runtime payloads (keep large optional binaries out of git by default)
+# Resources/mihomo/mihomo is intentionally versioned in this repository.
+Resources/sslocal/sslocal
