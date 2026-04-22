@@ -5,9 +5,6 @@ extension AppViewModel {
         guard customStrategyGroups.isEmpty else {
             return
         }
-        guard !UserDefaults.standard.bool(forKey: Self.didSeedDefaultStrategyGroupsKey) else {
-            return
-        }
 
         let enabledSources = subscriptionSources.filter(\.isEnabled)
         let preferredSource = enabledSources.first(where: { $0.id == selectedSourceFilterID }) ?? enabledSources.first
@@ -53,8 +50,6 @@ extension AppViewModel {
                 intervalSeconds: 300
             )
         ]
-
-        UserDefaults.standard.set(true, forKey: Self.didSeedDefaultStrategyGroupsKey)
     }
 
     func createCustomStrategyGroup(

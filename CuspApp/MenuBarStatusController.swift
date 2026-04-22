@@ -445,6 +445,7 @@ final class MenuBarStatusController: NSObject, NSMenuDelegate {
         if let section {
             viewModel.selectedSection = section
         }
+        AppVisibilityController.shared.prepareToShowMainWindow()
         NSApplication.shared.activate(ignoringOtherApps: true)
         if let window = NSApplication.shared.windows.first(where: { $0.canBecomeMain }) {
             window.makeKeyAndOrderFront(nil)

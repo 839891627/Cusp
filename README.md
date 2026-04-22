@@ -114,3 +114,9 @@ See `/Docs/Release-Guide.md` for CI release packaging and notarization setup.
 - `THIRD_PARTY_LICENSES.md`
 - `CODE_OF_CONDUCT.md`
 - `CHANGELOG.md`
+
+
+## xx
+![alt text](Resources/overview.jpg)
+![alt text](Resources/rules.png)
+![alt text](Resources/strategy.png)

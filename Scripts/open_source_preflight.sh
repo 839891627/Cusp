@@ -6,6 +6,11 @@ cd "$ROOT_DIR"
 
 echo "==> Cusp open-source preflight"
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "missing dependency: rg (ripgrep). Please install it before running preflight." >&2
+  exit 1
+fi
+
 required_files=(
   "README.md"
   "LICENSE"
