@@ -1,0 +1,26 @@
+CuspApp/ViewModels/AppViewModel.swift
+  95e0e457f32dabe2 216-217,867,872-879,881,1060-1074,1079-1080,1085-1086
+CuspApp/Views/HomeView.swift
+  95e0e457f32dabe2 5-7,52,64,66,71-88,90-91,252,256-257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "90885bdcfa0d8afe13582ba6dca213625b9a99a6",
+  "prompts": {
+    "95e0e457f32dabe2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d3d9a15c-6a79-4caa-a5e3-279c53c7631d",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 63,
+      "total_deletions": 111,
+      "accepted_lines": 63,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/25ff3cf0478e3f684f58e84d381d759f75c327577ec0ec118c3f2d3c1fe98ae5"
+    }
+  }
+}
