@@ -1,0 +1,103 @@
+CuspApp/Services/SecureCredentialStore.swift
+  95e0e457f32dabe2 7
+CuspApp/MenuBarStatusController.swift
+  95e0e457f32dabe2 335,346-365,367,370-374,380,476-486,498
+  f24eb0c5330ee2a2 234,236
+CuspApp/ViewModels/Support/AppViewModel+Types.swift
+  95e0e457f32dabe2 68-77
+SECURITY.md
+  f24eb0c5330ee2a2 11
+CuspApp/ViewModels/Domains/AppViewModel+NodesDomain.swift
+  95e0e457f32dabe2 4-17
+CONTRIBUTING.md
+  f24eb0c5330ee2a2 1
+README.md
+  f24eb0c5330ee2a2 1,3,106-107
+  dc8b429d14181163 18-21,29-31,58-59
+Package.swift
+  2a038ba7f2521784 1-4,6-10,13-16,19-20,24-26
+  dc8b429d14181163 5,11-12,17-18,21-23
+Scripts/generate_xcodeproj.rb
+  dc8b429d14181163 22-24,34-35,37,57-59,63,68,99-101,113-115
+  95e0e457f32dabe2 26
+CuspApp/ViewModels/Domains/AppViewModel+StrategyDomain.swift
+  95e0e457f32dabe2 4-59,145-146,149-154,158-170,172,174-262,264-270,278,280,301-304,318,446-455,457-469,489,552-581
+CuspApp/Views/SettingsView.swift
+  f24eb0c5330ee2a2 5,7,25,36,130-131,142,161,167-168,170,172,177-178
+CuspApp/ViewModels/Domains/AppViewModel+Presentation.swift
+  95e0e457f32dabe2 220,222,226,234,240,272,274,278,286,288,292
+  f24eb0c5330ee2a2 16-17,27-28,32-33
+run.sh
+  dc8b429d14181163 5-6,9,37
+  2a038ba7f2521784 1-4,7-8,10-36,38
+CuspApp/ViewModels/AppViewModel.swift
+  95e0e457f32dabe2 130-137,219,239-240,263,265,423,426,626-635,642,660-662,664,674,684-685,792,1150-1151,1153-1155,1483-1496
+  f24eb0c5330ee2a2 114,220-238,353,360,380,391,706,759,1197,1275-1276,1280
+LICENSE
+  f24eb0c5330ee2a2 3
+CuspApp/Views/NodesView.swift
+  f24eb0c5330ee2a2 41,89,151,155,161,172,178-179,191,195,199,203,213,215-216,218,287,290,297-298,301-302,322,326,329,341,431,439,460
+  95e0e457f32dabe2 63,189,193,197-198,200-202,204,253-263,267-269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4dbf58864ca5045dd3d537af0217f2e26af0ac2d",
+  "prompts": {
+    "2a038ba7f2521784": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019daa9d-0f50-7d81-a524-3351926578a3",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 180,
+      "total_deletions": 0,
+      "accepted_lines": 52,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/fca83db12a8a959ee5768433ed4907229402842e02a99d471ff61519443d765f"
+    },
+    "95e0e457f32dabe2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d3d9a15c-6a79-4caa-a5e3-279c53c7631d",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 946,
+      "total_deletions": 577,
+      "accepted_lines": 388,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/7a40e1de2692e403321dc832dbbd6b8137ae3002fdb854d0f86925df55b3ff7d"
+    },
+    "dc8b429d14181163": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019db448-6d79-75d2-8597-a36e9be0fdc6",
+        "model": "unknown"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 38,
+      "total_deletions": 38,
+      "accepted_lines": 38,
+      "overriden_lines": 0
+    },
+    "f24eb0c5330ee2a2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019db448-2b56-7710-b1e6-b3ef74b4fa8a",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 88,
+      "total_deletions": 90,
+      "accepted_lines": 88,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/0ecfa6b6085bbbbf7b03f660aefa6d89dd83fc5477936f499313aaefc3fcb840"
+    }
+  }
+}
