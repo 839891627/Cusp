@@ -68,6 +68,14 @@ xcodebuild \
 swift test
 ```
 
+## Local Unsigned Packaging
+
+If you do not have an Apple Developer account yet, generate unsigned local release artifacts with:
+
+```bash
+./Scripts/release_unsigned_local.sh v0.1.0
+```
+
 Pre-release open-source checks:
 
 ```bash

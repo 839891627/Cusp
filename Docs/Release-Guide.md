@@ -3,6 +3,26 @@
 This repository includes a GitHub Actions workflow at `.github/workflows/release.yml`
 to build, notarize, and publish a macOS release package (`.zip` + `.dmg`).
 
+## Local Unsigned Release (No Apple Developer Account)
+
+If you do not have Apple Developer credentials, use:
+
+```bash
+./Scripts/release_unsigned_local.sh v0.1.0
+```
+
+Output directory:
+
+- `build/dist/Cusp-unsigned-v0.1.0.zip`
+- `build/dist/Cusp-unsigned-v0.1.0.dmg`
+- `build/dist/SHA256SUMS.txt`
+- `build/dist/UNSIGNED-NOTES.txt`
+
+Important:
+- This package is unsigned and not notarized.
+- Gatekeeper may block launch until users manually allow it.
+- Network Extension related features may not fully work without proper signing/entitlements.
+
 ## 1) Configure GitHub Secrets
 
 In repository settings (`Settings -> Secrets and variables -> Actions`), add:

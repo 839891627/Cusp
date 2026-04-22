@@ -2,9 +2,9 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: AppViewModel
-    private let topSectionSpacing: CGFloat = CuspLayout.shellSpacing
-    private let overviewGridSpacing: CGFloat = 10
-    private let overviewCardMinHeight: CGFloat = 70
+    private let topSectionSpacing: CGFloat = 12
+    private let overviewGridSpacing: CGFloat = 8
+    private let overviewCardMinHeight: CGFloat = 66
 
     private var isChinese: Bool {
         viewModel.selectedLanguage == .simplifiedChinese
@@ -49,29 +49,9 @@ struct HomeView: View {
             VStack(spacing: CuspLayout.sectionSpacing) {
                 header
 
-                GeometryReader { proxy in
-                    let buttonSize = overviewButtonSize(for: proxy.size.width)
-                    let gridHeight = overviewGridHeight
-                    HStack(alignment: .top, spacing: topSectionSpacing) {
-                        ConnectButton(
-                            state: visualState,
-                            isEnabled: viewModel.isConnectButtonEnabled,
-                            size: buttonSize
-                        ) {
-                            viewModel.toggleConnection()
-                        }
-
-                        overviewMetricGrid
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .frame(height: max(buttonSize, gridHeight), alignment: .topLeading)
-                }
-                .frame(height: overviewTopSectionHeight)
+                topPanel
 
                 trafficPanel
-
-                readinessPanel
 
                 if let action = viewModel.lastActionMessage {
                     messageBanner(text: action, color: CuspPalette.success)
@@ -81,9 +61,34 @@ struct HomeView: View {
                     messageBanner(text: error, color: CuspPalette.error)
                 }
             }
+            .frame(maxWidth: 1040, alignment: .leading)
             .padding(CuspLayout.contentInset)
+            .frame(maxWidth: .infinity, alignment: .center)
             .controlSize(.large)
         }
+    }
+
+    private var topPanel: some View {
+        GeometryReader { proxy in
+            let buttonSize = overviewButtonSize(for: proxy.size.width)
+            let gridHeight = overviewGridHeight
+            HStack(alignment: .top, spacing: topSectionSpacing) {
+                ConnectButton(
+                    state: visualState,
+                    isEnabled: viewModel.isConnectButtonEnabled,
+                    size: buttonSize
+                ) {
+                    viewModel.toggleConnection()
+                }
+
+                overviewMetricGrid
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .frame(height: max(buttonSize, gridHeight), alignment: .topLeading)
+        }
+        .frame(height: overviewTopSectionHeight)
+        .flowGatePanelCard()
     }
 
     private var header: some View {
@@ -133,84 +138,6 @@ struct HomeView: View {
                 tint: CuspPalette.secondaryText
             )
         }
-    }
-
-    private var readinessPanel: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                        Text(t("Trial Readiness", "试用就绪状态"))
-                            .font(.system(.headline, design: .rounded, weight: .semibold))
-                            .foregroundStyle(CuspPalette.primaryText)
-                    Text(viewModel.readinessReport.statusTitle)
-                        .font(.system(.subheadline, design: .rounded))
-                        .foregroundStyle(viewModel.readinessReport.isReady ? CuspPalette.success : CuspPalette.warning)
-                }
-                Spacer()
-                Image(systemName: viewModel.readinessReport.isReady ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
-                    .foregroundStyle(viewModel.readinessReport.isReady ? CuspPalette.success : CuspPalette.warning)
-            }
-
-            ForEach(Array(viewModel.readinessReport.checks.enumerated()), id: \.offset) { _, item in
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: item.isPassing ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(item.isPassing ? CuspPalette.success : CuspPalette.warning)
-                        .padding(.top, 2)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(item.title)
-                            .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                            .foregroundStyle(CuspPalette.primaryText)
-                        Text(item.detail)
-                            .font(.system(.callout, design: .rounded))
-                            .foregroundStyle(CuspPalette.secondaryText)
-                            .lineSpacing(2)
-                    }
-
-                    Spacer()
-                }
-            }
-
-            Text(viewModel.readinessHint)
-                .font(.system(.callout, design: .rounded))
-                .foregroundStyle(CuspPalette.secondaryText)
-                .lineSpacing(2)
-
-            Divider()
-                .overlay(CuspPalette.hairline)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.setupGuide.title)
-                    .font(.system(.headline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(CuspPalette.primaryText)
-
-                ForEach(Array(viewModel.setupGuide.steps.enumerated()), id: \.offset) { index, step in
-                    HStack(alignment: .top, spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(CuspPalette.pillFill)
-                                .frame(width: 24, height: 24)
-                            Text("\(index + 1)")
-                                .font(.system(size: 11, weight: .bold, design: .rounded))
-                                .foregroundStyle(CuspPalette.primaryText)
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(step.title)
-                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                .foregroundStyle(CuspPalette.primaryText)
-                            Text(step.detail)
-                                .font(.system(.callout, design: .rounded))
-                                .foregroundStyle(CuspPalette.secondaryText)
-                                .lineSpacing(2)
-                        }
-
-                        Spacer()
-                    }
-                }
-            }
-        }
-        .flowGatePanelCard()
     }
 
     private var trafficPanel: some View {
@@ -322,12 +249,12 @@ struct HomeView: View {
     }
 
     private var overviewTopSectionHeight: CGFloat {
-        max(overviewGridHeight, 194)
+        max(overviewGridHeight, 176)
     }
 
     private func overviewButtonSize(for containerWidth: CGFloat) -> CGFloat {
-        let proposed = containerWidth * 0.27
-        return min(max(proposed, 176), 220)
+        let proposed = containerWidth * 0.2
+        return min(max(proposed, 148), 196)
     }
 
     private func summaryPill(title: String, value: String) -> some View {

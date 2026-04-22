@@ -213,6 +213,8 @@ final class AppViewModel: ObservableObject {
     private var lowTrafficNotifiedSourceIDs: Set<String> = []
     private var lastExternalVPNAutoDisconnectAt: Date?
     private var lastAutoFailoverAt: Date?
+    private var keychainValueCache: [String: String] = [:]
+    private var keychainMisses: Set<String> = []
     private let autoFailoverCooldown: TimeInterval = 30
     private let maxLogEntryCount = 500
     private let maxTrafficSamples = 10
@@ -862,16 +864,21 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        _ = try? saveCatalogSecurely(catalog)
+        _ = try? saveCatalogSecurely(catalog, restoreFromKeychain: false)
         availableConfigurations = visibleCatalogNodes.map(\.configuration)
     }
 
     @discardableResult
-    func saveCatalogSecurely(_ catalog: SubscriptionCatalog) throws -> SubscriptionCatalog {
-        let restored = restoreSensitiveValues(in: catalog)
-        let sanitized = sanitizedCatalogForPersistence(restored)
+    func saveCatalogSecurely(
+        _ catalog: SubscriptionCatalog,
+        restoreFromKeychain: Bool = true
+    ) throws -> SubscriptionCatalog {
+        let catalogWithSensitiveValues = restoreFromKeychain
+            ? restoreSensitiveValues(in: catalog)
+            : catalog
+        let sanitized = sanitizedCatalogForPersistence(catalogWithSensitiveValues)
         try store.saveSubscriptionCatalog(sanitized)
-        return restored
+        return catalogWithSensitiveValues
     }
 
     private func restoreSensitiveValues(in catalog: SubscriptionCatalog) -> SubscriptionCatalog {
@@ -1050,15 +1057,33 @@ final class AppViewModel: ObservableObject {
     }
 
     func keychainString(for account: String) -> String? {
-        credentialStore.string(for: account)
+        if let cached = keychainValueCache[account] {
+            return cached
+        }
+        if keychainMisses.contains(account) {
+            return nil
+        }
+
+        let value = credentialStore.string(for: account)
+        if let value, !value.isEmpty {
+            keychainValueCache[account] = value
+            return value
+        }
+
+        keychainMisses.insert(account)
+        return nil
     }
 
     func setKeychainString(_ value: String, for account: String) {
         credentialStore.setString(value, for: account)
+        keychainValueCache[account] = value
+        keychainMisses.remove(account)
     }
 
     func removeKeychainValue(for account: String) {
         credentialStore.removeValue(for: account)
+        keychainValueCache.removeValue(forKey: account)
+        keychainMisses.insert(account)
     }
 
     func uniqueDuplicateNodeName(base: String) -> String {
