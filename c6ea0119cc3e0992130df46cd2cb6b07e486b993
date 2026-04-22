@@ -1,0 +1,28 @@
+Scripts/open_source_preflight.sh
+  95e0e457f32dabe2 9-13
+CuspApp/CuspApp.swift
+  95e0e457f32dabe2 19-23,35-104
+CuspApp/MenuBarStatusController.swift
+  95e0e457f32dabe2 448
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c6ea0119cc3e0992130df46cd2cb6b07e486b993",
+  "prompts": {
+    "95e0e457f32dabe2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d3d9a15c-6a79-4caa-a5e3-279c53c7631d",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 153,
+      "total_deletions": 5,
+      "accepted_lines": 153,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/0c4e0ac9d3c99ac1e8c8110f20183cb9b2c3d3dd97994fd618ecf1707c03d41f"
+    }
+  }
+}
