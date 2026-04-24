@@ -1,0 +1,95 @@
+README.md
+  7a4ef289bd3cb8e8 7,35
+CuspApp/MenuBarStatusController.swift
+  5376f28267f23116 18,121,139-147,676-677,815-823
+  7a4ef289bd3cb8e8 7,37-41,45-46,70,220-223,225-226,228-230,232-234,238-240,245-250,259,265,278-289,291,301,315-319,322,327,330-331,361,364-375,381,393,400,420,440-580,586,593-594,596-642,644,646-648,656,731,765-766,798-799,804-805,810-811,854,868,873-879,881-918,922-1018,1026,1028,1030,1035,1053-1054,1057-1088
+Sources/CuspShared/CuspConstants.swift
+  5376f28267f23116 14-15
+Sources/CuspShared/SharedConfigurationStore.swift
+  7a4ef289bd3cb8e8 33-36,49-52
+CuspApp/ViewModels/Domains/AppViewModel+SettingsDomain.swift
+  7a4ef289bd3cb8e8 1-2,55-615
+CuspApp/ViewModels/AppViewModel.swift
+  7a4ef289bd3cb8e8 63-73,185-186,215,217,220-224,226-233,236-242,244,248,260-264,283-284,316-318,344,381,400,431,444,525-526,560,1065-1128,1130,1223-1224,1260,1269,1285-1292,1294-1297,1300-1303,1305-1307,1309,1340,1349,1355,1361,1367
+  5376f28267f23116 430,432-443,445-455,1368-1370
+Docs/Release-Guide.md
+  7a4ef289bd3cb8e8 24
+Tests/CuspSharedTests/EntitlementsInspectorTests.swift
+  7a4ef289bd3cb8e8 10,32,41
+Tests/CuspSharedTests/RuntimeStateMachineTests.swift
+  7a4ef289bd3cb8e8 1-32
+CuspApp/ViewModels/Domains/AppViewModel+Presentation.swift
+  7a4ef289bd3cb8e8 129-154
+Scripts/generate_xcodeproj.rb
+  7a4ef289bd3cb8e8 49,73-79
+Scripts/release_unsigned_local.sh
+  7a4ef289bd3cb8e8 56
+Tests/CuspSharedTests/MihomoConfigBuilderModeTests.swift
+  7a4ef289bd3cb8e8 16-17,31-32,46-47,65-76
+Tests/CuspSharedTests/MihomoConfigBuilderTests.swift
+  7a4ef289bd3cb8e8 20-28,123-323
+CuspApp/ViewModels/Domains/AppViewModel+NodesDomain.swift
+  7a4ef289bd3cb8e8 61-62,302
+Resources/mihomo/README.md
+  7a4ef289bd3cb8e8 13,15,17
+CuspApp/Views/HomeView.swift
+  5376f28267f23116 56-57,177-187,189-201,307-330,333-377,379-387
+Tests/CuspSharedTests/ProxyStartupMonitorTests.swift
+  7a4ef289bd3cb8e8 61-116
+Sources/CuspShared/ProxyStartupMonitor.swift
+  7a4ef289bd3cb8e8 51-99
+CuspApp/Views/AppSection.swift
+  5376f28267f23116 5,18-19,37-38,56-57
+Sources/CuspShared/EntitlementsInspector.swift
+  7a4ef289bd3cb8e8 5,7,9,12-16,18,25,31,35-36,38-41
+CuspApp/Services/LocalProxyManagerService.swift
+  7a4ef289bd3cb8e8 2,6-20,39,49-58,60-76,78-104,107-108,118-120,123,125,130,137-138,147,154,161,163-165,170-172,175-177,181,186-187,216-217,227-228,231-232,248,252-253,257,260,262,266-267,270,300-348
+CuspApp/Views/AppShellView.swift
+  7a4ef289bd3cb8e8 270-272,274
+  5376f28267f23116 62-63,130-269,273,275-388
+Sources/CuspShared/RuntimeStateMachine.swift
+  7a4ef289bd3cb8e8 1-27
+CuspApp/ViewModels/Support/AppViewModel+Types.swift
+  5376f28267f23116 181-229
+  7a4ef289bd3cb8e8 32-53
+CuspApp/Views/SettingsView.swift
+  7a4ef289bd3cb8e8 23,125-137
+Sources/CuspShared/MihomoConfigBuilder.swift
+  5376f28267f23116 58,60
+  7a4ef289bd3cb8e8 11,59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "f8406d4028e1d1e46eb2baf376eaa5ba025538a6",
+  "prompts": {
+    "5376f28267f23116": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e95fec7a-c871-4a1f-8074-e5f7a5a9913d",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 846,
+      "total_deletions": 94,
+      "accepted_lines": 486,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/c32cb6df60d5139b2cd02ee282a86d243c45992bc95e93f07ab4dbed2851468d"
+    },
+    "7a4ef289bd3cb8e8": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a5195529-0f39-4216-957b-f7830e61419d",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 2932,
+      "total_deletions": 1558,
+      "accepted_lines": 2608,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/cadb02367fbf7a8d4fa833858d981628add69d3473067e6484d02b9b45ab2dd4"
+    }
+  }
+}
