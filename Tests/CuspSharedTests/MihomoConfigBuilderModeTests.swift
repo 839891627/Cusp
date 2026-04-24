@@ -13,8 +13,8 @@ final class MihomoConfigBuilderModeTests: XCTestCase {
 
         let yaml = MihomoConfigBuilder.build(from: configuration, mode: .direct)
 
-        XCTAssertTrue(yaml.contains("mode: direct"))
-        XCTAssertTrue(yaml.contains("- MATCH,DIRECT"))
+        assertYAMLContains(yaml, "mode: direct")
+        assertRuleRendered(yaml, "MATCH,DIRECT")
     }
 
     func testBuildsGlobalModeConfig() {
@@ -28,8 +28,8 @@ final class MihomoConfigBuilderModeTests: XCTestCase {
 
         let yaml = MihomoConfigBuilder.build(from: configuration, mode: .global)
 
-        XCTAssertTrue(yaml.contains("mode: global"))
-        XCTAssertTrue(yaml.contains("- MATCH,Cusp"))
+        assertYAMLContains(yaml, "mode: global")
+        assertRuleRendered(yaml, "MATCH,Cusp")
     }
 
     func testBuildsRulesModeConfig() {
@@ -43,8 +43,8 @@ final class MihomoConfigBuilderModeTests: XCTestCase {
 
         let yaml = MihomoConfigBuilder.build(from: configuration, mode: .rules)
 
-        XCTAssertTrue(yaml.contains("mode: rule"))
-        XCTAssertTrue(yaml.contains("GEOIP,CN,DIRECT"))
+        assertYAMLContains(yaml, "mode: rule")
+        assertRuleRendered(yaml, "GEOIP,CN,DIRECT")
     }
 
     func testBuildsRulesModeConfigWithCustomRules() {
@@ -62,7 +62,17 @@ final class MihomoConfigBuilderModeTests: XCTestCase {
 
         let yaml = MihomoConfigBuilder.build(from: configuration, mode: .rules, routingRules: customRules)
 
-        XCTAssertTrue(yaml.contains("DOMAIN,api.openai.com,Cusp"))
-        XCTAssertTrue(yaml.contains("MATCH,DIRECT"))
+        assertRuleRendered(yaml, "DOMAIN,api.openai.com,Cusp")
+        assertRuleRendered(yaml, "MATCH,DIRECT")
+    }
+}
+
+private extension XCTestCase {
+    func assertYAMLContains(_ yaml: String, _ fragment: String, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(yaml.contains(fragment), "Expected YAML to contain: \(fragment)", file: file, line: line)
+    }
+
+    func assertRuleRendered(_ yaml: String, _ rule: String, file: StaticString = #filePath, line: UInt = #line) {
+        assertYAMLContains(yaml, "- \(rule)", file: file, line: line)
     }
 }

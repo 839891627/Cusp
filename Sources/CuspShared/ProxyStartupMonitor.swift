@@ -48,6 +48,55 @@ public enum ProxyStartupMonitor {
         throw Error.timedOut(host, port, sanitizedDiagnostics(from: diagnostics()))
     }
 
+    public static func waitUntilReadyAsync(
+        host: String,
+        port: Int,
+        timeoutInterval: TimeInterval,
+        pollInterval: TimeInterval = 0.1,
+        isListening: @Sendable () -> Bool,
+        isProcessRunning: @Sendable () -> Bool,
+        diagnostics: @Sendable () -> String
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeoutInterval)
+
+        while Date() < deadline {
+            if isListening() {
+                return
+            }
+
+            if !isProcessRunning() {
+                let summary = sanitizedDiagnostics(from: diagnostics())
+                throw Error.processExited(summary)
+            }
+
+            let delayNanoseconds = UInt64(max(0.01, pollInterval) * 1_000_000_000)
+            try? await Task.sleep(nanoseconds: delayNanoseconds)
+        }
+
+        throw Error.timedOut(host, port, sanitizedDiagnostics(from: diagnostics()))
+    }
+
+    public static func waitUntilReadyAsync(
+        host: String,
+        port: Int,
+        timeoutInterval: TimeInterval,
+        pollInterval: TimeInterval = 0.1,
+        isProcessRunning: @Sendable () -> Bool,
+        diagnostics: @Sendable () -> String
+    ) async throws {
+        try await waitUntilReadyAsync(
+            host: host,
+            port: port,
+            timeoutInterval: timeoutInterval,
+            pollInterval: pollInterval,
+            isListening: {
+                LocalPortWaiter.isListening(host: host, port: port)
+            },
+            isProcessRunning: isProcessRunning,
+            diagnostics: diagnostics
+        )
+    }
+
     public static func waitUntilReady(
         host: String,
         port: Int,

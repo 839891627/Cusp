@@ -53,6 +53,8 @@ struct HomeView: View {
 
                 trafficPanel
 
+                processTrafficPanel
+
                 if let action = viewModel.lastActionMessage {
                     messageBanner(text: action, color: CuspPalette.success)
                 }
@@ -172,6 +174,35 @@ struct HomeView: View {
         .flowGatePanelCard()
     }
 
+    private var processTrafficPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(t("Connection Routing", "连接路由"))
+                    .font(.system(.headline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(CuspPalette.primaryText)
+                Spacer()
+                Button(t("Manage", "管理")) {
+                    viewModel.selectedSection = .processes
+                }
+                .flowGateSecondaryActionStyle()
+            }
+
+            if viewModel.processTrafficEntries.isEmpty {
+                Text(t("No active route traffic.", "暂无活跃路由流量。"))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(CuspPalette.secondaryText)
+                    .padding(.vertical, 8)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(viewModel.processTrafficEntries.prefix(3)) { entry in
+                        processTrafficRow(entry)
+                    }
+                }
+            }
+        }
+        .flowGatePanelCard()
+    }
+
     private func metricCard(title: String, value: String, tint: Color, monospaced: Bool = true) -> some View {
         let cardShape = RoundedRectangle(cornerRadius: CuspLayout.nestedCornerRadius, style: .continuous)
         return VStack(alignment: .leading, spacing: 6) {
@@ -272,6 +303,88 @@ struct HomeView: View {
         .background(CuspPalette.raisedCardFill)
         .clipShape(RoundedRectangle(cornerRadius: CuspLayout.nestedCornerRadius, style: .continuous))
     }
+
+    private func processTrafficRow(_ entry: ProcessTrafficEntry) -> some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(routeTitle(entry.routing))
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(CuspPalette.primaryText)
+                    .lineLimit(1)
+                Text(t("\(entry.activeConnections) active", "\(entry.activeConnections) 个连接"))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(CuspPalette.tertiaryText)
+            }
+            Spacer()
+            routeBadge(for: entry.routing)
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("↓ \(byteCountString(entry.downloadBytes))")
+                    .foregroundStyle(CuspPalette.primaryText)
+                Text("↑ \(byteCountString(entry.uploadBytes))")
+                    .foregroundStyle(CuspPalette.secondaryText)
+            }
+            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+            .monospacedDigit()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .background(CuspPalette.raisedCardFill)
+        .clipShape(RoundedRectangle(cornerRadius: CuspLayout.nestedCornerRadius, style: .continuous))
+    }
+
+    private func routeTitle(_ routing: ProcessRoutingType) -> String {
+        switch routing {
+        case .direct:
+            return t("Direct Route", "直连路由")
+        case .proxy(let chain):
+            return t("Proxy Route", "代理路由") + " · " + chain
+        case .reject:
+            return t("Rejected", "已拒绝")
+        case .unknown:
+            return t("Unknown Route", "未知路由")
+        }
+    }
+
+    private func routeBadge(for routing: ProcessRoutingType) -> some View {
+        let text: String
+        let tint: Color
+        switch routing {
+        case .direct:
+            text = t("Direct", "直连")
+            tint = CuspPalette.success
+        case .proxy(let proxyName):
+            text = t("Proxy", "代理") + " · " + proxyName
+            tint = CuspPalette.accentBright
+        case .reject:
+            text = t("Reject", "拒绝")
+            tint = CuspPalette.error
+        case .unknown:
+            text = t("Unknown", "未知")
+            tint = CuspPalette.secondaryText
+        }
+
+        return Text(text)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(tint)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(tint.opacity(0.12))
+            .clipShape(Capsule())
+    }
+
+    private func byteCountString(_ bytes: UInt64) -> String {
+        Self.processByteFormatter.string(fromByteCount: Int64(bytes))
+    }
+
+    private static let processByteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
+        formatter.countStyle = .binary
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+        return formatter
+    }()
 
     private func messageBanner(text: String, color: Color) -> some View {
         Text(text)

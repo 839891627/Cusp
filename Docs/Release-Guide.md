@@ -21,7 +21,7 @@ Output directory:
 Important:
 - This package is unsigned and not notarized.
 - Gatekeeper may block launch until users manually allow it.
-- Network Extension related features may not fully work without proper signing/entitlements.
+- Some system-level networking capabilities may be limited in unsigned builds.
 
 ## 1) Configure GitHub Secrets
 

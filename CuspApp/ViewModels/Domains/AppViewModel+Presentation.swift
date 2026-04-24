@@ -126,6 +126,32 @@ extension AppViewModel {
         }
     }
 
+    func displayName(for window: RuntimeFSMLogAggregationWindow) -> String {
+        if selectedLanguage == .simplifiedChinese {
+            switch window {
+            case .off:
+                return "关闭"
+            case .threeSeconds:
+                return "3 秒"
+            case .fiveSeconds:
+                return "5 秒"
+            case .tenSeconds:
+                return "10 秒"
+            }
+        }
+
+        switch window {
+        case .off:
+            return "Off"
+        case .threeSeconds:
+            return "3s"
+        case .fiveSeconds:
+            return "5s"
+        case .tenSeconds:
+            return "10s"
+        }
+    }
+
     func displayName(for ruleType: RoutingRuleType) -> String {
         switch ruleType {
         case .domainSuffix:

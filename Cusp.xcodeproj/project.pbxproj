@@ -14,7 +14,6 @@
 		1BF5A816043AB267F4455C71 /* TrialSetupGuideBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE5D210869535FD860549B /* TrialSetupGuideBuilder.swift */; };
 		1DCE1445587CDC587D36732D /* RuleTemplateCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E59806CB0F86DAEF1065F67 /* RuleTemplateCatalog.swift */; };
 		1DF4A69C7229DDEC8F92FE54 /* LocalPortWaiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313796063E8290D0C614CFA9 /* LocalPortWaiter.swift */; };
-		21D15DDF11D87CB1D88C4533 /* VPNManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F53BDD735680FB9501E752A /* VPNManagerService.swift */; };
 		26C5422ECA1ECD0A5BE2F6E4 /* ConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB890A641F5517E2856F3FD /* ConnectionState.swift */; };
 		298BE3CCF8B02D05356124BF /* LocalPortWaiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313796063E8290D0C614CFA9 /* LocalPortWaiter.swift */; };
 		2C51DA099BFB94B301726B84 /* CatalogNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E44CEEC30EE6500C9FDA29 /* CatalogNode.swift */; };
@@ -35,7 +34,6 @@
 		5120523416E4963DB77716A4 /* SubscriptionCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B95572FD777DFAE9B9A1871 /* SubscriptionCatalog.swift */; };
 		52B51B36C6A6907A11591DFA /* SubscriptionCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B95572FD777DFAE9B9A1871 /* SubscriptionCatalog.swift */; };
 		52F7EB8655CD580ADD402E03 /* SystemProxyCommandBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B052C8F0632C75CEC7C29F79 /* SystemProxyCommandBuilder.swift */; };
-		53E438268CB9F361BBD9392C /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3DAA0E2923170708633073C /* PacketTunnelProvider.swift */; };
 		54D8E47152002B96D4BFF262 /* NodeLatencyProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E37F4AB0588EE3109258347 /* NodeLatencyProbe.swift */; };
 		564A9E7F54ED86BE668F9251 /* NodeBoardDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5488995A258279A11FD01129 /* NodeBoardDisplay.swift */; };
 		56C4B7F06BE5011FEDD71A34 /* AppViewModel+RulesDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3126202917F1B04E6C6A1A81 /* AppViewModel+RulesDomain.swift */; };
@@ -59,7 +57,6 @@
 		7E33D0C70ED8A304D1C96902 /* NodeCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2FF5B46DA01D535FC75C55 /* NodeCatalog.swift */; };
 		818897594FB90DB073AF1E4D /* AppViewModel+NodesDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B85576BF9EC4750B52DF4 /* AppViewModel+NodesDomain.swift */; };
 		8349F3B1415DF6612AB04630 /* MihomoConfigBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772249C3C9FCBBFF4EC7DECE /* MihomoConfigBuilder.swift */; };
-		84D56C22C21BF17F1B9D259F /* LocalProjectSetupInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EBB92F5C89A37296E6B675 /* LocalProjectSetupInspector.swift */; };
 		85CB97736CB8066F748E6F3A /* SubscriptionParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1465C782B40B8B4A0D75FD /* SubscriptionParser.swift */; };
 		8645D865FD6D5ABFA92D5F42 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DFAE64D591DB517E614380D /* SubscriptionsView.swift */; };
 		9D61E56938EF02D417BA4A69 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DB6AEE10DE5F44D48270FE /* HomeView.swift */; };
@@ -107,7 +104,6 @@
 		0EC39424C1AB8F6426B96390 /* EntitlementsInspector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EntitlementsInspector.swift; sourceTree = "<group>"; };
 		0FFB4B412AA75EFDE510A3E4 /* SecureCredentialStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SecureCredentialStore.swift; path = Services/SecureCredentialStore.swift; sourceTree = "<group>"; };
 		16846D8336AC207C8AD15516 /* ProcessManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProcessManager.swift; sourceTree = "<group>"; };
-		1917483B6ABFA0E37E13A6C8 /* CuspTunnel.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = CuspTunnel.entitlements; sourceTree = "<group>"; };
 		19CEA88FD0A796430F44BAA0 /* SubscriptionFetcher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionFetcher.swift; sourceTree = "<group>"; };
 		1B1A8F793136150E7BD2796D /* AppViewModel+SubscriptionsDomain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "AppViewModel+SubscriptionsDomain.swift"; path = "ViewModels/Domains/AppViewModel+SubscriptionsDomain.swift"; sourceTree = "<group>"; };
 		23DB6AEE10DE5F44D48270FE /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeView.swift; path = Views/HomeView.swift; sourceTree = "<group>"; };
@@ -125,32 +121,26 @@
 		497886FDE04DCFCA53D36EC5 /* mihomo */ = {isa = PBXFileReference; includeInIndex = 1; path = mihomo; sourceTree = "<group>"; };
 		51CB19967C13E59BA2F991F6 /* StrategyBoardSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StrategyBoardSection.swift; path = Views/StrategyBoardSection.swift; sourceTree = "<group>"; };
 		52095A09A9A5C3D9F0259354 /* mihomo */ = {isa = PBXFileReference; includeInIndex = 1; name = mihomo; path = mihomo/mihomo; sourceTree = "<group>"; };
-		53D3833DB8D54EC904F2BAF0 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5488995A258279A11FD01129 /* NodeBoardDisplay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NodeBoardDisplay.swift; sourceTree = "<group>"; };
 		58E51CAA4E13A551A677848F /* NodeListSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NodeListSection.swift; path = Views/NodeListSection.swift; sourceTree = "<group>"; };
 		59428B89D534AC2FF1F8C946 /* ShadowsocksConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShadowsocksConfiguration.swift; sourceTree = "<group>"; };
 		5DB890A641F5517E2856F3FD /* ConnectionState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConnectionState.swift; sourceTree = "<group>"; };
 		68CFB2F48395B6F0E97D5D43 /* MVP-Setup.md */ = {isa = PBXFileReference; includeInIndex = 1; path = "MVP-Setup.md"; sourceTree = "<group>"; };
 		6B3F9FDF42267B15754D6292 /* RuntimeMode.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RuntimeMode.swift; sourceTree = "<group>"; };
-		715DC9055C0E12BA54C2D5DD /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		75735B610D79257C97E6C175 /* AppViewModel+Types.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "AppViewModel+Types.swift"; path = "ViewModels/Support/AppViewModel+Types.swift"; sourceTree = "<group>"; };
-		76EBB92F5C89A37296E6B675 /* LocalProjectSetupInspector.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocalProjectSetupInspector.swift; path = Services/LocalProjectSetupInspector.swift; sourceTree = "<group>"; };
 		772249C3C9FCBBFF4EC7DECE /* MihomoConfigBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MihomoConfigBuilder.swift; sourceTree = "<group>"; };
-		7EEB7C91D4AD4C205F4563A5 /* CuspTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CuspTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		80FECEE4AA87ADEA86F4532A /* Cusp.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Cusp.entitlements; sourceTree = "<group>"; };
 		85A4AA1FBBBD736F42AFA6E8 /* MenuBarStatusController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarStatusController.swift; sourceTree = "<group>"; };
 		86EF371BDADE954C801F50E3 /* generate_xcodeproj.rb */ = {isa = PBXFileReference; includeInIndex = 1; path = generate_xcodeproj.rb; sourceTree = "<group>"; };
 		88D3BEE86CCF5191AFE01EC9 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Views/SettingsView.swift; sourceTree = "<group>"; };
 		8E1465C782B40B8B4A0D75FD /* SubscriptionParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionParser.swift; sourceTree = "<group>"; };
 		98C8C24C167A0963484B10B3 /* NodeFilter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NodeFilter.swift; sourceTree = "<group>"; };
-		9F53BDD735680FB9501E752A /* VPNManagerService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VPNManagerService.swift; path = Services/VPNManagerService.swift; sourceTree = "<group>"; };
 		A71A96CC98695DD183BBDCC4 /* ConnectButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectButton.swift; path = UI/ConnectButton.swift; sourceTree = "<group>"; };
 		ABD7C467A9AEDC3D5822FBAD /* SubscriptionCatalogBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionCatalogBuilder.swift; sourceTree = "<group>"; };
 		AC2FF5B46DA01D535FC75C55 /* NodeCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NodeCatalog.swift; sourceTree = "<group>"; };
 		AF6784A394AC77915033B426 /* SSURLParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SSURLParser.swift; sourceTree = "<group>"; };
 		B052C8F0632C75CEC7C29F79 /* SystemProxyCommandBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SystemProxyCommandBuilder.swift; sourceTree = "<group>"; };
 		B1286ACA07F10A221F0B96FF /* NetworkServiceParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkServiceParser.swift; sourceTree = "<group>"; };
-		B3DAA0E2923170708633073C /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
 		B869D19B88C271ACFABA07E0 /* SubscriptionSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionSource.swift; sourceTree = "<group>"; };
 		C0AE3E4FFDB3C213BBF2D9CD /* AppViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppViewModel.swift; path = ViewModels/AppViewModel.swift; sourceTree = "<group>"; };
 		C31848D29A37750FA7B63DD1 /* SharedConfigurationStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedConfigurationStore.swift; sourceTree = "<group>"; };
@@ -171,14 +161,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3931B476222A318E9818FEB3 /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D773C8845AD90B4C3CEAFD95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5FB175196B46ACB64EE516AE /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,10 +190,8 @@
 			children = (
 				CA26A368E0370187E8B1325F /* CuspApp.swift */,
 				85A4AA1FBBBD736F42AFA6E8 /* MenuBarStatusController.swift */,
-				76EBB92F5C89A37296E6B675 /* LocalProjectSetupInspector.swift */,
 				478EB51B79827895DE8F2F6B /* LocalProxyManagerService.swift */,
 				0FFB4B412AA75EFDE510A3E4 /* SecureCredentialStore.swift */,
-				9F53BDD735680FB9501E752A /* VPNManagerService.swift */,
 				A71A96CC98695DD183BBDCC4 /* ConnectButton.swift */,
 				2E72A0CE505022C8EED27780 /* VisualEffectView.swift */,
 				C0AE3E4FFDB3C213BBF2D9CD /* AppViewModel.swift */,
@@ -232,7 +212,6 @@
 				88D3BEE86CCF5191AFE01EC9 /* SettingsView.swift */,
 				51CB19967C13E59BA2F991F6 /* StrategyBoardSection.swift */,
 				0DFAE64D591DB517E614380D /* SubscriptionsView.swift */,
-				53D3833DB8D54EC904F2BAF0 /* Info.plist */,
 				80FECEE4AA87ADEA86F4532A /* Cusp.entitlements */,
 			);
 			name = CuspApp;
@@ -251,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				0A00FF60438126A079E6A88E /* Cusp.app */,
-				7EEB7C91D4AD4C205F4563A5 /* CuspTunnel.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -304,23 +282,11 @@
 				64C24110934B4365C02E5E9A /* Products */,
 				6314D654BD716BCA6D5AD64B /* Frameworks */,
 				41F08D38127C3D4F66A53651 /* CuspApp */,
-				863FB958164E170A4401D715 /* CuspTunnel */,
 				86566F62E56E48FF83868291 /* Sources */,
 				C0BA93279A8F4FD98363F126 /* Resources */,
 				0728AB35A8B2B6A6FA8D6443 /* Docs */,
 				3DA2AEA5F703623105DECFA4 /* Scripts */,
 			);
-			sourceTree = "<group>";
-		};
-		863FB958164E170A4401D715 /* CuspTunnel */ = {
-			isa = PBXGroup;
-			children = (
-				B3DAA0E2923170708633073C /* PacketTunnelProvider.swift */,
-				715DC9055C0E12BA54C2D5DD /* Info.plist */,
-				1917483B6ABFA0E37E13A6C8 /* CuspTunnel.entitlements */,
-			);
-			name = CuspTunnel;
-			path = CuspTunnel;
 			sourceTree = "<group>";
 		};
 		86566F62E56E48FF83868291 /* Sources */ = {
@@ -365,23 +331,6 @@
 			productReference = 0A00FF60438126A079E6A88E /* Cusp.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B7B12C97977A2524D1887698 /* CuspTunnel */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F3775434792A23D8FEF5C626 /* Build configuration list for PBXNativeTarget "CuspTunnel" */;
-			buildPhases = (
-				DD424F95DF30ACE9E80E4D13 /* Sources */,
-				D773C8845AD90B4C3CEAFD95 /* Frameworks */,
-				B712FD2CC5B06E22C73CEF06 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = CuspTunnel;
-			productName = CuspTunnel;
-			productReference = 7EEB7C91D4AD4C205F4563A5 /* CuspTunnel.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -415,7 +364,6 @@
 			projectRoot = "";
 			targets = (
 				7338A0A25B2194B495197C90 /* Cusp */,
-				B7B12C97977A2524D1887698 /* CuspTunnel */,
 			);
 		};
 /* End PBXProject section */
@@ -428,15 +376,6 @@
 				F1C3E5A7B9D1023456789ABC /* Cusp.icns in Resources */,
 				435FEB4C96EF73559C912026 /* README.md in Resources */,
 				E42753D4B289D5C84953F52E /* mihomo in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B712FD2CC5B06E22C73CEF06 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A3267DE4DEA9D1929388F002 /* README.md in Resources */,
-				A58FCDF5654F0934D2BB5A86 /* mihomo in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,10 +414,8 @@
 				1BF5A816043AB267F4455C71 /* TrialSetupGuideBuilder.swift in Sources */,
 				6BEE7AB6718D96550C465F6D /* CuspApp.swift in Sources */,
 				10F470C852A9F003B78E6D0A /* MenuBarStatusController.swift in Sources */,
-				84D56C22C21BF17F1B9D259F /* LocalProjectSetupInspector.swift in Sources */,
 				3640BBD30BA6D4E22B4E52EC /* LocalProxyManagerService.swift in Sources */,
 				9F4757F0DD459B90C59A415C /* SecureCredentialStore.swift in Sources */,
-				21D15DDF11D87CB1D88C4533 /* VPNManagerService.swift in Sources */,
 				2E26548556E7A2E2A6356AF0 /* ConnectButton.swift in Sources */,
 				0F33B897B6E41362C20DDE00 /* VisualEffectView.swift in Sources */,
 				5BEEC877F1F4DE69D9863E3E /* AppViewModel.swift in Sources */,
@@ -499,40 +436,6 @@
 				D8EE36100CFE21C053B758E4 /* SettingsView.swift in Sources */,
 				4D27CC642E22E3874EA5147A /* StrategyBoardSection.swift in Sources */,
 				8645D865FD6D5ABFA92D5F42 /* SubscriptionsView.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DD424F95DF30ACE9E80E4D13 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				114FC83D51061F7239DAB181 /* CatalogNode.swift in Sources */,
-				B6C4013CF0ECA2A462D8AC90 /* ConnectionState.swift in Sources */,
-				F8BCD911FC627366C9C0A20D /* EntitlementsInspector.swift in Sources */,
-				ABB7F751FCDF904EB69ABB9B /* CuspConstants.swift in Sources */,
-				1DF4A69C7229DDEC8F92FE54 /* LocalPortWaiter.swift in Sources */,
-				5D57B21D4A95BBBF1AFF7F6D /* MVPReadinessEvaluator.swift in Sources */,
-				8349F3B1415DF6612AB04630 /* MihomoConfigBuilder.swift in Sources */,
-				A99AD96D37D5D87BB766C224 /* NetworkServiceParser.swift in Sources */,
-				6EE533C02EE2EA10754D9909 /* NodeBoardDisplay.swift in Sources */,
-				3DE0A3CB65246AB73D5F7CE2 /* NodeCatalog.swift in Sources */,
-				BB81CC30C35F3D57AF570FB0 /* NodeFilter.swift in Sources */,
-				661D1E65D02A064C10AF3A9F /* NodeLatencyProbe.swift in Sources */,
-				09C4E1DD9B422210942F71C9 /* ProcessManager.swift in Sources */,
-				6BD36A2EC10C184701D5B3A2 /* ProxyNetworkSettingsFactory.swift in Sources */,
-				606C36B9C090479194B34B71 /* ProxyStartupMonitor.swift in Sources */,
-				AFCEB067F3EB3AB268F8714D /* RuntimeMode.swift in Sources */,
-				F2ACD9DD3345E4ECCFF09C02 /* SSURLParser.swift in Sources */,
-				EA7FBC98490DB020958DD9E5 /* ShadowsocksConfiguration.swift in Sources */,
-				446D898AF2715A270CCF8FD2 /* SharedConfigurationStore.swift in Sources */,
-				52B51B36C6A6907A11591DFA /* SubscriptionCatalog.swift in Sources */,
-				5EE366ED46D167D9B674EE7E /* SubscriptionCatalogBuilder.swift in Sources */,
-				DB8C2F25779B003EB0BFA1C1 /* SubscriptionFetcher.swift in Sources */,
-				85CB97736CB8066F748E6F3A /* SubscriptionParser.swift in Sources */,
-				58B8DFB8DF66FCD5F1D89674 /* SubscriptionSource.swift in Sources */,
-				52F7EB8655CD580ADD402E03 /* SystemProxyCommandBuilder.swift in Sources */,
-				6D0282E9B1D74252D9009813 /* TrialSetupGuideBuilder.swift in Sources */,
-				53E438268CB9F361BBD9392C /* PacketTunnelProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,28 +500,6 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		490DEFD4BCC9C9BF51FB6624 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = CuspTunnel/CuspTunnel.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = CuspTunnel/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../../Frameworks @loader_path/../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.Cusp.CuspTunnel;
-				PRODUCT_NAME = CuspTunnel;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -698,28 +579,6 @@
 			};
 			name = Release;
 		};
-		8AE137F67A52752079E0ACDA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = CuspTunnel/CuspTunnel.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = CuspTunnel/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../../Frameworks @loader_path/../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.Cusp.CuspTunnel;
-				PRODUCT_NAME = CuspTunnel;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 6.0;
-			};
-			name = Release;
-		};
 		CD684B61D85FAE71400D1252 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -759,15 +618,6 @@
 			buildConfigurations = (
 				183ACA568126C8FE3DBDB5DA /* Debug */,
 				7083C2BE1DE2FAAA39A3404B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F3775434792A23D8FEF5C626 /* Build configuration list for PBXNativeTarget "CuspTunnel" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8AE137F67A52752079E0ACDA /* Release */,
-				490DEFD4BCC9C9BF51FB6624 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

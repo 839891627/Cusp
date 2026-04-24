@@ -59,6 +59,8 @@ struct AppShellView: View {
             switch viewModel.selectedSection {
             case .overview:
                 HomeView(viewModel: viewModel)
+            case .processes:
+                ProcessesView(viewModel: viewModel)
             case .nodes:
                 NodesView(viewModel: viewModel)
             case .rules:
@@ -122,6 +124,265 @@ struct AppShellView: View {
         case .invalid:
             return CuspPalette.error
         }
+    }
+}
+
+private struct ProcessesView: View {
+    @ObservedObject var viewModel: AppViewModel
+    @State private var searchText = ""
+    @State private var showUnknownOnly = false
+    @State private var selectedRouteFilter: ProcessRouteFilter = .all
+
+    private var isChinese: Bool {
+        viewModel.selectedLanguage == .simplifiedChinese
+    }
+
+    private func t(_ en: String, _ zh: String) -> String {
+        isChinese ? zh : en
+    }
+
+    private var pageHeaderFont: Font {
+        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
+    }
+
+    private var visibleEntries: [ProcessTrafficEntry] {
+        let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return viewModel.processTrafficEntries.filter { entry in
+            guard routeMatchesFilter(entry.routing) else {
+                return false
+            }
+            if showUnknownOnly {
+                guard case .unknown = entry.routing else {
+                    return false
+                }
+            }
+            guard !keyword.isEmpty else {
+                return true
+            }
+            if routeTitle(entry.routing).lowercased().contains(keyword) {
+                return true
+            }
+            switch entry.routing {
+            case .proxy(let chain):
+                return chain.lowercased().contains(keyword)
+            case .direct, .reject, .unknown:
+                return false
+            }
+        }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: CuspLayout.sectionSpacing) {
+                header
+                controls
+                processListCard
+            }
+            .padding(CuspLayout.contentInset)
+            .controlSize(.large)
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(t("Connection Routes", "连接路由"))
+                .font(pageHeaderFont)
+                .foregroundStyle(CuspPalette.primaryText)
+            Text(t("Inspect and manage active connection routes and traffic.", "查看并管理活跃连接路由与流量。"))
+                .font(.system(.callout, design: .rounded))
+                .foregroundStyle(CuspPalette.secondaryText)
+        }
+    }
+
+    private var controls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            TextField(t("Search route or proxy chain", "搜索路由或代理链路"), text: $searchText)
+                .flowGateFilledInputField()
+            HStack(spacing: 10) {
+                Picker(t("Route", "路由"), selection: $selectedRouteFilter) {
+                    ForEach(ProcessRouteFilter.allCases, id: \.rawValue) { filter in
+                        Text(routeFilterTitle(filter)).tag(filter)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Toggle(isOn: $showUnknownOnly) {
+                    Text(t("Unknown only", "仅未知路由"))
+                        .font(.system(.callout, design: .rounded, weight: .semibold))
+                        .foregroundStyle(CuspPalette.secondaryText)
+                }
+                .toggleStyle(.switch)
+                Button(t("Refresh", "刷新")) {
+                    viewModel.refreshProcessTrafficNow()
+                }
+                .flowGateSecondaryActionStyle()
+            }
+        }
+    }
+
+    private var processListCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(t("Active Connection Routes", "活跃连接路由"))
+                    .font(CuspPalette.sectionTitleFont)
+                    .foregroundStyle(CuspPalette.primaryText)
+                Spacer()
+                Text("\(visibleEntries.count)")
+                    .font(.system(.callout, design: .monospaced, weight: .semibold))
+                    .foregroundStyle(CuspPalette.tertiaryText)
+            }
+
+            if visibleEntries.isEmpty {
+                Text(t("No routes under current filter.", "当前筛选下暂无路由连接。"))
+                    .font(.system(.callout, design: .rounded))
+                    .foregroundStyle(CuspPalette.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(CuspPalette.raisedCardFill)
+                    .clipShape(RoundedRectangle(cornerRadius: CuspLayout.compactCornerRadius, style: .continuous))
+            } else {
+                ForEach(visibleEntries) { entry in
+                    processEntryRow(entry)
+                }
+            }
+        }
+        .flowGatePanelCard()
+    }
+
+    private func processEntryRow(_ entry: ProcessTrafficEntry) -> some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(routeTitle(entry.routing))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(CuspPalette.primaryText)
+                Text(t("\(entry.activeConnections) active", "\(entry.activeConnections) 个连接"))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(CuspPalette.tertiaryText)
+                if case .unknown = entry.routing, entry.metadataSummary != nil {
+                    Button(t("Copy metadata", "复制 metadata")) {
+                        viewModel.copyProcessMetadataToClipboard(entryID: entry.id)
+                    }
+                    .flowGateSecondaryActionStyle()
+                }
+            }
+            Spacer()
+            routeBadge(for: entry.routing)
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(t("Total ↓ ", "累计↓ ") + byteCountString(entry.downloadBytes))
+                Text(t("Total ↑ ", "累计↑ ") + byteCountString(entry.uploadBytes))
+                Text(t("Rate ↓ ", "速率↓ ") + rateString(entry.downloadBytesPerSecond))
+                    .foregroundStyle(CuspPalette.secondaryText)
+                Text(t("Rate ↑ ", "速率↑ ") + rateString(entry.uploadBytesPerSecond))
+                    .foregroundStyle(CuspPalette.secondaryText)
+                Text("Σ \(byteCountString(entry.totalBytes))")
+                    .foregroundStyle(CuspPalette.tertiaryText)
+            }
+            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+            .monospacedDigit()
+            .foregroundStyle(CuspPalette.primaryText)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(CuspPalette.raisedCardFill.opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: CuspLayout.nestedCornerRadius, style: .continuous))
+    }
+
+    private func routeBadge(for routing: ProcessRoutingType) -> some View {
+        let text: String
+        let tint: Color
+        switch routing {
+        case .direct:
+            text = t("Direct", "直连")
+            tint = CuspPalette.success
+        case .proxy(let chain):
+            text = t("Proxy", "代理") + " · " + chain
+            tint = CuspPalette.accentBright
+        case .reject:
+            text = t("Reject", "拒绝")
+            tint = CuspPalette.error
+        case .unknown:
+            text = t("Unknown", "未知")
+            tint = CuspPalette.secondaryText
+        }
+        return Text(text)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(tint)
+            .lineLimit(1)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(tint.opacity(0.12))
+            .clipShape(Capsule())
+    }
+
+    private func byteCountString(_ bytes: UInt64) -> String {
+        Self.processByteFormatter.string(fromByteCount: Int64(bytes))
+    }
+
+    private func rateString(_ bytesPerSecond: Double) -> String {
+        "\(Self.processByteFormatter.string(fromByteCount: Int64(max(0, bytesPerSecond))))/s"
+    }
+
+    private func routeFilterTitle(_ filter: ProcessRouteFilter) -> String {
+        switch filter {
+        case .all:
+            return t("All", "全部")
+        case .direct:
+            return t("Direct", "直连")
+        case .proxy:
+            return t("Proxy", "代理")
+        case .reject:
+            return t("Reject", "拒绝")
+        case .unknown:
+            return t("Unknown", "未知")
+        }
+    }
+
+    private func routeTitle(_ routing: ProcessRoutingType) -> String {
+        switch routing {
+        case .direct:
+            return t("Direct Route", "直连路由")
+        case .proxy(let chain):
+            return t("Proxy Route", "代理路由") + " · " + chain
+        case .reject:
+            return t("Rejected Route", "拒绝路由")
+        case .unknown:
+            return t("Unknown Route", "未知路由")
+        }
+    }
+
+    private func routeMatchesFilter(_ routing: ProcessRoutingType) -> Bool {
+        switch selectedRouteFilter {
+        case .all:
+            return true
+        case .direct:
+            if case .direct = routing { return true }
+            return false
+        case .proxy:
+            if case .proxy = routing { return true }
+            return false
+        case .reject:
+            if case .reject = routing { return true }
+            return false
+        case .unknown:
+            if case .unknown = routing { return true }
+            return false
+        }
+    }
+
+    private static let processByteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
+        formatter.countStyle = .binary
+        formatter.includesUnit = true
+        formatter.isAdaptive = true
+        return formatter
+    }()
+
+    private enum ProcessRouteFilter: String, CaseIterable {
+        case all
+        case direct
+        case proxy
+        case reject
+        case unknown
     }
 }
 

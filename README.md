@@ -4,7 +4,7 @@ Cusp is a native macOS proxy client focused on clarity, stability, and fast dail
 
 ## Highlights
 
-- Native SwiftUI + Network Extension architecture
+- Native SwiftUI architecture for local proxy orchestration
 - Clash/Mihomo subscription parsing (common protocols, including SS/VMess/Trojan/VLESS)
 - Real runtime mode switching: `Direct` / `Global` / `Rules`
 - Strategy groups with effective selection and runtime application
@@ -16,7 +16,6 @@ Cusp is a native macOS proxy client focused on clarity, stability, and fast dail
 
 ```text
 CuspApp/                # Main macOS app (UI, state, menu bar)
-CuspTunnel/             # Network Extension tunnel provider
 Sources/CuspShared/     # Shared core logic (parsing, config builder, runtime helpers)
 Tests/CuspSharedTests/  # Shared-layer unit tests
 Resources/                  # Runtime resources (mihomo binary placeholder, etc.)
@@ -28,20 +27,18 @@ Scripts/                    # Utility scripts (e.g. Xcode project generation)
 
 - `CuspApp`: user interactions, view models, menu bar orchestration
 - `CuspShared`: subscription parsing, node catalog, rule/model mapping, Mihomo config generation
-- `CuspTunnel`: lifecycle of local runtime process and proxy network settings application
 
 Data flow:
 1. Import subscription(s)
 2. Parse and normalize nodes/rules
 3. Build Mihomo runtime config
-4. Start runtime via tunnel provider
+4. Start local runtime process and apply system proxy
 5. Apply system proxy and update app/menu state
 
 ## Requirements
 
 - macOS 14+
 - Xcode 16+ (or toolchain compatible with Swift 6)
-- Network Extension capability for signed runs on real devices
 
 ## Build & Run
 

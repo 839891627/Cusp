@@ -1,7 +1,23 @@
 import Foundation
+import Security
 
 @MainActor
 final class LocalProxyManagerService {
+    struct RuntimeTransitionEvent {
+        let timestamp: Date
+        let from: ConnectionState
+        let to: ConnectionState
+        let reason: String
+        let accepted: Bool
+        let elapsedMilliseconds: Int?
+
+        var logLine: String {
+            let elapsedText = elapsedMilliseconds.map { " (\($0) ms)" } ?? ""
+            let decision = accepted ? "accepted" : "rejected"
+            return "\(from.rawValue) -> \(to.rawValue) [\(decision)] \(reason)\(elapsedText)"
+        }
+    }
+
     enum Error: LocalizedError {
         case missingBinary
         case noEnabledNetworkServices
@@ -20,6 +36,7 @@ final class LocalProxyManagerService {
     }
 
     var statusDidChange: ((ConnectionState) -> Void)?
+    var transitionDidOccur: ((RuntimeTransitionEvent) -> Void)?
 
     private(set) var connectionState: ConnectionState = .disconnected {
         didSet {
@@ -29,12 +46,66 @@ final class LocalProxyManagerService {
 
     private(set) var availableNetworkServices: [String] = []
     private let processManager = ProcessManager()
+    private let commandExecutor = CommandExecutor()
+    private let credentialStore = SecureCredentialStore(service: "org.cusp.runtime")
+    private static let controllerSecretAccount = "mihomo-controller-secret"
+    private var runtimeConfigURL: URL?
 
-    func prepare() throws {
-        availableNetworkServices = try loadEnabledNetworkServices()
-        if connectionState == .invalid {
-            connectionState = .disconnected
+    func prepare() async throws {
+        let startedAt = Date()
+        availableNetworkServices = try await loadEnabledNetworkServices()
+        _ = transition(to: .disconnected, reason: "prepare completed", startedAt: startedAt)
+    }
+
+    @discardableResult
+    private func transition(to next: ConnectionState, reason: String, startedAt: Date? = nil) -> Bool {
+        let previous = connectionState
+        let elapsedMilliseconds = startedAt.map { Int(max(0, Date().timeIntervalSince($0) * 1000)) }
+        let normalizedReason = normalizeTransitionReason(reason)
+        guard canTransition(from: previous, to: next) else {
+            emitTransitionEvent(
+                RuntimeTransitionEvent(
+                    timestamp: Date(),
+                    from: previous,
+                    to: next,
+                    reason: normalizedReason,
+                    accepted: false,
+                    elapsedMilliseconds: elapsedMilliseconds
+                )
+            )
+            return false
         }
+        connectionState = next
+        emitTransitionEvent(
+            RuntimeTransitionEvent(
+                timestamp: Date(),
+                from: previous,
+                to: next,
+                reason: normalizedReason,
+                accepted: true,
+                elapsedMilliseconds: elapsedMilliseconds
+            )
+        )
+        return true
+    }
+
+    private func canTransition(from current: ConnectionState, to next: ConnectionState) -> Bool {
+        switch next {
+        case .connecting:
+            return current == .disconnected || current == .invalid
+        case .connected:
+            return current == .connecting
+        case .disconnecting:
+            return current == .connected || current == .connecting
+        case .disconnected:
+            return current == .invalid || current == .connecting || current == .disconnecting || current == .connected
+        case .invalid:
+            return false
+        }
+    }
+
+    func controllerSecret() -> String {
+        ensureControllerSecret()
     }
 
     func start(
@@ -44,26 +115,27 @@ final class LocalProxyManagerService {
         routingRules: [RoutingRule] = RoutingRulePreset.commonMVP,
         proxyGroups: [MihomoProxyGroup] = [],
         activeProxyGroupName: String = "Cusp"
-    ) throws {
-        if connectionState == .connected || connectionState == .connecting {
+    ) async throws {
+        let startedAt = Date()
+        guard transition(to: .connecting, reason: "start requested") else {
             return
         }
-
-        connectionState = .connecting
-        let services = try loadEnabledNetworkServices()
+        let services = try await loadEnabledNetworkServices()
         guard !services.isEmpty else {
-            connectionState = .disconnected
+            _ = transition(to: .disconnected, reason: "start aborted: no enabled network services", startedAt: startedAt)
             throw Error.noEnabledNetworkServices
         }
 
         let binaryURL = try locateMihomoBinary()
+        let controllerSecret = ensureControllerSecret()
         let configURL = try writeRuntimeConfiguration(
             from: configuration,
             allConfigurations: allConfigurations,
             mode: mode,
             routingRules: routingRules,
             proxyGroups: proxyGroups,
-            activeProxyGroupName: activeProxyGroupName
+            activeProxyGroupName: activeProxyGroupName,
+            controllerSecret: controllerSecret
         )
 
         do {
@@ -72,46 +144,47 @@ final class LocalProxyManagerService {
                 arguments: ["-f", configURL.path],
                 environment: ProcessInfo.processInfo.environment
             )
-            try ProxyStartupMonitor.waitUntilReady(
+            try await ProxyStartupMonitor.waitUntilReadyAsync(
                 host: CuspConstants.localProxyHost,
                 port: CuspConstants.localHTTPProxyPort,
                 timeoutInterval: CuspConstants.proxyStartupTimeoutInterval,
                 isProcessRunning: { process.isRunning },
                 diagnostics: { self.processManager.diagnosticSummary() }
             )
-            try run(SystemProxyCommandBuilder.enableCommands(
+            try await run(SystemProxyCommandBuilder.enableCommands(
                 services: services,
                 host: CuspConstants.localProxyHost,
                 httpPort: CuspConstants.localHTTPProxyPort,
                 socksPort: CuspConstants.localSOCKSProxyPort
             ))
             availableNetworkServices = services
-            connectionState = .connected
+            _ = transition(to: .connected, reason: "start completed", startedAt: startedAt)
         } catch {
-            try? run(SystemProxyCommandBuilder.disableCommands(services: services))
-            processManager.cleanup()
-            connectionState = .disconnected
+            try? await run(SystemProxyCommandBuilder.disableCommands(services: services))
+            cleanupRuntimeArtifacts()
+            _ = transition(to: .disconnected, reason: "start failed: \(error.localizedDescription)", startedAt: startedAt)
             throw Error.commandFailed(error.localizedDescription)
         }
     }
 
-    func stop() throws {
-        if connectionState == .disconnected || connectionState == .disconnecting {
+    func stop() async throws {
+        let startedAt = Date()
+        guard transition(to: .disconnecting, reason: "stop requested") else {
             return
         }
-
-        connectionState = .disconnecting
-        let services = availableNetworkServices.isEmpty ? (try? loadEnabledNetworkServices()) ?? [] : availableNetworkServices
+        let services = availableNetworkServices.isEmpty
+            ? ((try? await loadEnabledNetworkServices()) ?? [])
+            : availableNetworkServices
         var capturedError: Swift.Error?
 
         do {
-            try run(SystemProxyCommandBuilder.disableCommands(services: services))
+            try await run(SystemProxyCommandBuilder.disableCommands(services: services))
         } catch {
             capturedError = error
         }
 
-        processManager.cleanup()
-        connectionState = .disconnected
+        cleanupRuntimeArtifacts()
+        _ = transition(to: .disconnected, reason: "stop completed", startedAt: startedAt)
 
         if let capturedError {
             throw capturedError
@@ -140,7 +213,8 @@ final class LocalProxyManagerService {
         mode: RuntimeMode,
         routingRules: [RoutingRule],
         proxyGroups: [MihomoProxyGroup],
-        activeProxyGroupName: String
+        activeProxyGroupName: String,
+        controllerSecret: String
     ) throws -> URL {
         let root = try runtimeDirectory()
         let fileURL = root.appendingPathComponent("config.yaml")
@@ -150,9 +224,12 @@ final class LocalProxyManagerService {
             mode: mode,
             routingRules: routingRules,
             proxyGroups: proxyGroups,
-            activeProxyGroupName: activeProxyGroupName
+            activeProxyGroupName: activeProxyGroupName,
+            localControllerSecret: controllerSecret
         )
         try contents.write(to: fileURL, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
+        runtimeConfigURL = fileURL
         return fileURL
     }
 
@@ -168,26 +245,29 @@ final class LocalProxyManagerService {
             .appendingPathComponent("Cusp", isDirectory: true)
             .appendingPathComponent("Runtime", isDirectory: true)
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: directory.path)
         return directory
     }
 
-    private func loadEnabledNetworkServices() throws -> [String] {
-        let output = try run(ProxyCommand(
+    private func loadEnabledNetworkServices() async throws -> [String] {
+        let output = try await run(ProxyCommand(
             launchPath: SystemProxyCommandBuilder.networksetupPath,
             arguments: ["-listallnetworkservices"]
         ))
-        let services = NetworkServiceParser.parseEnabledServices(from: output)
-        availableNetworkServices = services
-        return services
+        return NetworkServiceParser.parseEnabledServices(from: output)
     }
 
-    private func run(_ commands: [ProxyCommand]) throws {
+    private func run(_ commands: [ProxyCommand]) async throws {
         for command in commands {
-            _ = try run(command)
+            _ = try await run(command)
         }
     }
 
-    private func run(_ command: ProxyCommand) throws -> String {
+    private func run(_ command: ProxyCommand) async throws -> String {
+        try await commandExecutor.run(command)
+    }
+
+    nonisolated private static func execute(_ command: ProxyCommand) throws -> String {
         let process = Process()
         let stdout = Pipe()
         let stderr = Pipe()
@@ -215,6 +295,57 @@ final class LocalProxyManagerService {
         }
 
         return output
+    }
+
+    private func ensureControllerSecret() -> String {
+        if let existing = credentialStore.string(for: Self.controllerSecretAccount), !existing.isEmpty {
+            return existing
+        }
+        let generated = makeRandomSecret()
+        credentialStore.setString(generated, for: Self.controllerSecretAccount)
+        return generated
+    }
+
+    private func makeRandomSecret() -> String {
+        var bytes = [UInt8](repeating: 0, count: 24)
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        guard status == errSecSuccess else {
+            return UUID().uuidString.replacingOccurrences(of: "-", with: "")
+        }
+        return Data(bytes)
+            .base64EncodedString()
+            .replacingOccurrences(of: "=", with: "")
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+    }
+
+    private func cleanupRuntimeArtifacts() {
+        processManager.cleanup()
+        if let runtimeConfigURL {
+            try? FileManager.default.removeItem(at: runtimeConfigURL)
+            self.runtimeConfigURL = nil
+        }
+    }
+
+    private func emitTransitionEvent(_ event: RuntimeTransitionEvent) {
+        transitionDidOccur?(event)
+    }
+
+    private func normalizeTransitionReason(_ reason: String) -> String {
+        let collapsed = reason
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "\n", with: " ")
+        if collapsed.count <= 220 {
+            return collapsed
+        }
+        let prefix = collapsed.prefix(220)
+        return "\(prefix)..."
+    }
+
+    private actor CommandExecutor {
+        func run(_ command: ProxyCommand) throws -> String {
+            try LocalProxyManagerService.execute(command)
+        }
     }
 
     private func locateProjectRoot() -> URL? {

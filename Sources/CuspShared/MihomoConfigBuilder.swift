@@ -8,6 +8,7 @@ public enum MihomoConfigBuilder {
         routingRules: [RoutingRule] = RoutingRulePreset.commonMVP,
         proxyGroups: [MihomoProxyGroup] = [],
         activeProxyGroupName: String = "Cusp",
+        localControllerSecret: String = CuspConstants.localControllerSecret,
         localHTTPPort: Int = CuspConstants.localHTTPProxyPort,
         localSOCKSPort: Int = CuspConstants.localSOCKSProxyPort
     ) -> String {
@@ -54,6 +55,9 @@ public enum MihomoConfigBuilder {
         return """
         mixed-port: \(localHTTPPort)
         socks-port: \(localSOCKSPort)
+        external-controller: "\(CuspConstants.localProxyHost):\(CuspConstants.localControllerPort)"
+        secret: "\(localControllerSecret)"
+        find-process-mode: strict
         allow-lan: false
         \(modeLine)
         log-level: info

@@ -9,9 +9,6 @@ CuspApp/
   ViewModels/    # 当前主要为 AppViewModel
   Views/         # 主窗口页面与菜单栏视图逻辑
 
-CuspTunnel/
-  PacketTunnelProvider.swift
-
 Sources/CuspShared/
   解析器、配置构建器、运行时模型、共享存储与网络辅助
 

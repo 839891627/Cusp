@@ -58,8 +58,8 @@ extension AppViewModel {
                         runtimeActivityMessage = nil
                     }
 
-                    try proxyService.stop()
-                    try proxyService.start(
+                    try await proxyService.stop()
+                    try await proxyService.start(
                         with: configuration,
                         allConfigurations: runtimeConfigurationCandidates(),
                         mode: selectedRuntimeMode,
@@ -299,7 +299,7 @@ extension AppViewModel {
                 if connectionState == .connected {
                     Task {
                         do {
-                            try proxyService.stop()
+                            try await proxyService.stop()
                             await refreshOverviewMetrics()
                         } catch {
                             lastActionMessage = nil

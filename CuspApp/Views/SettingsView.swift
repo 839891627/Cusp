@@ -20,6 +20,7 @@ struct SettingsView: View {
                 subscriptionRefreshCard
 
                 runtimeCard
+                runtimeLogCard
                 systemIntegrationCard
             }
             .padding(CuspLayout.contentInset)
@@ -117,6 +118,23 @@ struct SettingsView: View {
                     )
                 )
             }
+            .padding(.top, controlsGroupTopSpacing)
+        }
+    }
+
+    private var runtimeLogCard: some View {
+        settingsCard(title: viewModel.selectedLanguage == .simplifiedChinese ? "运行时日志" : "Runtime Logs") {
+            Picker(
+                viewModel.selectedLanguage == .simplifiedChinese ? "FSM 重复日志聚合窗口" : "FSM duplicate log aggregation",
+                selection: $viewModel.selectedRuntimeFSMLogAggregationWindow
+            ) {
+                ForEach(RuntimeFSMLogAggregationWindow.allCases) { window in
+                    Text(viewModel.displayName(for: window)).tag(window)
+                }
+            }
+            .pickerStyle(.segmented)
+            .controlSize(.small)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, controlsGroupTopSpacing)
         }
     }

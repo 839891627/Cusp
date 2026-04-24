@@ -29,6 +29,28 @@ enum SubscriptionRefreshInterval: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+enum RuntimeFSMLogAggregationWindow: String, CaseIterable, Identifiable, Sendable {
+    case off
+    case threeSeconds
+    case fiveSeconds
+    case tenSeconds
+
+    var id: String { rawValue }
+
+    var seconds: TimeInterval? {
+        switch self {
+        case .off:
+            return nil
+        case .threeSeconds:
+            return 3
+        case .fiveSeconds:
+            return 5
+        case .tenSeconds:
+            return 10
+        }
+    }
+}
+
 enum RuleTemplateKind: String, CaseIterable, Identifiable, Sendable {
     case smartCN
     case aiAndGlobal
@@ -154,5 +176,54 @@ struct NetworkByteSnapshot {
     let timestamp: Date
     let uploadBytes: UInt64
     let downloadBytes: UInt64
+}
+
+enum ProcessRoutingType: Equatable, Hashable, Sendable {
+    case direct
+    case proxy(String)
+    case reject
+    case unknown
+}
+
+struct ProcessTrafficEntry: Identifiable, Equatable, Sendable {
+    let routing: ProcessRoutingType
+    let uploadBytes: UInt64
+    let downloadBytes: UInt64
+    let uploadBytesPerSecond: Double
+    let downloadBytesPerSecond: Double
+    let activeConnections: Int
+    let metadataSummary: String?
+
+    var id: String { Self.snapshotKey(routing: routing) }
+
+    var totalBytes: UInt64 {
+        uploadBytes + downloadBytes
+    }
+
+    private var routingIdentifier: String {
+        switch routing {
+        case .direct:
+            return "direct"
+        case .proxy(let chain):
+            return "proxy:\(chain)"
+        case .reject:
+            return "reject"
+        case .unknown:
+            return "unknown"
+        }
+    }
+
+    static func snapshotKey(routing: ProcessRoutingType) -> String {
+        switch routing {
+        case .direct:
+            return "route:direct"
+        case .proxy(let chain):
+            return "route:proxy:\(chain)"
+        case .reject:
+            return "route:reject"
+        case .unknown:
+            return "route:unknown"
+        }
+    }
 }
 

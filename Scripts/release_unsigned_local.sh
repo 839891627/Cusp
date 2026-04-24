@@ -53,7 +53,7 @@ echo "==> Writing checksums"
 cat > "$NOTES_PATH" <<'EOF'
 This package is unsigned and not notarized.
 On user machines, Gatekeeper may block launch until manually approved.
-Because this app includes Network Extension functionality, some capabilities may not work correctly without proper signing/entitlements.
+Because this app modifies system proxy settings, macOS may still prompt for permission in some environments.
 EOF
 
 echo "==> Done"

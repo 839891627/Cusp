@@ -2,6 +2,7 @@ import SwiftUI
 
 enum AppSection: String, CaseIterable, Identifiable {
     case overview
+    case processes
     case nodes
     case rules
     case subscriptions
@@ -14,6 +15,8 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .overview:
             return language == .simplifiedChinese ? "总览" : "Overview"
+        case .processes:
+            return language == .simplifiedChinese ? "连接路由" : "Routes"
         case .nodes:
             return language == .simplifiedChinese ? "策略" : "Strategy"
         case .rules:
@@ -31,6 +34,8 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .overview:
             return language == .simplifiedChinese ? "连接与运行时摘要" : "Connection and runtime summary"
+        case .processes:
+            return language == .simplifiedChinese ? "连接路由管理" : "Connection routing management"
         case .nodes:
             return language == .simplifiedChinese ? "浏览并切换策略与节点" : "Browse and switch strategies"
         case .rules:
@@ -48,6 +53,8 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .overview:
             return "square.grid.2x2"
+        case .processes:
+            return "list.bullet.rectangle.portrait"
         case .nodes:
             return "point.3.connected.trianglepath.dotted"
         case .rules:

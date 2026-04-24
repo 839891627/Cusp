@@ -7,7 +7,7 @@ final class EntitlementsInspectorTests: XCTestCase {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let fileURL = directory.appendingPathComponent("CuspTunnel.entitlements")
+        let fileURL = directory.appendingPathComponent("sample.entitlements")
         let plist = """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -29,7 +29,7 @@ final class EntitlementsInspectorTests: XCTestCase {
         let entitlements = try EntitlementsInspector.load(from: fileURL)
 
         XCTAssertEqual(entitlements.appGroups, ["group.dev.cusp"])
-        XCTAssertTrue(entitlements.supportsPacketTunnel)
+        XCTAssertTrue(entitlements.hasNetworkExtensionEntitlement)
     }
 
     func testReturnsEmptyEntitlementsWhenFileMissing() throws {
@@ -38,6 +38,6 @@ final class EntitlementsInspectorTests: XCTestCase {
         )
 
         XCTAssertTrue(entitlements.appGroups.isEmpty)
-        XCTAssertFalse(entitlements.supportsPacketTunnel)
+        XCTAssertFalse(entitlements.hasNetworkExtensionEntitlement)
     }
 }

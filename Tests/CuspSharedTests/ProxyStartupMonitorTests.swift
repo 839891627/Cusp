@@ -58,4 +58,60 @@ final class ProxyStartupMonitorTests: XCTestCase {
             )
         )
     }
+
+    func testThrowsProcessExitedWithDiagnosticsBeforeTimeoutAsync() async {
+        do {
+            try await ProxyStartupMonitor.waitUntilReadyAsync(
+                host: "127.0.0.1",
+                port: 1086,
+                timeoutInterval: 1,
+                pollInterval: 0.01,
+                isListening: { false },
+                isProcessRunning: { false },
+                diagnostics: { "MMDB invalid, remove and download" }
+            )
+            XCTFail("Expected async process exited error.")
+        } catch {
+            XCTAssertEqual(
+                error as? ProxyStartupMonitor.Error,
+                .processExited("MMDB invalid, remove and download")
+            )
+        }
+    }
+
+    func testThrowsTimedOutWithDiagnosticsWhenProcessStaysAliveAsync() async {
+        do {
+            try await ProxyStartupMonitor.waitUntilReadyAsync(
+                host: "127.0.0.1",
+                port: 1086,
+                timeoutInterval: 0.05,
+                pollInterval: 0.01,
+                isListening: { false },
+                isProcessRunning: { true },
+                diagnostics: { "Still warming geodata" }
+            )
+            XCTFail("Expected async timeout error.")
+        } catch {
+            XCTAssertEqual(
+                error as? ProxyStartupMonitor.Error,
+                .timedOut("127.0.0.1", 1086, "Still warming geodata")
+            )
+        }
+    }
+
+    func testReturnsWhenPortBecomesReadyBeforeTimeoutAsync() async throws {
+        let readyAt = Date().addingTimeInterval(0.03)
+
+        try await ProxyStartupMonitor.waitUntilReadyAsync(
+            host: "127.0.0.1",
+            port: 1086,
+            timeoutInterval: 0.2,
+            pollInterval: 0.01,
+            isListening: {
+                Date() >= readyAt
+            },
+            isProcessRunning: { true },
+            diagnostics: { "" }
+        )
+    }
 }

@@ -60,6 +60,17 @@ final class AppViewModel: ObservableObject {
             configureAutoRefreshTask()
         }
     }
+    @Published var selectedRuntimeFSMLogAggregationWindow: RuntimeFSMLogAggregationWindow = .fiveSeconds {
+        didSet {
+            guard selectedRuntimeFSMLogAggregationWindow != oldValue else {
+                return
+            }
+            UserDefaults.standard.set(selectedRuntimeFSMLogAggregationWindow.rawValue, forKey: Self.runtimeFSMLogAggregationWindowKey)
+            if selectedRuntimeFSMLogAggregationWindow.seconds == nil {
+                flushRuntimeFSMRejectedAggregationIfNeeded(force: true, referenceDate: Date())
+            }
+        }
+    }
     @Published var sourceGroupAliases: [String: String] = [:] {
         didSet {
             guard sourceGroupAliases != oldValue else {
@@ -171,7 +182,8 @@ final class AppViewModel: ObservableObject {
     @Published var sessionDownloadText = "0 B"
     @Published var todayTotalText = "0 B"
     @Published var monthlyTotalText = "0 B"
-    @Published private(set) var trafficSamples: [TrafficSample] = []
+    @Published var trafficSamples: [TrafficSample] = []
+    @Published var processTrafficEntries: [ProcessTrafficEntry] = []
     @Published var lastActionMessage: String? {
         didSet {
             guard lastActionMessage != oldValue else {
@@ -200,27 +212,40 @@ final class AppViewModel: ObservableObject {
     let proxyService: LocalProxyManagerService
     private let credentialStore: SecureCredentialStore
     private var hasBootstrapped = false
-    private var metricsRefreshTask: Task<Void, Never>?
+    var metricsRefreshTask: Task<Void, Never>?
     var autoRefreshTask: Task<Void, Never>?
-    private var trafficRefreshTask: Task<Void, Never>?
+    var trafficRefreshTask: Task<Void, Never>?
     private var externalVPNMonitorTask: Task<Void, Never>?
     private var proxyPreparationError: String?
-    private var lastTrafficSnapshot: NetworkByteSnapshot?
-    private var sessionUploadBytes: UInt64 = 0
-    private var sessionDownloadBytes: UInt64 = 0
-    private var todayTotalBytes: UInt64 = 0
-    private var monthlyTotalBytes: UInt64 = 0
+    var lastTrafficSnapshot: NetworkByteSnapshot?
+    var sessionUploadBytes: UInt64 = 0
+    var sessionDownloadBytes: UInt64 = 0
+    var todayTotalBytes: UInt64 = 0
+    var monthlyTotalBytes: UInt64 = 0
     private var lowTrafficNotifiedSourceIDs: Set<String> = []
-    private var lastExternalVPNAutoDisconnectAt: Date?
-    private var lastAutoFailoverAt: Date?
+    var lastExternalVPNAutoDisconnectAt: Date?
+    var lastAutoFailoverAt: Date?
+    var trafficRefreshTick = 0
+    var lastProcessTrafficSnapshot: [String: ProcessByteSnapshot] = [:]
+    var lastProcessTrafficRefreshedAt: Date?
+    var lastTrafficPersistenceAt: Date?
+    var lastPublicIPFetchAt: Date?
+    var cachedPublicIPText: String = "--"
     private var keychainValueCache: [String: String] = [:]
     private var keychainMisses: Set<String> = []
-    private let autoFailoverCooldown: TimeInterval = 30
+    private var runtimeFSMRejectedAggregation: RuntimeFSMRejectedAggregation?
+    let autoFailoverCooldown: TimeInterval = 30
+    let trafficPersistenceInterval: TimeInterval = 15
+    let connectedMetricsRefreshIntervalNanoseconds: UInt64 = 20_000_000_000
+    let disconnectedMetricsRefreshIntervalNanoseconds: UInt64 = 60_000_000_000
+    let connectedPublicIPRefreshInterval: TimeInterval = 90
+    let disconnectedPublicIPRefreshInterval: TimeInterval = 300
     private let maxLogEntryCount = 500
-    private let maxTrafficSamples = 10
+    let maxTrafficSamples = 10
     static let defaultRuntimeProxyGroupName = "Cusp"
     private static let selectedLanguageKey = "Cusp.selectedLanguage"
     private static let subscriptionRefreshIntervalKey = "Cusp.subscriptionRefreshInterval"
+    private static let runtimeFSMLogAggregationWindowKey = "Cusp.runtimeFSMLogAggregationWindow"
     private static let sourceGroupAliasesKey = "Cusp.sourceGroupAliases"
     private static let sourceGroupOrderKey = "Cusp.sourceGroupOrder"
     private static let strategyGroupPoliciesKey = "Cusp.strategyGroupPolicies"
@@ -232,11 +257,11 @@ final class AppViewModel: ObservableObject {
     static let restoreConnectionOnLaunchKey = "Cusp.restoreConnectionOnLaunchEnabled"
     static let notificationEnabledKey = "Cusp.notificationEnabled"
     static let disconnectWhenOtherVPNActiveKey = "Cusp.disconnectWhenOtherVPNActiveEnabled"
-    private static let wasConnectedOnExitKey = "Cusp.wasConnectedOnExit"
-    private static let todayTrafficDateKey = "Cusp.todayTrafficDate"
-    private static let monthlyTrafficTagKey = "Cusp.monthlyTrafficTag"
-    private static let todayTrafficBytesKey = "Cusp.todayTrafficBytes"
-    private static let monthlyTrafficBytesKey = "Cusp.monthlyTrafficBytes"
+    static let wasConnectedOnExitKey = "Cusp.wasConnectedOnExit"
+    static let todayTrafficDateKey = "Cusp.todayTrafficDate"
+    static let monthlyTrafficTagKey = "Cusp.monthlyTrafficTag"
+    static let todayTrafficBytesKey = "Cusp.todayTrafficBytes"
+    static let monthlyTrafficBytesKey = "Cusp.monthlyTrafficBytes"
     private static let lowTrafficNotifiedSourceIDsKey = "Cusp.lowTrafficNotifiedSourceIDs"
     private static let strategyGroupSwitchRecordsKey = "Cusp.strategyGroupSwitchRecords"
     static let didSeedDefaultStrategyGroupsKey = "Cusp.didSeedDefaultStrategyGroups"
@@ -255,6 +280,8 @@ final class AppViewModel: ObservableObject {
         self.selectedLanguage = AppLanguage(rawValue: savedLanguage) ?? .english
         let savedRefreshInterval = UserDefaults.standard.string(forKey: Self.subscriptionRefreshIntervalKey) ?? ""
         self.selectedSubscriptionRefreshInterval = SubscriptionRefreshInterval(rawValue: savedRefreshInterval) ?? .manual
+        let savedRuntimeFSMWindow = UserDefaults.standard.string(forKey: Self.runtimeFSMLogAggregationWindowKey) ?? ""
+        self.selectedRuntimeFSMLogAggregationWindow = RuntimeFSMLogAggregationWindow(rawValue: savedRuntimeFSMWindow) ?? .fiveSeconds
         self.sourceGroupAliases = UserDefaults.standard.dictionary(forKey: Self.sourceGroupAliasesKey) as? [String: String] ?? [:]
         self.sourceGroupOrder = UserDefaults.standard.stringArray(forKey: Self.sourceGroupOrderKey) ?? []
         self.strategyGroupPolicies = UserDefaults.standard.dictionary(forKey: Self.strategyGroupPoliciesKey) as? [String: String] ?? [:]
@@ -286,6 +313,9 @@ final class AppViewModel: ObservableObject {
         self.proxyService.statusDidChange = { [weak self] state in
             self?.connectionState = state
         }
+        self.proxyService.transitionDidOccur = { [weak self] event in
+            self?.handleRuntimeFSMEvent(event)
+        }
     }
 
     deinit {
@@ -311,7 +341,7 @@ final class AppViewModel: ObservableObject {
         }
 
         do {
-            try proxyService.prepare()
+            try await proxyService.prepare()
             proxyPreparationError = nil
         } catch {
             proxyPreparationError = friendlyProxyPreparationError(error)
@@ -348,7 +378,7 @@ final class AppViewModel: ObservableObject {
                 }
 
                 if connectionState == .connected || connectionState == .connecting {
-                    try proxyService.stop()
+                    try await proxyService.stop()
                     lastActionMessage = "System proxy disabled."
                     UserDefaults.standard.set(false, forKey: Self.wasConnectedOnExitKey)
                     sendNotificationIfNeeded(
@@ -367,7 +397,7 @@ final class AppViewModel: ObservableObject {
                         lastErrorMessage = "Save a valid ss:// node before connecting."
                         return
                     }
-                    try proxyService.start(
+                    try await proxyService.start(
                         with: activeConfiguration,
                         allConfigurations: runtimeConfigurationCandidates(),
                         mode: selectedRuntimeMode,
@@ -394,6 +424,32 @@ final class AppViewModel: ObservableObject {
                     body: error.localizedDescription
                 )
             }
+        }
+    }
+
+    func disconnectBeforeQuitIfNeeded() async {
+        persistTrafficCountersIfNeeded(force: true)
+        guard connectionState == .connected || connectionState == .connecting else {
+            return
+        }
+
+        do {
+            isApplyingRuntimeChange = true
+            runtimeActivityMessage = "Disconnecting proxy runtime..."
+            defer {
+                isApplyingRuntimeChange = false
+                runtimeActivityMessage = nil
+            }
+
+            try await proxyService.stop()
+            UserDefaults.standard.set(false, forKey: Self.wasConnectedOnExitKey)
+            lastActionMessage = "System proxy disabled."
+            lastErrorMessage = nil
+            refreshReadiness()
+            await refreshOverviewMetrics()
+        } catch {
+            lastActionMessage = nil
+            lastErrorMessage = error.localizedDescription
         }
     }
 
@@ -466,8 +522,8 @@ final class AppViewModel: ObservableObject {
                     runtimeActivityMessage = nil
                 }
 
-                try proxyService.stop()
-                try proxyService.start(
+                try await proxyService.stop()
+                try await proxyService.start(
                     with: activeConfiguration,
                     allConfigurations: runtimeConfigurationCandidates(),
                     mode: mode,
@@ -501,6 +557,7 @@ final class AppViewModel: ObservableObject {
         monthlyTotalText = "0 B"
         UserDefaults.standard.set(0, forKey: Self.todayTrafficBytesKey)
         UserDefaults.standard.set(0, forKey: Self.monthlyTrafficBytesKey)
+        persistTrafficCountersIfNeeded(force: true)
         lastActionMessage = selectedLanguage == .simplifiedChinese ? "已重置流量统计。" : "Traffic statistics reset."
         lastErrorMessage = nil
     }
@@ -579,150 +636,6 @@ final class AppViewModel: ObservableObject {
 
     func clearLogs() {
         logEntries.removeAll()
-    }
-
-    private func startMetricsRefreshLoop() {
-        metricsRefreshTask?.cancel()
-        metricsRefreshTask = Task { [weak self] in
-            while let self, !Task.isCancelled {
-                await self.refreshOverviewMetrics()
-                try? await Task.sleep(nanoseconds: 20_000_000_000)
-            }
-        }
-    }
-
-    func refreshOverviewMetrics() async {
-        let currentConfiguration = activeConfiguration
-        async let ipResult = fetchPublicIPAddress()
-        async let latencyResult: (String, NodeLatencyProbe.ProbeResult?) = {
-            guard let currentConfiguration else {
-                return ("-- ms", nil)
-            }
-            let probeResult = await NodeLatencyProbe.measureLatency(
-                host: currentConfiguration.host,
-                port: currentConfiguration.port
-            )
-            if let latency = probeResult.latencyMs {
-                return ("\(latency) ms", probeResult)
-            }
-            return (probeResult.status == .timeout ? "Timeout" : "-- ms", probeResult)
-        }()
-
-        let (ipText, latencyPayload) = await (ipResult, latencyResult)
-        let (latencyValue, probeResult) = latencyPayload
-        latencyText = latencyValue
-        ipAddressText = ipText
-
-        if let currentConfiguration, let probeResult {
-            updateProbeResult(for: currentConfiguration.stableID, result: probeResult)
-            handleAutoFailoverIfNeeded(currentConfiguration: currentConfiguration, probeResult: probeResult)
-        }
-    }
-
-    private func updateProbeResult(for stableID: String, result: NodeLatencyProbe.ProbeResult) {
-        guard let index = catalogNodes.firstIndex(where: { $0.stableID == stableID }) else {
-            return
-        }
-
-        let existing = catalogNodes[index]
-        let resolvedLatency: Int?
-        if result.status == .success, existing.latestLatencyMs != nil {
-            // Keep list-card latency stable (typically from full speed test), and
-            // only refresh status for periodic active-node probes.
-            resolvedLatency = existing.latestLatencyMs
-        } else {
-            resolvedLatency = result.latencyMs
-        }
-
-        if existing.latestLatencyMs == resolvedLatency, existing.probeStatus == result.status {
-            return
-        }
-
-        catalogNodes[index] = CatalogNode(
-            configuration: existing.configuration,
-            sourceID: existing.sourceID,
-            latestLatencyMs: resolvedLatency,
-            lastProbeAt: Date(),
-            probeStatus: result.status
-        )
-        persistCurrentSubscriptionCatalog()
-    }
-
-    private func handleAutoFailoverIfNeeded(
-        currentConfiguration: ShadowsocksConfiguration,
-        probeResult: NodeLatencyProbe.ProbeResult
-    ) {
-        guard connectionState == .connected, !isApplyingRuntimeChange else {
-            return
-        }
-        guard probeResult.status == .failure || probeResult.status == .timeout else {
-            return
-        }
-        guard
-            let activeCustomGroup = activeCustomStrategyGroup(),
-            activeCustomGroup.type == .fallback,
-            normalizedMihomoGroupName(activeCustomGroup.name) == activeRuntimeProxyGroupName,
-            let currentNode = catalogNodes.first(where: { $0.stableID == currentConfiguration.stableID }),
-            currentNode.sourceID == activeCustomGroup.sourceID
-        else {
-            return
-        }
-
-        if let lastAutoFailoverAt, Date().timeIntervalSince(lastAutoFailoverAt) < autoFailoverCooldown {
-            return
-        }
-
-        let sameGroupNodes = catalogNodes
-            .filter { $0.sourceID == activeCustomGroup.sourceID && $0.stableID != currentNode.stableID }
-        guard let candidate = preferredNode(in: sameGroupNodes, policy: .fallback) else {
-            return
-        }
-        guard candidate.stableID != currentNode.stableID else {
-            return
-        }
-
-        lastAutoFailoverAt = Date()
-        selectConfiguration(id: candidate.stableID)
-        markStrategyGroupSwitched(id: activeCustomGroup.id, source: .autoFailover, at: lastAutoFailoverAt ?? Date())
-        let groupName = activeCustomGroup.name
-        lastActionMessage = selectedLanguage == .simplifiedChinese
-            ? "检测到节点不可用，已按策略组「\(groupName)」自动切换。"
-            : "Detected node failure and auto-switched by strategy group \"\(groupName)\"."
-    }
-
-    private func fetchPublicIPAddress() async -> String {
-        let endpoints = [
-            "https://api.ipify.org",
-            "https://ipv4.icanhazip.com",
-            "https://ifconfig.me/ip"
-        ]
-
-        for endpoint in endpoints {
-            guard let url = URL(string: endpoint) else {
-                continue
-            }
-
-            var request = URLRequest(url: url)
-            request.timeoutInterval = 6
-            request.cachePolicy = .reloadIgnoringLocalCacheData
-            request.setValue("Cusp/1.0", forHTTPHeaderField: "User-Agent")
-
-            do {
-                let (data, response) = try await URLSession.shared.data(for: request)
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                    continue
-                }
-                let value = String(decoding: data, as: UTF8.self)
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                if !value.isEmpty {
-                    return value
-                }
-            } catch {
-                continue
-            }
-        }
-
-        return "--"
     }
 
     func refreshReadiness() {
@@ -1149,6 +1062,74 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    private struct RuntimeFSMRejectedAggregation {
+        let signature: String
+        let baseMessage: String
+        let firstAt: Date
+        var lastAt: Date
+        var count: Int
+    }
+
+    private func handleRuntimeFSMEvent(_ event: LocalProxyManagerService.RuntimeTransitionEvent) {
+        guard let aggregationWindow = selectedRuntimeFSMLogAggregationWindow.seconds else {
+            flushRuntimeFSMRejectedAggregationIfNeeded(force: true, referenceDate: event.timestamp)
+            appendLog(
+                level: event.accepted ? .info : .error,
+                category: "RuntimeFSM",
+                message: event.logLine
+            )
+            return
+        }
+
+        if event.accepted {
+            flushRuntimeFSMRejectedAggregationIfNeeded(force: true, referenceDate: event.timestamp)
+            appendLog(level: .info, category: "RuntimeFSM", message: event.logLine)
+            return
+        }
+
+        let signature = "\(event.from.rawValue)->\(event.to.rawValue)|\(event.reason)"
+        if var aggregated = runtimeFSMRejectedAggregation {
+            let inSameWindow = event.timestamp.timeIntervalSince(aggregated.firstAt) <= aggregationWindow
+            if aggregated.signature == signature, inSameWindow {
+                aggregated.count += 1
+                aggregated.lastAt = event.timestamp
+                runtimeFSMRejectedAggregation = aggregated
+                return
+            }
+            flushRuntimeFSMRejectedAggregationIfNeeded(force: true, referenceDate: event.timestamp)
+        }
+
+        runtimeFSMRejectedAggregation = RuntimeFSMRejectedAggregation(
+            signature: signature,
+            baseMessage: event.logLine,
+            firstAt: event.timestamp,
+            lastAt: event.timestamp,
+            count: 1
+        )
+        appendLog(level: .error, category: "RuntimeFSM", message: event.logLine)
+    }
+
+    private func flushRuntimeFSMRejectedAggregationIfNeeded(force: Bool, referenceDate: Date) {
+        guard let aggregated = runtimeFSMRejectedAggregation else {
+            return
+        }
+        let aggregationWindow = selectedRuntimeFSMLogAggregationWindow.seconds ?? 0
+        let windowElapsed = referenceDate.timeIntervalSince(aggregated.firstAt) > aggregationWindow
+        guard force || windowElapsed else {
+            return
+        }
+
+        if aggregated.count > 1 {
+            let duplicates = aggregated.count - 1
+            appendLog(
+                level: .error,
+                category: "RuntimeFSM",
+                message: "Repeated \(duplicates)x within \(Int(aggregationWindow))s: \(aggregated.baseMessage)"
+            )
+        }
+        runtimeFSMRejectedAggregation = nil
+    }
+
     func syncStrategyGroupPreferences() {
         let sourceIDs = subscriptionSources.map(\.id)
         let sourceIDSet = Set(sourceIDs)
@@ -1239,8 +1220,8 @@ final class AppViewModel: ObservableObject {
         }
         Task {
             do {
-                try proxyService.stop()
-                try proxyService.start(
+                try await proxyService.stop()
+                try await proxyService.start(
                     with: activeConfiguration,
                     allConfigurations: runtimeConfigurationCandidates(),
                     mode: selectedRuntimeMode,
@@ -1255,16 +1236,6 @@ final class AppViewModel: ObservableObject {
             } catch {
                 lastActionMessage = nil
                 lastErrorMessage = error.localizedDescription
-            }
-        }
-    }
-
-    private func startTrafficRefreshLoop() {
-        trafficRefreshTask?.cancel()
-        trafficRefreshTask = Task { [weak self] in
-            while let self, !Task.isCancelled {
-                await self.refreshTrafficMetrics()
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
             }
         }
     }
@@ -1286,7 +1257,7 @@ final class AppViewModel: ObservableObject {
         guard connectionState == .connected else {
             return
         }
-        guard externalVPNLooksActive() else {
+        guard await externalVPNLooksActive() else {
             return
         }
         if let last = lastExternalVPNAutoDisconnectAt, Date().timeIntervalSince(last) < 15 {
@@ -1295,7 +1266,7 @@ final class AppViewModel: ObservableObject {
 
         lastExternalVPNAutoDisconnectAt = Date()
         do {
-            try proxyService.stop()
+            try await proxyService.stop()
             lastActionMessage = selectedLanguage == .simplifiedChinese
                 ? "检测到其他 VPN 已连接，Cusp 已自动断开。"
                 : "Detected another active VPN. Cusp disconnected automatically."
@@ -1311,144 +1282,31 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    private func externalVPNLooksActive() -> Bool {
-        let process = Process()
-        let stdout = Pipe()
-        process.executableURL = URL(fileURLWithPath: "/usr/sbin/scutil")
-        process.arguments = ["--nwi"]
-        process.standardOutput = stdout
-        process.standardError = Pipe()
+    private func externalVPNLooksActive() async -> Bool {
+        await Task.detached(priority: .utility) {
+            let process = Process()
+            let stdout = Pipe()
+            process.executableURL = URL(fileURLWithPath: "/usr/sbin/scutil")
+            process.arguments = ["--nwi"]
+            process.standardOutput = stdout
+            process.standardError = Pipe()
 
-        do {
-            try process.run()
-        } catch {
-            return false
-        }
-
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
-            return false
-        }
-
-        let output = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
-            .lowercased() ?? ""
-        return output.contains("utun") || output.contains("ipsec")
-    }
-
-    private func refreshTrafficMetrics() async {
-        normalizeTrafficCountersIfNeeded()
-        guard let current = currentNetworkByteSnapshot() else {
-            return
-        }
-
-        defer {
-            lastTrafficSnapshot = current
-        }
-
-        guard let previous = lastTrafficSnapshot else {
-            lastTrafficSnapshot = current
-            return
-        }
-
-        let deltaSeconds = max(0.001, current.timestamp.timeIntervalSince(previous.timestamp))
-        let uploadDelta = current.uploadBytes >= previous.uploadBytes ? current.uploadBytes - previous.uploadBytes : 0
-        let downloadDelta = current.downloadBytes >= previous.downloadBytes ? current.downloadBytes - previous.downloadBytes : 0
-
-        let uploadRate = Double(uploadDelta) / deltaSeconds
-        let downloadRate = Double(downloadDelta) / deltaSeconds
-        uploadRateText = Self.rateFormatter(bytesPerSecond: uploadRate)
-        downloadRateText = Self.rateFormatter(bytesPerSecond: downloadRate)
-
-        guard connectionState == .connected || connectionState == .connecting else {
-            return
-        }
-
-        sessionUploadBytes += uploadDelta
-        sessionDownloadBytes += downloadDelta
-        todayTotalBytes += uploadDelta + downloadDelta
-        monthlyTotalBytes += uploadDelta + downloadDelta
-
-        sessionUploadText = Self.byteFormatter.string(fromByteCount: Int64(sessionUploadBytes))
-        sessionDownloadText = Self.byteFormatter.string(fromByteCount: Int64(sessionDownloadBytes))
-        todayTotalText = Self.byteFormatter.string(fromByteCount: Int64(todayTotalBytes))
-        monthlyTotalText = Self.byteFormatter.string(fromByteCount: Int64(monthlyTotalBytes))
-
-        UserDefaults.standard.set(Int(todayTotalBytes), forKey: Self.todayTrafficBytesKey)
-        UserDefaults.standard.set(Int(monthlyTotalBytes), forKey: Self.monthlyTrafficBytesKey)
-
-        trafficSamples.append(
-            TrafficSample(
-                uploadBytesPerSecond: uploadRate,
-                downloadBytesPerSecond: downloadRate
-            )
-        )
-        if trafficSamples.count > maxTrafficSamples {
-            trafficSamples.removeFirst(trafficSamples.count - maxTrafficSamples)
-        }
-    }
-
-    private func currentNetworkByteSnapshot() -> NetworkByteSnapshot? {
-        var ifaddr: UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else {
-            return nil
-        }
-
-        defer { freeifaddrs(ifaddr) }
-
-        var sent: UInt64 = 0
-        var received: UInt64 = 0
-        var pointer = firstAddr
-        while true {
-            let interface = pointer.pointee
-            let flags = Int32(interface.ifa_flags)
-            let isUp = (flags & IFF_UP) != 0
-            let isLoopback = (flags & IFF_LOOPBACK) != 0
-            if isUp && !isLoopback,
-               interface.ifa_addr?.pointee.sa_family == UInt8(AF_LINK),
-               let data = interface.ifa_data?.assumingMemoryBound(to: if_data.self) {
-                sent += UInt64(data.pointee.ifi_obytes)
-                received += UInt64(data.pointee.ifi_ibytes)
+            do {
+                try process.run()
+            } catch {
+                return false
             }
-            guard let next = interface.ifa_next else {
-                break
+
+            process.waitUntilExit()
+            guard process.terminationStatus == 0 else {
+                return false
             }
-            pointer = next
+
+            let output = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
+                .lowercased() ?? ""
+            return output.contains("utun") || output.contains("ipsec")
         }
-
-        return NetworkByteSnapshot(timestamp: Date(), uploadBytes: sent, downloadBytes: received)
-    }
-
-    private func resetSessionTraffic() {
-        sessionUploadBytes = 0
-        sessionDownloadBytes = 0
-        sessionUploadText = "0 B"
-        sessionDownloadText = "0 B"
-        trafficSamples = []
-    }
-
-    private func normalizeTrafficCountersIfNeeded() {
-        let now = Date()
-        let dateFormatter = Self.dayFormatter
-        let monthFormatter = Self.monthFormatter
-        let todayTag = dateFormatter.string(from: now)
-        let monthTag = monthFormatter.string(from: now)
-
-        let savedTodayTag = UserDefaults.standard.string(forKey: Self.todayTrafficDateKey) ?? todayTag
-        let savedMonthTag = UserDefaults.standard.string(forKey: Self.monthlyTrafficTagKey) ?? monthTag
-
-        if savedTodayTag != todayTag {
-            todayTotalBytes = 0
-            UserDefaults.standard.set(0, forKey: Self.todayTrafficBytesKey)
-        }
-        if savedMonthTag != monthTag {
-            monthlyTotalBytes = 0
-            UserDefaults.standard.set(0, forKey: Self.monthlyTrafficBytesKey)
-        }
-
-        UserDefaults.standard.set(todayTag, forKey: Self.todayTrafficDateKey)
-        UserDefaults.standard.set(monthTag, forKey: Self.monthlyTrafficTagKey)
-        todayTotalText = Self.byteFormatter.string(fromByteCount: Int64(todayTotalBytes))
-        monthlyTotalText = Self.byteFormatter.string(fromByteCount: Int64(monthlyTotalBytes))
+        .value
     }
 
     func notifyIfLowRemainingTraffic() {
@@ -1479,7 +1337,7 @@ final class AppViewModel: ObservableObject {
         return formatter
     }()
 
-    private static let byteFormatter: ByteCountFormatter = {
+    static let byteFormatter: ByteCountFormatter = {
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
         formatter.countStyle = .binary
@@ -1488,23 +1346,28 @@ final class AppViewModel: ObservableObject {
         return formatter
     }()
 
-    private static func rateFormatter(bytesPerSecond: Double) -> String {
+    static func rateFormatter(bytesPerSecond: Double) -> String {
         let clamped = max(0, bytesPerSecond)
         let amount = byteFormatter.string(fromByteCount: Int64(clamped))
         return "\(amount)/s"
     }
 
-    private static let dayFormatter: DateFormatter = {
+    static let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
 
-    private static let monthFormatter: DateFormatter = {
+    static let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM"
         return formatter
     }()
+
+    struct ProcessByteSnapshot {
+        let uploadBytes: UInt64
+        let downloadBytes: UInt64
+    }
 
     private static func loadStrategyGroupSwitchRecords() -> [String: StrategyGroupSwitchRecord] {
         guard let data = UserDefaults.standard.data(forKey: Self.strategyGroupSwitchRecordsKey) else {

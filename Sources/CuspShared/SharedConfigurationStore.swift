@@ -30,7 +30,10 @@ public final class SharedConfigurationStore {
         userDefaults.set(data, forKey: CuspConstants.sharedNodeCatalogKey)
         userDefaults.set(catalog.selectedNodeID, forKey: CuspConstants.selectedNodeIDKey)
 
-        if let firstNode = catalog.nodes.first {
+        if let selectedID = catalog.selectedNodeID,
+           let selectedNode = catalog.nodes.first(where: { $0.stableID == selectedID }) {
+            try save(selectedNode)
+        } else if let firstNode = catalog.nodes.first {
             try save(firstNode)
         } else {
             clear()
@@ -43,7 +46,10 @@ public final class SharedConfigurationStore {
         userDefaults.set(catalog.selectedNodeID, forKey: CuspConstants.selectedNodeIDKey)
         userDefaults.set(catalog.selectedMode.rawValue, forKey: CuspConstants.selectedModeKey)
 
-        if let firstNode = catalog.nodes.first {
+        if let selectedID = catalog.selectedNodeID,
+           let selectedNode = catalog.nodes.first(where: { $0.stableID == selectedID }) {
+            try save(selectedNode.configuration)
+        } else if let firstNode = catalog.nodes.first {
             try save(firstNode.configuration)
         }
     }

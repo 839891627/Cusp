@@ -10,12 +10,11 @@ This folder is a local runtime placeholder.
 
 ## Local setup
 
-Place a prebuilt executable named `mihomo` in this folder before running the
-Packet Tunnel target on a signed machine.
+Place a prebuilt executable named `mihomo` in this folder before running the app.
 
-Expected runtime path inside the extension bundle:
+Expected runtime path inside the app bundle:
 
-`CuspTunnel.appex/Contents/Resources/mihomo`
+`Cusp.app/Contents/Resources/mihomo`
 
 Set executable bit:
 
