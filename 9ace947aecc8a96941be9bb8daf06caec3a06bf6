@@ -1,0 +1,28 @@
+Docs/UI-Redesign-AI-Brief.md
+  cdde49b7acbacdc8 1-134
+Docs/UXPilot-Export-Triage.md
+  cdde49b7acbacdc8 1-50
+Docs/UI-Redesign-Phase2-AI-Prompt.md
+  cdde49b7acbacdc8 1-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "9ace947aecc8a96941be9bb8daf06caec3a06bf6",
+  "prompts": {
+    "cdde49b7acbacdc8": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "24b9984e-0d26-4a8e-ae46-32ea33787a1f",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "jinliang.cao",
+      "messages": [],
+      "total_additions": 285,
+      "total_deletions": 0,
+      "accepted_lines": 285,
+      "overriden_lines": 0,
+      "messages_url": "https://codeaiapi.xinfei-inc.cn/cas/29711ae783b4f184749cc8b0fa1dd6a3195f58c2024127558951297a400ec923"
+    }
+  }
+}
