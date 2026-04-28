@@ -101,7 +101,9 @@ If you need to upgrade or replace it, keep the version and checksum records in `
 ## Security & Open Source Notes
 
 See `/Docs/Open-Source-Risk-Assessment.md` for risk analysis and release checklist.
-See `/Docs/Release-Guide.md` for CI release packaging and notarization setup.
+See `/Docs/Release-Guide.md` for unsigned release packaging.
+See `/Docs/Unsigned-Install-Guide.md` for unsigned install/troubleshooting steps.
+See `/Docs/UI-Terminology.md` for EN/zh-Hans UI terminology alignment.
 
 ## Governance Files
 

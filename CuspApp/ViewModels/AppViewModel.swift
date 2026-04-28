@@ -184,6 +184,7 @@ final class AppViewModel: ObservableObject {
     @Published var monthlyTotalText = "0 B"
     @Published var trafficSamples: [TrafficSample] = []
     @Published var processTrafficEntries: [ProcessTrafficEntry] = []
+    @Published private(set) var residualSystemProxyServices: [String] = []
     @Published var lastActionMessage: String? {
         didSet {
             guard lastActionMessage != oldValue else {
@@ -343,6 +344,10 @@ final class AppViewModel: ObservableObject {
         do {
             try await proxyService.prepare()
             proxyPreparationError = nil
+            residualSystemProxyServices = proxyService.residualSystemProxyServices
+            if !residualSystemProxyServices.isEmpty {
+                lastErrorMessage = residualProxyWarningMessage
+            }
         } catch {
             proxyPreparationError = friendlyProxyPreparationError(error)
             lastErrorMessage = proxyPreparationError
@@ -621,6 +626,58 @@ final class AppViewModel: ObservableObject {
         lastErrorMessage = nil
     }
 
+    func openUnsignedInstallGuide() {
+        let fileManager = FileManager.default
+        let localCandidates = [
+            Bundle.main.url(forResource: "Unsigned-Install-Guide", withExtension: "md"),
+            Bundle.main.resourceURL?.appendingPathComponent("Docs/Unsigned-Install-Guide.md"),
+            locateProjectRoot()?.appendingPathComponent("Docs/Unsigned-Install-Guide.md")
+        ]
+        .compactMap { $0 }
+
+        for url in localCandidates where fileManager.fileExists(atPath: url.path) {
+            if NSWorkspace.shared.open(url) {
+                lastActionMessage = selectedLanguage == .simplifiedChinese
+                    ? "已打开无签名安装排障指南。"
+                    : "Opened the unsigned install troubleshooting guide."
+                lastErrorMessage = nil
+                return
+            }
+        }
+
+        if let webURL = URL(string: "https://github.com/arvincjl/Cusp/blob/main/Docs/Unsigned-Install-Guide.md"),
+           NSWorkspace.shared.open(webURL) {
+            lastActionMessage = selectedLanguage == .simplifiedChinese
+                ? "已打开无签名安装排障指南。"
+                : "Opened the unsigned install troubleshooting guide."
+            lastErrorMessage = nil
+            return
+        }
+
+        lastActionMessage = nil
+        lastErrorMessage = selectedLanguage == .simplifiedChinese
+            ? "无法打开安装排障指南。"
+            : "Unable to open the install troubleshooting guide."
+    }
+
+    func restoreResidualSystemProxySettings() {
+        Task {
+            do {
+                try await proxyService.restoreResidualSystemProxySettings()
+                residualSystemProxyServices = proxyService.residualSystemProxyServices
+                lastActionMessage = selectedLanguage == .simplifiedChinese
+                    ? "已恢复 Cusp 残留的系统代理设置。"
+                    : "Restored residual Cusp system proxy settings."
+                lastErrorMessage = nil
+                refreshReadiness()
+                await refreshOverviewMetrics()
+            } catch {
+                lastActionMessage = nil
+                lastErrorMessage = friendlyProxyPreparationError(error)
+            }
+        }
+    }
+
     func copyLogsToClipboard() {
         let exportText = buildLogsExportText()
         guard !exportText.isEmpty else {
@@ -639,18 +696,18 @@ final class AppViewModel: ObservableObject {
     }
 
     func refreshReadiness() {
-        let lastTunnelError = store.loadLastTunnelError()
+        let lastRuntimeError = store.loadLastRuntimeError()
         readinessReport = MVPReadinessEvaluator.report(
             hasConfiguration: activeConfiguration != nil,
             hasBundledBinary: hasBundledMihomoBinary(),
             hasNetworkServices: !proxyService.availableNetworkServices.isEmpty,
-            proxyPreparationError: lastTunnelError ?? proxyPreparationError
+            proxyPreparationError: lastRuntimeError ?? proxyPreparationError
         )
         setupGuide = TrialSetupGuideBuilder.build(from: readinessReport)
 
-        if let lastTunnelError, !lastTunnelError.isEmpty,
+        if let lastRuntimeError, !lastRuntimeError.isEmpty,
            connectionState == .disconnected || connectionState == .invalid {
-            lastErrorMessage = lastTunnelError
+            lastErrorMessage = lastRuntimeError
         }
     }
 
@@ -663,7 +720,17 @@ final class AppViewModel: ObservableObject {
         ]
         .compactMap { $0 }
 
-        return candidates.contains { fileManager.isExecutableFile(atPath: $0.path) || fileManager.fileExists(atPath: $0.path) }
+        return candidates.contains {
+            (fileManager.isExecutableFile(atPath: $0.path) || fileManager.fileExists(atPath: $0.path))
+                && MihomoRuntimeManifest.bundled.validateBinary(at: $0)
+        }
+    }
+
+    private var residualProxyWarningMessage: String {
+        let services = residualSystemProxyServices.joined(separator: ", ")
+        return selectedLanguage == .simplifiedChinese
+            ? "检测到 Cusp 残留的系统代理设置：\(services)。请恢复以避免断网。"
+            : "Residual Cusp system proxy settings detected on: \(services). Restore them to avoid broken networking."
     }
 
     private func friendlyProxyPreparationError(_ error: Error) -> String {
@@ -671,7 +738,9 @@ final class AppViewModel: ObservableObject {
         if description.lowercased().contains("authorization")
             || description.lowercased().contains("permission")
             || description.lowercased().contains("administrator") {
-            return "System proxy access failed. Cusp may need permission to change network settings on this Mac."
+            return selectedLanguage == .simplifiedChinese
+                ? "系统代理访问失败。Cusp 可能需要管理员权限修改网络设置；可先复制系统代理命令并用 sudo 执行。"
+                : "System proxy access failed. Cusp may need administrator permission to change network settings. Copy the system proxy commands and run them with sudo as a fallback."
         }
 
         return "Local proxy runtime is not ready: \(description)"
@@ -1044,7 +1113,8 @@ final class AppViewModel: ObservableObject {
     }
 
     private func appendLog(level: AppLogLevel, category: String, message: String) {
-        let normalizedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedMessage = RuntimeLogSanitizer.sanitize(message)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalizedMessage.isEmpty else {
             return
         }
@@ -1186,7 +1256,8 @@ final class AppViewModel: ObservableObject {
 
         return logEntries.map { entry in
             let timestamp = Self.logTimestampFormatter.string(from: entry.timestamp)
-            return "[\(timestamp)] [\(entry.level.rawValue.uppercased())] [\(entry.category)] \(entry.message)"
+            let message = RuntimeLogSanitizer.sanitize(entry.message)
+            return "[\(timestamp)] [\(entry.level.rawValue.uppercased())] [\(entry.category)] \(message)"
         }
         .joined(separator: "\n")
     }

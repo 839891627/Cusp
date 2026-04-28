@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Overview Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset',
+                        'mac-prompt': '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tl-red { background-color: #FF5F56; }
+        .tl-yellow { background-color: #FFBD2E; }
+        .tl-green { background-color: #27C93F; }
+        
+        .mac-window {
+            width: 100%;
+            max-width: 1200px;
+            height: 800px;
+            background: rgba(236, 236, 236, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(223, 223, 223, 0.5);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #F4F7FB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .window-drag-area {
+            -webkit-app-region: drag;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Custom Toggle Switch for macOS style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .toggle-label {
+            background-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-knob {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        /* Dashboard specific styles based on references */
+        .dash-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden font-sans text-mac-text">
+
+    <!-- macOS Window Container -->
+    <div id="app-window" class="mac-window">
+        
+        <!-- Drag Area for macOS -->
+        <div class="window-drag-area"></div>
+
+        <!-- Sidebar Navigation -->
+        <div id="sidebar" class="sidebar pt-4 pb-6 px-4 flex flex-col justify-between relative z-20">
+            <div>
+                <!-- Traffic Lights -->
+                <div class="flex items-center mb-8 pl-1">
+                    <span class="traffic-light tl-red"></span>
+                    <span class="traffic-light tl-yellow"></span>
+                    <span class="traffic-light tl-green"></span>
+                </div>
+
+                <!-- App Icon / Title -->
+                <div class="flex items-center gap-3 mb-8 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm">Cusp Proxy</h1>
+                        <p class="text-[11px] text-mac-textMuted flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                            Connected
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="space-y-1">
+                    <div class="px-3 py-2 rounded-md bg-mac-sidebarActive text-mac-text font-medium text-sm flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                        <i class="fa-solid fa-chart-pie w-5 text-center text-mac-accent"></i>
+                        Overview Dashboard
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Nodes Management
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                        Strategy Groups
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                        Rules Editor
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-terminal w-5 text-center"></i>
+                        Real-time Logs
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-down w-5 text-center"></i>
+                        Subscription Management
+                    </div>
+                    
+                    <div class="pt-4 mt-4 border-t border-black/5">
+                        <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            Global Settings
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Bottom Status -->
+            <div class="px-2">
+                <div class="p-3 bg-white/50 rounded-lg border border-black/5 backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-mac-text">Global Routing</span>
+                        <div class="relative inline-block w-8 h-4 align-middle select-none">
+                            <input type="checkbox" name="toggle" id="globalToggle" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer top-0 left-0 z-10 toggle-knob" checked/>
+                            <label for="globalToggle" class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-mac-textMuted">Rule-based mode active</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard View -->
+        <div id="main-dashboard" class="main-content relative z-20 overflow-y-auto">
+            
+            <!-- Header Bar -->
+            <div class="h-14 border-b border-gray-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30 pt-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200">
+                        <span class="text-xs text-mac-textMuted">Current Strategy:</span>
+                        <select class="bg-transparent text-sm font-medium text-mac-text outline-none cursor-pointer pr-4 appearance-none">
+                            <option>Auto-Select (Low Latency)</option>
+                            <option>US West Proxy</option>
+                            <option>EU Servers</option>
+                            <option>Direct Connection</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-mac-textMuted -ml-2 pointer-events-none"></i>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button class="w-8 h-8 rounded-md bg-white border border-gray-200 shadow-sm flex items-center justify-center text-mac-textMuted hover:text-mac-text hover:bg-gray-50 transition-colors" title="Flush DNS">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                    <button class="w-8 h-8 rounded-md bg-white border border-gray-200 shadow-sm flex items-center justify-center text-mac-textMuted hover:text-mac-text hover:bg-gray-50 transition-colors" title="Reload Rules">
+                        <i class="fa-solid fa-file-code"></i>
+                    </button>
+                    <button class="px-4 py-1.5 rounded-md text-sm font-medium text-white bg-red-500 shadow-sm hover:bg-red-600 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-stop text-xs"></i>
+                        Stop Proxy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="p-6 space-y-6">
+                
+                <!-- KPIs / Stat Tiles -->
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- Tile 1 -->
+                    <div class="dash-card p-4 relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-medium text-mac-textMuted">Active Node</span>
+                            <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                <i class="fa-solid fa-server text-[10px]"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-mac-text mb-1">US-West-01</h3>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="text-green-500 font-medium">12ms</span>
+                            <span class="text-mac-textMuted">latency</span>
+                        </div>
+                        <!-- Sparkline graphic placeholder -->
+                        <div class="absolute bottom-0 left-0 right-0 h-10 opacity-20 pointer-events-none">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-full stroke-blue-500 fill-none" stroke-width="2">
+                                <path d="M0,20 C20,20 20,10 40,15 C60,20 60,5 80,10 C100,15 100,15 100,15" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Tile 2 -->
+                    <div class="dash-card p-4 relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-medium text-mac-textMuted">Download Speed</span>
+                            <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+                                <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-mac-text mb-1">45.2 MB/s</h3>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="text-mac-textMuted">Peak: 89 MB/s</span>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 h-10 opacity-20 pointer-events-none">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-full stroke-green-500 fill-none" stroke-width="2">
+                                <path d="M0,15 C20,15 30,5 50,10 C70,15 80,25 100,5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Tile 3 -->
+                    <div class="dash-card p-4 relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-medium text-mac-textMuted">Upload Speed</span>
+                            <div class="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
+                                <i class="fa-solid fa-arrow-up text-[10px]"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-mac-text mb-1">12.8 MB/s</h3>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="text-mac-textMuted">Peak: 24 MB/s</span>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 h-10 opacity-20 pointer-events-none">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-full stroke-purple-500 fill-none" stroke-width="2">
+                                <path d="M0,25 C20,25 30,20 50,22 C70,24 80,10 100,15" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Tile 4 -->
+                    <div class="dash-card p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-medium text-mac-textMuted">Active Connections</span>
+                            <div class="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                                <i class="fa-solid fa-link text-[10px]"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-mac-text mb-1">1,284</h3>
+                        <div class="flex items-center justify-between text-xs mt-2">
+                            <span class="text-mac-textMuted">Proxy: 842</span>
+                            <span class="text-mac-textMuted">Direct: 442</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden flex">
+                            <div class="h-full bg-blue-500" style="width: 65%"></div>
+                            <div class="h-full bg-gray-300" style="width: 35%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Charts Area -->
+                <div class="grid grid-cols-3 gap-6">
+                    
+                    <!-- Traffic Chart -->
+                    <div class="dash-card col-span-2 p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-mac-text text-sm">Traffic Summary</h3>
+                            <div class="flex bg-gray-100 p-0.5 rounded-md">
+                                <button class="px-3 py-1 text-xs font-medium rounded bg-white shadow-sm text-mac-text">1H</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded text-mac-textMuted hover:text-mac-text">24H</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded text-mac-textMuted hover:text-mac-text">7D</button>
+                            </div>
+                        </div>
+                        <div id="trafficChart" class="w-full h-[240px]"></div>
+                    </div>
+
+                    <!-- Protocol Distribution -->
+                    <div class="dash-card col-span-1 p-5">
+                        <h3 class="font-semibold text-mac-text text-sm mb-4">Protocol Distribution</h3>
+                        <div id="protocolChart" class="w-full h-[180px]"></div>
+                        
+                        <div class="mt-4 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+                                    <span class="text-mac-textMuted">HTTPS</span>
+                                </div>
+                                <span class="font-medium text-mac-text">64%</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#8B5CF6]"></span>
+                                    <span class="text-mac-textMuted">SOCKS5</span>
+                                </div>
+                                <span class="font-medium text-mac-text">22%</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+                                    <span class="text-mac-textMuted">QUIC</span>
+                                </div>
+                                <span class="font-medium text-mac-text">14%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Nodes & Alerts -->
+                <div class="grid grid-cols-2 gap-6">
+                    
+                    <!-- Top Nodes Table -->
+                    <div class="dash-card flex flex-col">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-semibold text-mac-text text-sm">Top Nodes Health</h3>
+                            <button class="text-xs text-mac-accent hover:text-mac-accentHover">View All</button>
+                        </div>
+                        <div class="p-0 overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50">
+                                        <th class="px-4 py-2 text-[11px] font-medium text-mac-textMuted uppercase tracking-wider">Node Name</th>
+                                        <th class="px-4 py-2 text-[11px] font-medium text-mac-textMuted uppercase tracking-wider">Latency</th>
+                                        <th class="px-4 py-2 text-[11px] font-medium text-mac-textMuted uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-2 text-[11px] font-medium text-mac-textMuted uppercase tracking-wider text-right">Traffic</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-4 py-3 flex items-center gap-2">
+                                            <span class="w-4 h-3 rounded-[2px] bg-cover bg-center" style="background-image: url('https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg')"></span>
+                                            <span class="font-medium text-mac-text text-xs">US-West-01</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-green-500 font-medium">12ms</td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-mac-textMuted text-right">2.4 GB</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-4 py-3 flex items-center gap-2">
+                                            <span class="w-4 h-3 rounded-[2px] bg-cover bg-center" style="background-image: url('https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg')"></span>
+                                            <span class="font-medium text-mac-text text-xs">US-East-02</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-green-500 font-medium">45ms</td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                                Standby
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-mac-textMuted text-right">840 MB</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-4 py-3 flex items-center gap-2">
+                                            <span class="w-4 h-3 rounded-[2px] bg-cover bg-center" style="background-image: url('https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg')"></span>
+                                            <span class="font-medium text-mac-text text-xs">EU-Frankfurt-01</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-yellow-500 font-medium">112ms</td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                                Standby
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-mac-textMuted text-right">1.2 GB</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-4 py-3 flex items-center gap-2">
+                                            <span class="w-4 h-3 rounded-[2px] bg-cover bg-center" style="background-image: url('https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg')"></span>
+                                            <span class="font-medium text-mac-text text-xs">JP-Tokyo-04</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-red-500 font-medium">Timeout</td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-100">
+                                                Error
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-mac-textMuted text-right">0 B</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Alerts / Logs -->
+                    <div class="dash-card flex flex-col">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-semibold text-mac-text text-sm">Recent Alerts</h3>
+                            <button class="text-xs text-mac-accent hover:text-mac-accentHover">Go to Logs</button>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            
+                            <div class="flex gap-3 items-start">
+                                <div class="w-6 h-6 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-500 shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-triangle-exclamation text-[10px]"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-medium text-mac-text">High Latency Detected</h4>
+                                    <p class="text-[11px] text-mac-textMuted mt-0.5">Node HK-01 latency spiked to 450ms. Auto-switched to JP-Tokyo-02.</p>
+                                    <span class="text-[10px] text-gray-400 mt-1 block">2 mins ago</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-start">
+                                <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-code-merge text-[10px]"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-medium text-mac-text">Rules Updated</h4>
+                                    <p class="text-[11px] text-mac-textMuted mt-0.5">Remote rule provider "AdBlock Basic" successfully updated.</p>
+                                    <span class="text-[10px] text-gray-400 mt-1 block">15 mins ago</span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 items-start">
+                                <div class="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-circle-xmark text-[10px]"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-medium text-mac-text">Connection Dropped</h4>
+                                    <p class="text-[11px] text-mac-textMuted mt-0.5">Failed to establish QUIC connection to SG-03. Retrying...</p>
+                                    <span class="text-[10px] text-gray-400 mt-1 block">1 hour ago</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts
+        function initializeCharts() {
+            try {
+                // Traffic Line Chart
+                var trafficData = [
+                    {
+                        x: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30', '10:35', '10:40', '10:45', '10:50', '10:55', '11:00'],
+                        y: [12, 19, 15, 25, 22, 30, 28, 35, 45, 38, 42, 50, 45],
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Download',
+                        line: { color: '#3B82F6', width: 2, shape: 'spline', smoothing: 1.3 },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(59, 130, 246, 0.1)'
+                    },
+                    {
+                        x: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30', '10:35', '10:40', '10:45', '10:50', '10:55', '11:00'],
+                        y: [5, 8, 6, 12, 10, 15, 12, 18, 20, 15, 18, 25, 20],
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Upload',
+                        line: { color: '#8B5CF6', width: 2, shape: 'spline', smoothing: 1.3 },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(139, 92, 246, 0.1)'
+                    }
+                ];
+
+                var trafficLayout = {
+                    margin: { t: 10, r: 10, b: 30, l: 30 },
+                    plot_bgcolor: 'transparent',
+                    paper_bgcolor: 'transparent',
+                    showlegend: true,
+                    legend: { orientation: 'h', y: -0.2 },
+                    xaxis: { 
+                        showgrid: false,
+                        tickfont: { size: 10, color: '#9CA3AF' }
+                    },
+                    yaxis: { 
+                        showgrid: true,
+                        gridcolor: 'rgba(0,0,0,0.05)',
+                        tickfont: { size: 10, color: '#9CA3AF' }
+                    }
+                };
+
+                Plotly.newPlot('trafficChart', trafficData, trafficLayout, {displayModeBar: false, responsive: true});
+
+                // Protocol Donut Chart
+                var protocolData = [{
+                    values: [64, 22, 14],
+                    labels: ['HTTPS', 'SOCKS5', 'QUIC'],
+                    type: 'pie',
+                    hole: .7,
+                    marker: {
+                        colors: ['#3B82F6', '#8B5CF6', '#10B981']
+                    },
+                    textinfo: 'none',
+                    hoverinfo: 'label+percent'
+                }];
+
+                var protocolLayout = {
+                    margin: { t: 0, r: 0, b: 0, l: 0 },
+                    showlegend: false,
+                    plot_bgcolor: 'transparent',
+                    paper_bgcolor: 'transparent',
+                    annotations: [{
+                        font: { size: 20, color: '#2D2D2D', weight: 'bold' },
+                        showarrow: false,
+                        text: '100%',
+                        x: 0.5,
+                        y: 0.5
+                    }]
+                };
+
+                Plotly.newPlot('protocolChart', protocolData, protocolLayout, {displayModeBar: false, responsive: true});
+
+            } catch(e) {
+                console.error("Chart initialization failed:", e);
+            }
+        }
+
+        window.addEventListener('load', initializeCharts);
+        setTimeout(initializeCharts, 1200);
+    </script>
+</body>
+</html>

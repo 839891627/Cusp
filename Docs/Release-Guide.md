@@ -1,11 +1,11 @@
 # Cusp Release Guide
 
-This repository includes a GitHub Actions workflow at `.github/workflows/release.yml`
-to build, notarize, and publish a macOS release package (`.zip` + `.dmg`).
+This repository uses an unsigned release workflow intended for environments
+without an Apple Developer account.
 
-## Local Unsigned Release (No Apple Developer Account)
+## 1) Local Unsigned Release
 
-If you do not have Apple Developer credentials, use:
+Build local unsigned artifacts:
 
 ```bash
 ./Scripts/release_unsigned_local.sh v0.1.0
@@ -23,20 +23,12 @@ Important:
 - Gatekeeper may block launch until users manually allow it.
 - Some system-level networking capabilities may be limited in unsigned builds.
 
-## 1) Configure GitHub Secrets
+## 2) GitHub Unsigned Release
 
-In repository settings (`Settings -> Secrets and variables -> Actions`), add:
+The workflow at `.github/workflows/release.yml` calls
+`./Scripts/release_unsigned_local.sh` and publishes unsigned artifacts.
 
-- `BUILD_CERTIFICATE_BASE64`: Base64 of your `Developer ID Application` `.p12` certificate
-- `P12_PASSWORD`: Password for that `.p12`
-- `KEYCHAIN_PASSWORD`: Temporary keychain password used in CI
-- `APPLE_ID`: Apple account email
-- `APPLE_APP_SPECIFIC_PASSWORD`: App-specific password for notarization
-- `APPLE_TEAM_ID`: Apple Developer Team ID
-
-## 2) Trigger Release
-
-Two ways:
+Trigger methods:
 
 1. Push a tag:
 
@@ -49,18 +41,20 @@ git push origin v0.1.0
 - GitHub -> `Actions` -> `Release` -> `Run workflow`
 - Input tag like `v0.1.0`
 
-## 3) Output Artifacts
+## 3) Workflow Artifacts
 
 Workflow output includes:
 
-- `Cusp-vX.Y.Z.zip` (notarized app bundle zip)
-- `Cusp-vX.Y.Z.dmg`
+- `Cusp-unsigned-vX.Y.Z.zip`
+- `Cusp-unsigned-vX.Y.Z.dmg`
 - `SHA256SUMS.txt`
+- `UNSIGNED-NOTES.txt`
 
 The workflow also creates/updates the GitHub Release under the same tag.
 
-## 4) Common Troubleshooting
+## 4) Troubleshooting
 
-- Signing error: verify `BUILD_CERTIFICATE_BASE64` and `P12_PASSWORD`.
-- Notarization error: verify `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`.
-- Tag format check: use `v<major>.<minor>.<patch>` such as `v0.1.0`.
+- Tag format error: use `v<major>.<minor>.<patch>`, for example `v0.1.0`.
+- App blocked by Gatekeeper: follow [Unsigned-Install-Guide.md](/Users/arvin/Documents/claude/FlowGate/Docs/Unsigned-Install-Guide.md).
+- System proxy not restored after crash: use the app's `Restore` action on the
+  overview page, or copy system proxy commands from menu and run with `sudo`.

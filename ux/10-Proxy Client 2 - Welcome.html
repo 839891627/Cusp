@@ -1,0 +1,154 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="welcome-screen" class="w-full min-h-screen bg-white flex items-center justify-center p-6">
+  <div class="w-full max-w-2xl mx-auto">
+    
+    <!-- Logo and App Name -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-neutral-900 rounded-2xl mb-6">
+        <i class="fa-solid fa-network-wired text-white text-3xl"></i>
+      </div>
+      <h1 class="text-4xl text-neutral-900 mb-3">Welcome to Cusp Proxy 2</h1>
+      <p class="text-lg text-neutral-600 max-w-md mx-auto">Lightning-fast proxy management with advanced diagnostics and recovery capabilities</p>
+    </div>
+
+    <!-- Illustration / Visual -->
+    <div class="w-full bg-neutral-100 rounded-2xl p-12 mb-12 border border-neutral-200">
+      <div class="grid grid-cols-3 gap-6 max-w-lg mx-auto">
+        <!-- Speed Icon -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white rounded-xl border border-neutral-200 flex items-center justify-center mx-auto mb-3">
+            <i class="fa-solid fa-bolt text-neutral-900 text-2xl"></i>
+          </div>
+          <p class="text-sm text-neutral-900">Ultra Fast</p>
+          <p class="text-xs text-neutral-500 mt-1">Optimized performance</p>
+        </div>
+
+        <!-- Diagnostics Icon -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white rounded-xl border border-neutral-200 flex items-center justify-center mx-auto mb-3">
+            <i class="fa-solid fa-stethoscope text-neutral-900 text-2xl"></i>
+          </div>
+          <p class="text-sm text-neutral-900">Smart Diagnostics</p>
+          <p class="text-xs text-neutral-500 mt-1">Auto-detect issues</p>
+        </div>
+
+        <!-- Recovery Icon -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white rounded-xl border border-neutral-200 flex items-center justify-center mx-auto mb-3">
+            <i class="fa-solid fa-rotate-right text-neutral-900 text-2xl"></i>
+          </div>
+          <p class="text-sm text-neutral-900">Auto Recovery</p>
+          <p class="text-xs text-neutral-500 mt-1">Seamless fixes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Features List -->
+    <div class="bg-neutral-50 rounded-xl p-8 mb-8 border border-neutral-200">
+      <div class="space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 bg-neutral-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm text-neutral-900">Real-time connection monitoring</p>
+            <p class="text-xs text-neutral-600 mt-1">Track all proxy connections with instant status updates</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 bg-neutral-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm text-neutral-900">Intelligent diagnostic tools</p>
+            <p class="text-xs text-neutral-600 mt-1">Automatically identify and resolve connectivity issues</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 bg-neutral-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm text-neutral-900">MenuBar control access</p>
+            <p class="text-xs text-neutral-600 mt-1">Quick access to all features from your macOS menu bar</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 bg-neutral-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-check text-white text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm text-neutral-900">Privacy-first design</p>
+            <p class="text-xs text-neutral-600 mt-1">Your data stays on your device, no external tracking</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+      <button class="flex-1 bg-neutral-900 text-white px-8 py-4 rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2">
+        <i class="fa-solid fa-rocket"></i>
+        Get Started
+      </button>
+      <button class="flex-1 bg-white text-neutral-900 px-8 py-4 rounded-xl border-2 border-neutral-900 hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2">
+        <i class="fa-solid fa-file-import"></i>
+        Import Config
+      </button>
+    </div>
+
+    <!-- Privacy Notice -->
+    <div class="bg-neutral-900 rounded-xl p-6 text-center">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+        <p class="text-sm text-white">Privacy & Security</p>
+      </div>
+      <p class="text-xs text-neutral-300 max-w-lg mx-auto leading-relaxed">
+        Cusp Proxy 2 runs entirely on your Mac. No data is sent to external servers. Access the app anytime from your MenuBar for quick proxy management and diagnostics.
+      </p>
+    </div>
+
+    <!-- System Requirements Note -->
+    <div class="mt-8 text-center">
+      <p class="text-xs text-neutral-500">
+        <i class="fa-brands fa-apple mr-1"></i>
+        Requires macOS 12.0 or later
+      </p>
+    </div>
+
+  </div>
+</div>
+
+                        </body>
+                        </html>
+                        

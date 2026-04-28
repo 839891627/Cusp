@@ -36,13 +36,13 @@ final class ProcessManagerTests: XCTestCase {
         let manager = ProcessManager()
         _ = try manager.launch(
             executableURL: URL(fileURLWithPath: "/bin/sh"),
-            arguments: ["-c", "echo tunnel-boom >&2; sleep 1"],
+            arguments: ["-c", "echo runtime-boom >&2; sleep 1"],
             environment: [:]
         )
 
         Thread.sleep(forTimeInterval: 0.2)
 
-        XCTAssertTrue(manager.diagnosticSummary().contains("tunnel-boom"))
+        XCTAssertTrue(manager.diagnosticSummary().contains("runtime-boom"))
 
         manager.cleanup()
     }

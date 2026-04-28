@@ -1,0 +1,588 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="profiles-management" class="w-full min-h-screen bg-white flex">
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar" class="w-64 bg-neutral-50 border-r border-neutral-200 flex flex-col">
+    
+    <!-- Logo -->
+    <div class="p-6 border-b border-neutral-200">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-network-wired text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-base text-neutral-900">Cusp Proxy 2</h1>
+          <p class="text-xs text-neutral-600">v2.0.1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 p-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-chart-line text-sm"></i>
+            <span class="text-sm">Overview Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-route text-sm"></i>
+            <span class="text-sm">Routes Management</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-shield text-sm"></i>
+            <span class="text-sm">Rules Editor</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            <span class="text-sm">Real-time Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-neutral-900 text-white">
+            <i class="fa-solid fa-user-group text-sm"></i>
+            <span class="text-sm">Profiles</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="text-sm">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-bars text-sm"></i>
+            <span class="text-sm">MenuBar Popover</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- System Status Footer -->
+    <div class="p-4 border-t border-neutral-200">
+      <div class="bg-white rounded-lg border border-neutral-200 p-3">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-2 bg-neutral-400 rounded-full"></div>
+          <span class="text-xs text-neutral-700">System Status</span>
+        </div>
+        <p class="text-xs text-neutral-600">Disconnected</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <header id="header" class="bg-white border-b border-neutral-200 px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl text-neutral-900 mb-1">Profiles</h1>
+          <p class="text-sm text-neutral-600">Manage proxy configurations and connection profiles</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-file-import text-xs"></i>
+            Import
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i>
+            New Profile
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex-1 flex overflow-hidden">
+      
+      <!-- Profiles List -->
+      <div id="profiles-list" class="flex-1 flex flex-col overflow-hidden bg-white">
+        
+        <!-- Search and Filter Bar -->
+        <div class="px-6 py-4 border-b border-neutral-200">
+          <div class="flex items-center gap-3">
+            <div class="flex-1 relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+              <input type="text" placeholder="Search profiles..." class="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+            </div>
+            <select class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+              <option>All Profiles</option>
+              <option>Active</option>
+              <option>Inactive</option>
+              <option>Default</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Profiles Grid -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            
+            <!-- Profile Card 1 - Active & Default -->
+            <div class="bg-white border-2 border-neutral-900 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-briefcase text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Work Profile</h3>
+                    <p class="text-xs text-neutral-600">Corporate VPN</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-900 text-white rounded text-xs">Active</span>
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Default</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">3</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">12</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">24</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check text-xs"></i>
+                Connected
+              </button>
+            </div>
+
+            <!-- Profile Card 2 -->
+            <div class="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-home text-neutral-900 text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Home Profile</h3>
+                    <p class="text-xs text-neutral-600">Personal Network</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Inactive</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">2</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">8</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">15</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plug text-xs"></i>
+                Connect
+              </button>
+            </div>
+
+            <!-- Profile Card 3 -->
+            <div class="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-globe text-neutral-900 text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Global Profile</h3>
+                    <p class="text-xs text-neutral-600">International Access</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Inactive</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">5</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">20</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">45</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plug text-xs"></i>
+                Connect
+              </button>
+            </div>
+
+            <!-- Profile Card 4 -->
+            <div class="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-neutral-900 text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Secure Profile</h3>
+                    <p class="text-xs text-neutral-600">High Security</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Inactive</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">4</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">10</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">30</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plug text-xs"></i>
+                Connect
+              </button>
+            </div>
+
+            <!-- Profile Card 5 -->
+            <div class="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-plane text-neutral-900 text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Travel Profile</h3>
+                    <p class="text-xs text-neutral-600">Mobile Hotspot</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Inactive</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">2</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">6</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">18</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plug text-xs"></i>
+                Connect
+              </button>
+            </div>
+
+            <!-- Profile Card 6 -->
+            <div class="bg-white border border-neutral-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-flask text-neutral-900 text-sm"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base text-neutral-900">Test Profile</h3>
+                    <p class="text-xs text-neutral-600">Development</p>
+                  </div>
+                </div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-ellipsis-vertical text-neutral-700"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Inactive</span>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Endpoints:</span>
+                  <span class="text-neutral-900">1</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Routes:</span>
+                  <span class="text-neutral-900">4</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-neutral-600">Rules:</span>
+                  <span class="text-neutral-900">8</span>
+                </div>
+              </div>
+
+              <button class="w-full px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plug text-xs"></i>
+                Connect
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Profile Detail Pane -->
+      <div id="profile-detail-pane" class="w-96 bg-neutral-50 border-l border-neutral-200 flex flex-col overflow-hidden">
+        
+        <!-- Detail Header -->
+        <div class="px-6 py-4 border-b border-neutral-200 bg-white">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-briefcase text-white text-sm"></i>
+              </div>
+              <div>
+                <h3 class="text-base text-neutral-900">Work Profile</h3>
+                <p class="text-xs text-neutral-600">Corporate VPN</p>
+              </div>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+              <i class="fa-solid fa-xmark text-neutral-700"></i>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-1 bg-neutral-900 text-white rounded text-xs">Active</span>
+            <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Default</span>
+          </div>
+        </div>
+
+        <!-- Detail Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+          
+          <!-- Endpoints Section -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-xs text-neutral-700 uppercase tracking-wide">Endpoints</h4>
+              <button class="text-xs text-neutral-900 hover:underline">Add</button>
+            </div>
+            <div class="space-y-2">
+              <div class="bg-white border border-neutral-200 rounded-lg p-3">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex-1">
+                    <p class="text-sm text-neutral-900 mb-1">proxy.company.com</p>
+                    <p class="text-xs text-neutral-600">HTTPS, Port 8443</p>
+                  </div>
+                  <span class="px-2 py-1 bg-neutral-900 text-white rounded text-xs">Primary</span>
+                </div>
+              </div>
+              <div class="bg-white border border-neutral-200 rounded-lg p-3">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex-1">
+                    <p class="text-sm text-neutral-900 mb-1">backup.company.com</p>
+                    <p class="text-xs text-neutral-600">HTTPS, Port 8443</p>
+                  </div>
+                  <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Backup</span>
+                </div>
+              </div>
+              <div class="bg-white border border-neutral-200 rounded-lg p-3">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex-1">
+                    <p class="text-sm text-neutral-900 mb-1">192.168.1.100</p>
+                    <p class="text-xs text-neutral-600">SOCKS5, Port 1080</p>
+                  </div>
+                  <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">Local</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Authentication Section -->
+          <div class="mb-6">
+            <h4 class="text-xs text-neutral-700 uppercase tracking-wide mb-3">Authentication</h4>
+            <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-3">
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Method:</span>
+                <span class="text-xs text-neutral-900">Username/Password</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Username:</span>
+                <span class="text-xs text-neutral-900">john.doe</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Password:</span>
+                <span class="text-xs text-neutral-900">••••••••</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Certificate:</span>
+                <span class="text-xs text-neutral-900">None</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DNS Settings Section -->
+          <div class="mb-6">
+            <h4 class="text-xs text-neutral-700 uppercase tracking-wide mb-3">DNS Settings</h4>
+            <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-3">
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Primary DNS:</span>
+                <span class="text-xs text-neutral-900">8.8.8.8</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Secondary DNS:</span>
+                <span class="text-xs text-neutral-900">8.8.4.4</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">DNS over HTTPS:</span>
+                <span class="text-xs text-neutral-900">Enabled</span>
+              </div>
+              <div class="flex items-start justify-between">
+                <span class="text-xs text-neutral-600">Search Domains:</span>
+                <span class="text-xs text-neutral-900">company.local</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Associated Configuration -->
+          <div class="mb-6">
+            <h4 class="text-xs text-neutral-700 uppercase tracking-wide mb-3">Associated Configuration</h4>
+            <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-route text-neutral-700 text-xs"></i>
+                  <span class="text-xs text-neutral-900">Routes</span>
+                </div>
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">12</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-shield text-neutral-700 text-xs"></i>
+                  <span class="text-xs text-neutral-900">Rules</span>
+                </div>
+                <span class="px-2 py-1 bg-neutral-100 text-neutral-900 rounded text-xs">24</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Actions -->
+          <div class="mb-6">
+            <h4 class="text-xs text-neutral-700 uppercase tracking-wide mb-3">Profile Actions</h4>
+            <div class="space-y-2">
+              <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                <span>Export Profile</span>
+                <i class="fa-solid fa-file-export text-neutral-700 text-xs"></i>
+              </button>
+              <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                <span>Duplicate Profile</span>
+                <i class="fa-solid fa-copy text-neutral-700 text-xs"></i>
+              </button>
+              <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                <span>Set as Default</span>
+                <i class="fa-solid fa-star text-neutral-700 text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div>
+            <h4 class="text-xs text-neutral-700 uppercase tracking-wide mb-3">Danger Zone</h4>
+            <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-900 hover:bg-neutral-900 hover:text-white transition-all text-sm text-neutral-900 flex items-center justify-between">
+              <span>Delete Profile</span>
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+            <p class="text-xs text-neutral-600 mt-2">This profile has 12 routes and 24 rules. Deleting will affect dependent configurations.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+                        </body>
+                        </html>
+                        

@@ -1,0 +1,647 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="settings-screen" class="w-full min-h-screen bg-white flex">
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar" class="w-64 bg-neutral-50 border-r border-neutral-200 flex flex-col">
+    
+    <!-- Logo -->
+    <div class="p-6 border-b border-neutral-200">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-network-wired text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-base text-neutral-900">Cusp Proxy 2</h1>
+          <p class="text-xs text-neutral-600">v2.0.1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 p-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-chart-line text-sm"></i>
+            <span class="text-sm">Overview Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-route text-sm"></i>
+            <span class="text-sm">Routes Management</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-shield text-sm"></i>
+            <span class="text-sm">Rules Editor</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            <span class="text-sm">Real-time Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-user-group text-sm"></i>
+            <span class="text-sm">Profiles</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-neutral-900 text-white">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="text-sm">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-bars text-sm"></i>
+            <span class="text-sm">MenuBar Popover</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- System Status Footer -->
+    <div class="p-4 border-t border-neutral-200">
+      <div class="bg-white rounded-lg border border-neutral-200 p-3">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-2 bg-neutral-400 rounded-full"></div>
+          <span class="text-xs text-neutral-700">System Status</span>
+        </div>
+        <p class="text-xs text-neutral-600">Disconnected</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <header id="header" class="bg-white border-b border-neutral-200 px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl text-neutral-900 mb-1">Settings</h1>
+          <p class="text-sm text-neutral-600">Configure application preferences and system behavior</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-rotate-left text-xs"></i>
+            Reset to Defaults
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk text-xs"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Settings Content -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="max-w-5xl mx-auto p-8">
+
+        <!-- General Settings Section -->
+        <section id="general-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-sliders text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">General</h2>
+              <p class="text-xs text-neutral-600">Application startup and interface preferences</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Launch at Login</h3>
+                <p class="text-xs text-neutral-600">Automatically start Cusp Proxy when you log in to macOS</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Start Minimized</h3>
+                <p class="text-xs text-neutral-600">Launch application in the menu bar without showing main window</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                  <h3 class="text-sm text-neutral-900 mb-1">MenuBar Icon Style</h3>
+                  <p class="text-xs text-neutral-600">Choose how the icon appears in the macOS menu bar</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-3">
+                <button class="p-4 border-2 border-neutral-900 rounded-lg hover:bg-neutral-50 transition-colors">
+                  <i class="fa-solid fa-network-wired text-neutral-900 text-xl mb-2"></i>
+                  <p class="text-xs text-neutral-900">Standard</p>
+                </button>
+                <button class="p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                  <i class="fa-solid fa-circle text-neutral-700 text-xl mb-2"></i>
+                  <p class="text-xs text-neutral-700">Minimal</p>
+                </button>
+                <button class="p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                  <i class="fa-solid fa-signal text-neutral-700 text-xl mb-2"></i>
+                  <p class="text-xs text-neutral-700">Signal</p>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Show Connection Status</h3>
+                <p class="text-xs text-neutral-600">Display connection indicator in menu bar icon</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Network Settings Section -->
+        <section id="network-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-wifi text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Network</h2>
+              <p class="text-xs text-neutral-600">DNS, MTU, and split-tunnel configuration</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">DNS Servers</h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs text-neutral-600 mb-2">Primary DNS</label>
+                  <input type="text" value="8.8.8.8" class="w-full px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+                <div>
+                  <label class="block text-xs text-neutral-600 mb-2">Secondary DNS</label>
+                  <input type="text" value="8.8.4.4" class="w-full px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">DNS over HTTPS (DoH)</h3>
+                <p class="text-xs text-neutral-600">Encrypt DNS queries for enhanced privacy</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">MTU Size</h3>
+              <div class="flex items-center gap-3">
+                <input type="number" value="1500" class="flex-1 px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                <span class="text-xs text-neutral-600">bytes</span>
+              </div>
+              <p class="text-xs text-neutral-600 mt-2">Maximum Transmission Unit (default: 1500)</p>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Split Tunnel Defaults</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-globe text-neutral-700 text-sm"></i>
+                    <span class="text-sm text-neutral-900">Route all traffic through proxy</span>
+                  </div>
+                  <input type="radio" name="split-tunnel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900" checked>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-filter text-neutral-700 text-sm"></i>
+                    <span class="text-sm text-neutral-900">Route only specified domains</span>
+                  </div>
+                  <input type="radio" name="split-tunnel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-ban text-neutral-700 text-sm"></i>
+                    <span class="text-sm text-neutral-900">Exclude specified domains</span>
+                  </div>
+                  <input type="radio" name="split-tunnel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">IPv6 Support</h3>
+                <p class="text-xs text-neutral-600">Enable IPv6 routing through proxy connections</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Diagnostics Section -->
+        <section id="diagnostics-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-stethoscope text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Diagnostics</h2>
+              <p class="text-xs text-neutral-600">Logging, debugging, and troubleshooting options</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Log Level</h3>
+              <select class="w-full px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                <option>Error</option>
+                <option>Warning</option>
+                <option selected>Info</option>
+                <option>Debug</option>
+                <option>Verbose</option>
+              </select>
+              <p class="text-xs text-neutral-600 mt-2">Higher levels generate more detailed logs</p>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Log Retention Period</h3>
+              <div class="flex items-center gap-3">
+                <input type="number" value="7" class="flex-1 px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                <span class="text-xs text-neutral-600">days</span>
+              </div>
+              <p class="text-xs text-neutral-600 mt-2">Automatically delete logs older than this period</p>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Enable Packet Capture</h3>
+                <p class="text-xs text-neutral-600">Record network packets for advanced debugging (impacts performance)</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Diagnostic Actions</h3>
+              <div class="space-y-2">
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Export Current Logs</span>
+                  <i class="fa-solid fa-download text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Generate Diagnostic Report</span>
+                  <i class="fa-solid fa-file-medical text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Test Network Connectivity</span>
+                  <i class="fa-solid fa-vial text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Updates Section -->
+        <section id="updates-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-cloud-arrow-down text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Updates</h2>
+              <p class="text-xs text-neutral-600">Software update preferences and release channels</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Automatic Updates</h3>
+                <p class="text-xs text-neutral-600">Download and install updates automatically</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Update Channel</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <i class="fa-solid fa-check-circle text-neutral-700 text-sm"></i>
+                      <span class="text-sm text-neutral-900">Stable</span>
+                    </div>
+                    <p class="text-xs text-neutral-600">Recommended for most users</p>
+                  </div>
+                  <input type="radio" name="update-channel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900" checked>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <i class="fa-solid fa-rocket text-neutral-700 text-sm"></i>
+                      <span class="text-sm text-neutral-900">Beta</span>
+                    </div>
+                    <p class="text-xs text-neutral-600">Early access to new features</p>
+                  </div>
+                  <input type="radio" name="update-channel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <i class="fa-solid fa-flask text-neutral-700 text-sm"></i>
+                      <span class="text-sm text-neutral-900">Development</span>
+                    </div>
+                    <p class="text-xs text-neutral-600">Bleeding edge, may be unstable</p>
+                  </div>
+                  <input type="radio" name="update-channel" class="w-4 h-4 text-neutral-900 focus:ring-neutral-900">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm text-neutral-900 mb-1">Current Version</h3>
+                  <p class="text-xs text-neutral-600">v2.0.1 (Build 2025.04.27)</p>
+                </div>
+                <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900">
+                  Check for Updates
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Privacy Section -->
+        <section id="privacy-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-user-shield text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Privacy</h2>
+              <p class="text-xs text-neutral-600">Data retention and privacy controls</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Anonymous Usage Statistics</h3>
+                <p class="text-xs text-neutral-600">Help improve Cusp Proxy by sharing anonymous usage data</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Crash Reports</h3>
+                <p class="text-xs text-neutral-600">Automatically send crash reports to help diagnose issues</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Clear Data</h3>
+              <div class="space-y-2">
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Clear Connection History</span>
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Clear All Logs</span>
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center justify-between">
+                  <span>Clear DNS Cache</span>
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Keyboard Shortcuts Section -->
+        <section id="keyboard-shortcuts" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-keyboard text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Keyboard Shortcuts</h2>
+              <p class="text-xs text-neutral-600">Global hotkeys and application shortcuts</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl">
+            <div class="p-5 border-b border-neutral-200">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-sm text-neutral-900 mb-1">Enable Global Shortcuts</h3>
+                  <p class="text-xs text-neutral-600">Allow keyboard shortcuts to work system-wide</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">Toggle Connection</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⇧</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">C</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">Show/Hide Window</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⇧</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">W</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">Open Settings</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">,</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">Switch Profile</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⇧</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">P</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">View Logs</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⇧</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">L</kbd>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-sm text-neutral-900">Quick Connect</span>
+                  <div class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+                    <kbd class="px-3 py-1 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-900">K</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Advanced Section -->
+        <section id="advanced-settings" class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-wrench text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg text-neutral-900">Advanced</h2>
+              <p class="text-xs text-neutral-600">Developer and power user options</p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200">
+            
+            <div class="p-5 flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="text-sm text-neutral-900 mb-1">Developer Mode</h3>
+                <p class="text-xs text-neutral-600">Enable advanced debugging and experimental features</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Configuration File Location</h3>
+              <div class="flex items-center gap-2">
+                <input type="text" value="~/Library/Application Support/CuspProxy2/" class="flex-1 px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900" readonly>
+                <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900">
+                  <i class="fa-solid fa-folder-open text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-sm text-neutral-900 mb-3">Reset Application</h3>
+              <button class="w-full px-4 py-3 rounded-lg bg-white border-2 border-neutral-900 hover:bg-neutral-900 hover:text-white transition-all text-sm text-neutral-900 flex items-center justify-between">
+                <span>Reset All Settings to Defaults</span>
+                <i class="fa-solid fa-rotate-left text-xs"></i>
+              </button>
+              <p class="text-xs text-neutral-600 mt-2">This will restore all settings to their default values. Profiles and connection history will not be affected.</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-white border-t border-neutral-200 px-8 py-4">
+      <div class="flex items-center justify-between">
+        <p class="text-xs text-neutral-600">Changes are saved automatically</p>
+        <div class="flex items-center gap-2">
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900">
+            Cancel
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white">
+            Apply Changes
+          </button>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+</div>
+
+                        </body>
+                        </html>
+                        

@@ -134,15 +134,15 @@ public final class SharedConfigurationStore {
         userDefaults.removeObject(forKey: CuspConstants.selectedModeKey)
     }
 
-    public func saveLastTunnelError(_ message: String) {
-        userDefaults.set(message, forKey: CuspConstants.lastTunnelErrorKey)
+    public func saveLastRuntimeError(_ message: String) {
+        userDefaults.set(message, forKey: CuspConstants.lastRuntimeErrorKey)
     }
 
-    public func loadLastTunnelError() -> String? {
-        userDefaults.string(forKey: CuspConstants.lastTunnelErrorKey)
+    public func loadLastRuntimeError() -> String? {
+        userDefaults.string(forKey: CuspConstants.lastRuntimeErrorKey)
     }
 
-    public func clearLastTunnelError() {
-        userDefaults.removeObject(forKey: CuspConstants.lastTunnelErrorKey)
+    public func clearLastRuntimeError() {
+        userDefaults.removeObject(forKey: CuspConstants.lastRuntimeErrorKey)
     }
 }

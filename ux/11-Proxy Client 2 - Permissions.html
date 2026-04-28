@@ -1,0 +1,191 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="permissions-setup-screen" class="w-full h-screen bg-white flex items-center justify-center p-6">
+  <div class="w-full max-w-3xl mx-auto">
+    
+    <!-- Logo and Header -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-neutral-900 rounded-2xl mb-5">
+        <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl text-neutral-900 mb-3">System Permissions Setup</h1>
+      <p class="text-base text-neutral-600 max-w-xl mx-auto">Cusp Proxy needs a few permissions to manage your proxy connections securely and keep you informed</p>
+    </div>
+
+    <!-- Permissions Checklist -->
+    <div class="bg-neutral-50 rounded-2xl border border-neutral-200 p-8 mb-8">
+      
+      <!-- Required Permissions Header -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-asterisk text-neutral-900 text-xs"></i>
+          <h2 class="text-sm text-neutral-900 uppercase tracking-wide">Required Permissions</h2>
+        </div>
+        <p class="text-xs text-neutral-600">These permissions are essential for Cusp Proxy to function properly</p>
+      </div>
+
+      <!-- Network Extension / VPN Permission -->
+      <div class="bg-white rounded-xl border-2 border-neutral-900 p-6 mb-4">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-check text-white text-sm"></i>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-base text-neutral-900">Network Extension</h3>
+              <span class="px-2 py-0.5 bg-neutral-900 text-white text-xs rounded">Granted</span>
+            </div>
+            <p class="text-sm text-neutral-600 mb-3">Allows Cusp Proxy to create and manage VPN configurations for secure proxy connections</p>
+            <div class="bg-neutral-50 rounded-lg p-3 border border-neutral-200">
+              <p class="text-xs text-neutral-700 leading-relaxed">
+                <i class="fa-solid fa-info-circle text-neutral-500 mr-1"></i>
+                This permission enables the app to route your network traffic through configured proxy servers. You'll see a system prompt requesting this access.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Permission -->
+      <div class="bg-white rounded-xl border-2 border-neutral-300 p-6 mb-6">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 bg-neutral-200 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-circle text-neutral-400 text-xs"></i>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-base text-neutral-900">Notifications</h3>
+              <span class="px-2 py-0.5 bg-neutral-200 text-neutral-700 text-xs rounded">Pending</span>
+            </div>
+            <p class="text-sm text-neutral-600 mb-3">Get alerts for connection errors, disconnections, and important diagnostic events</p>
+            <div class="bg-neutral-50 rounded-lg p-3 border border-neutral-200 mb-3">
+              <p class="text-xs text-neutral-700 leading-relaxed">
+                <i class="fa-solid fa-info-circle text-neutral-500 mr-1"></i>
+                Stay informed when your proxy disconnects unexpectedly or when the app detects and fixes connectivity issues automatically.
+              </p>
+            </div>
+            <button class="w-full bg-neutral-900 text-white px-4 py-2.5 rounded-lg hover:bg-neutral-800 transition-colors text-sm flex items-center justify-center gap-2">
+              <i class="fa-solid fa-bell"></i>
+              Grant Notification Access
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional Permissions Header -->
+      <div class="mb-6 pt-6 border-t border-neutral-200">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-circle-plus text-neutral-600 text-xs"></i>
+          <h2 class="text-sm text-neutral-900 uppercase tracking-wide">Optional Permissions</h2>
+        </div>
+        <p class="text-xs text-neutral-600">Recommended for the best experience, but not required</p>
+      </div>
+
+      <!-- Login Items Permission -->
+      <div class="bg-white rounded-xl border border-neutral-200 p-6">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center border border-neutral-200">
+              <i class="fa-solid fa-minus text-neutral-400 text-sm"></i>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-base text-neutral-900">Launch at Login</h3>
+              <span class="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded border border-neutral-200">Not Set</span>
+            </div>
+            <p class="text-sm text-neutral-600 mb-3">Start Cusp Proxy automatically when you log in to your Mac</p>
+            <div class="bg-neutral-50 rounded-lg p-3 border border-neutral-200 mb-3">
+              <p class="text-xs text-neutral-700 leading-relaxed">
+                <i class="fa-solid fa-info-circle text-neutral-500 mr-1"></i>
+                Enables seamless proxy protection from the moment you start your Mac. You can change this later in System Settings.
+              </p>
+            </div>
+            <button class="w-full bg-white text-neutral-900 px-4 py-2.5 rounded-lg border-2 border-neutral-900 hover:bg-neutral-50 transition-colors text-sm flex items-center justify-center gap-2">
+              <i class="fa-solid fa-rocket"></i>
+              Enable Launch at Login
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Status Summary -->
+    <div class="bg-neutral-100 rounded-xl p-5 mb-8 border border-neutral-200">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-neutral-300 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-hourglass-half text-neutral-600 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-sm text-neutral-900">Setup Progress</p>
+            <p class="text-xs text-neutral-600">1 of 2 required permissions granted</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 bg-neutral-900 rounded-full"></div>
+          <div class="w-2 h-2 bg-neutral-300 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+      <button disabled class="flex-1 bg-neutral-200 text-neutral-400 px-8 py-4 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-right"></i>
+        Continue
+      </button>
+      <button class="flex-1 bg-white text-neutral-900 px-8 py-4 rounded-xl border-2 border-neutral-200 hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back
+      </button>
+    </div>
+
+    <!-- Help Text -->
+    <div class="text-center">
+      <p class="text-xs text-neutral-500 mb-2">
+        <i class="fa-solid fa-circle-info mr-1"></i>
+        Complete all required permissions to continue
+      </p>
+      <button class="text-xs text-neutral-900 underline hover:no-underline">
+        Need help with permissions?
+      </button>
+    </div>
+
+  </div>
+</div>
+
+                        </body>
+                        </html>
+                        

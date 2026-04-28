@@ -1,0 +1,415 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="overview-dashboard" class="w-full min-h-screen bg-white flex">
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar" class="w-64 bg-neutral-50 border-r border-neutral-200 flex flex-col">
+    
+    <!-- Logo -->
+    <div class="p-6 border-b border-neutral-200">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-network-wired text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-base text-neutral-900">Cusp Proxy 2</h1>
+          <p class="text-xs text-neutral-600">v2.0.1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 p-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-neutral-900 text-white">
+            <i class="fa-solid fa-chart-line text-sm"></i>
+            <span class="text-sm">Overview Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-route text-sm"></i>
+            <span class="text-sm">Routes Management</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-shield text-sm"></i>
+            <span class="text-sm">Rules Editor</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            <span class="text-sm">Real-time Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-user-group text-sm"></i>
+            <span class="text-sm">Profiles</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="text-sm">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-bars text-sm"></i>
+            <span class="text-sm">MenuBar Popover</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- System Status Footer -->
+    <div class="p-4 border-t border-neutral-200">
+      <div class="bg-white rounded-lg border border-neutral-200 p-3">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-2 bg-neutral-400 rounded-full"></div>
+          <span class="text-xs text-neutral-700">System Status</span>
+        </div>
+        <p class="text-xs text-neutral-600">Disconnected</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main-content" class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <header id="header" class="bg-white border-b border-neutral-200 px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl text-neutral-900 mb-1">Overview Dashboard</h1>
+          <p class="text-sm text-neutral-600">Monitor connection status and system diagnostics</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-rotate text-xs"></i>
+            Refresh
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-lines text-xs"></i>
+            Open Logs
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="flex-1 overflow-y-auto p-8">
+      
+      <!-- Connection Control Card -->
+      <div class="bg-neutral-50 border border-neutral-200 rounded-2xl p-8 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <!-- Connection Toggle -->
+          <div>
+            <h2 class="text-lg text-neutral-900 mb-6 flex items-center gap-2">
+              <i class="fa-solid fa-plug text-neutral-700"></i>
+              Connection Status
+            </h2>
+            <div class="bg-white rounded-xl border border-neutral-200 p-6">
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-circle-xmark text-neutral-500 text-xl"></i>
+                  </div>
+                  <div>
+                    <p class="text-base text-neutral-900 mb-1">Disconnected</p>
+                    <p class="text-xs text-neutral-600">No active connection</p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer">
+                  <div class="w-14 h-7 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-neutral-900"></div>
+                </label>
+              </div>
+              <div class="pt-4 border-t border-neutral-200">
+                <p class="text-xs text-neutral-600 mb-2">Last Connected</p>
+                <p class="text-sm text-neutral-900">Never</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Profile Selector -->
+          <div>
+            <h2 class="text-lg text-neutral-900 mb-6 flex items-center gap-2">
+              <i class="fa-solid fa-user-circle text-neutral-700"></i>
+              Active Profile
+            </h2>
+            <div class="bg-white rounded-xl border border-neutral-200 p-6">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center">
+                  <i class="fa-solid fa-user text-white text-lg"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-base text-neutral-900 mb-1">Personal</p>
+                  <p class="text-xs text-neutral-600">Default profile • 8 routes • 5 rules</p>
+                </div>
+                <button class="px-3 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-xs text-neutral-900">
+                  Change
+                </button>
+              </div>
+              <div class="grid grid-cols-2 gap-3 pt-4 border-t border-neutral-200">
+                <div>
+                  <p class="text-xs text-neutral-600 mb-1">Server</p>
+                  <p class="text-sm text-neutral-900">us-west-1.proxy.io</p>
+                </div>
+                <div>
+                  <p class="text-xs text-neutral-600 mb-1">Protocol</p>
+                  <p class="text-sm text-neutral-900">Shadowsocks</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mb-6">
+        <h2 class="text-lg text-neutral-900 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-neutral-700"></i>
+          Quick Actions
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <button class="bg-white border border-neutral-200 rounded-xl p-5 hover:bg-neutral-50 transition-colors text-left">
+            <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center mb-3">
+              <i class="fa-solid fa-play text-neutral-700"></i>
+            </div>
+            <p class="text-sm text-neutral-900 mb-1">Start Connection</p>
+            <p class="text-xs text-neutral-600">Connect to active profile</p>
+          </button>
+
+          <button class="bg-white border border-neutral-200 rounded-xl p-5 hover:bg-neutral-50 transition-colors text-left">
+            <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center mb-3">
+              <i class="fa-solid fa-stop text-neutral-700"></i>
+            </div>
+            <p class="text-sm text-neutral-900 mb-1">Stop Connection</p>
+            <p class="text-xs text-neutral-600">Disconnect from proxy</p>
+          </button>
+
+          <button class="bg-white border border-neutral-200 rounded-xl p-5 hover:bg-neutral-50 transition-colors text-left">
+            <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center mb-3">
+              <i class="fa-solid fa-vial text-neutral-700"></i>
+            </div>
+            <p class="text-sm text-neutral-900 mb-1">Test Connectivity</p>
+            <p class="text-xs text-neutral-600">Run diagnostic test</p>
+          </button>
+
+          <button class="bg-white border border-neutral-200 rounded-xl p-5 hover:bg-neutral-50 transition-colors text-left">
+            <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center mb-3">
+              <i class="fa-solid fa-broom text-neutral-700"></i>
+            </div>
+            <p class="text-sm text-neutral-900 mb-1">Flush DNS</p>
+            <p class="text-xs text-neutral-600">Clear DNS cache</p>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Diagnostics Cards -->
+      <div class="mb-6">
+        <h2 class="text-lg text-neutral-900 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-stethoscope text-neutral-700"></i>
+          Key Diagnostics
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Latency -->
+          <div class="bg-white border border-neutral-200 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-gauge-high text-neutral-700"></i>
+              </div>
+              <span class="text-xs text-neutral-600">Real-time</span>
+            </div>
+            <p class="text-xs text-neutral-600 mb-1">Latency</p>
+            <p class="text-2xl text-neutral-900 mb-1">—</p>
+            <p class="text-xs text-neutral-600">No connection active</p>
+          </div>
+
+          <!-- Throughput -->
+          <div class="bg-white border border-neutral-200 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-arrow-down-up-across-line text-neutral-700"></i>
+              </div>
+              <span class="text-xs text-neutral-600">Current</span>
+            </div>
+            <p class="text-xs text-neutral-600 mb-1">Throughput</p>
+            <p class="text-2xl text-neutral-900 mb-1">0 KB/s</p>
+            <div class="flex items-center gap-2 text-xs text-neutral-600">
+              <span><i class="fa-solid fa-arrow-down text-xs mr-1"></i>0</span>
+              <span><i class="fa-solid fa-arrow-up text-xs mr-1"></i>0</span>
+            </div>
+          </div>
+
+          <!-- Last Error -->
+          <div class="bg-white border border-neutral-200 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-neutral-700"></i>
+              </div>
+              <span class="text-xs text-neutral-600">Status</span>
+            </div>
+            <p class="text-xs text-neutral-600 mb-1">Last Error</p>
+            <p class="text-sm text-neutral-900 mb-1">None</p>
+            <p class="text-xs text-neutral-600">System healthy</p>
+          </div>
+
+          <!-- Active Routes/Rules -->
+          <div class="bg-white border border-neutral-200 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-list-check text-neutral-700"></i>
+              </div>
+              <span class="text-xs text-neutral-600">Active</span>
+            </div>
+            <p class="text-xs text-neutral-600 mb-1">Routes & Rules</p>
+            <div class="flex items-center gap-3">
+              <div>
+                <p class="text-2xl text-neutral-900">8</p>
+                <p class="text-xs text-neutral-600">Routes</p>
+              </div>
+              <div class="w-px h-8 bg-neutral-200"></div>
+              <div>
+                <p class="text-2xl text-neutral-900">5</p>
+                <p class="text-xs text-neutral-600">Rules</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Status Timeline -->
+      <div>
+        <h2 class="text-lg text-neutral-900 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-neutral-700"></i>
+          Recent Activity
+        </h2>
+        <div class="bg-white border border-neutral-200 rounded-xl p-6">
+          
+          <!-- Timeline Items -->
+          <div class="space-y-4">
+            
+            <div class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="fa-solid fa-circle text-neutral-400 text-xs"></i>
+                </div>
+                <div class="w-px flex-1 bg-neutral-200 mt-2"></div>
+              </div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-sm text-neutral-900">Application Started</p>
+                  <span class="text-xs text-neutral-600">Just now</span>
+                </div>
+                <p class="text-xs text-neutral-600">Cusp Proxy 2 launched successfully</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="fa-solid fa-circle text-neutral-400 text-xs"></i>
+                </div>
+                <div class="w-px flex-1 bg-neutral-200 mt-2"></div>
+              </div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-sm text-neutral-900">Configuration Loaded</p>
+                  <span class="text-xs text-neutral-600">1 minute ago</span>
+                </div>
+                <p class="text-xs text-neutral-600">Profile "Personal" loaded with 8 routes and 5 rules</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="fa-solid fa-circle text-neutral-400 text-xs"></i>
+                </div>
+                <div class="w-px flex-1 bg-neutral-200 mt-2"></div>
+              </div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-sm text-neutral-900">System Check Completed</p>
+                  <span class="text-xs text-neutral-600">2 minutes ago</span>
+                </div>
+                <p class="text-xs text-neutral-600">Network permissions verified, no issues detected</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="fa-solid fa-circle text-neutral-400 text-xs"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-sm text-neutral-900">DNS Cache Cleared</p>
+                  <span class="text-xs text-neutral-600">15 minutes ago</span>
+                </div>
+                <p class="text-xs text-neutral-600">Manual DNS flush completed successfully</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- View All Link -->
+          <div class="mt-6 pt-4 border-t border-neutral-200 text-center">
+            <button class="text-sm text-neutral-900 hover:underline flex items-center gap-2 mx-auto">
+              View Full History
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+                        </body>
+                        </html>
+                        

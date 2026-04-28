@@ -164,7 +164,7 @@ final class MenuBarStatusController: NSObject, NSMenuDelegate {
         modeGlobalItem.action = #selector(selectRuntimeMode(_:))
         modeGlobalItem.representedObject = RuntimeMode.global
 
-        modeDirectItem.title = "Direct"
+        modeDirectItem.title = t("Direct", "直连")
         modeDirectItem.target = self
         modeDirectItem.action = #selector(selectRuntimeMode(_:))
         modeDirectItem.representedObject = RuntimeMode.direct
@@ -180,23 +180,23 @@ final class MenuBarStatusController: NSObject, NSMenuDelegate {
         let sourceFilterParent = NSMenuItem(title: t("Select Source", "选择订阅源"), action: nil, keyEquivalent: "")
         sourceFilterParent.submenu = sourceFilterSubmenu
         functionsSubmenu.addItem(sourceFilterParent)
-        functionsSubmenu.addItem(menuItem(t("Run Speed Test", "执行测速"), action: #selector(runSpeedTest)))
+        functionsSubmenu.addItem(menuItem(t("Run Speed Test", "运行测速"), action: #selector(runSpeedTest)))
         functionsSubmenu.addItem(menuItem(t("Copy Terminal Proxy Env", "复制终端代理环境变量"), action: #selector(copyTerminalProxyCommands)))
         functionsSubmenu.addItem(menuItem(t("Copy System Proxy Commands", "复制系统代理命令"), action: #selector(copySystemProxyCommands)))
         functionsSubmenu.addItem(menuItem(t("Copy Logs", "复制日志"), action: #selector(copyLogs)))
         functionsSubmenu.addItem(.separator())
 
-        toggleLaunchAtLoginItem.title = t("Launch At Login", "开机自启")
+        toggleLaunchAtLoginItem.title = t("Launch at Login", "开机自启")
         toggleLaunchAtLoginItem.target = self
         toggleLaunchAtLoginItem.action = #selector(toggleLaunchAtLogin)
         functionsSubmenu.addItem(toggleLaunchAtLoginItem)
 
-        toggleRestoreConnectionItem.title = t("Restore Connection", "启动恢复连接")
+        toggleRestoreConnectionItem.title = t("Restore Connection on Launch", "启动时恢复连接")
         toggleRestoreConnectionItem.target = self
         toggleRestoreConnectionItem.action = #selector(toggleRestoreConnection)
         functionsSubmenu.addItem(toggleRestoreConnectionItem)
 
-        toggleDisconnectOnOtherVPNItem.title = t("Disconnect On Other VPN", "检测其他 VPN 自动断开")
+        toggleDisconnectOnOtherVPNItem.title = t("Auto-Disconnect When Other VPN Is Active", "检测到其他 VPN 时自动断开")
         toggleDisconnectOnOtherVPNItem.target = self
         toggleDisconnectOnOtherVPNItem.action = #selector(toggleDisconnectOnOtherVPN)
         functionsSubmenu.addItem(toggleDisconnectOnOtherVPNItem)
@@ -1085,4 +1085,3 @@ private struct StrategyGroupsMenuSignature: Equatable {
     let switchRecords: [String: StrategyGroupSwitchRecord]
     let nodeSnapshots: [StrategyGroupNodeSnapshot]
 }
-

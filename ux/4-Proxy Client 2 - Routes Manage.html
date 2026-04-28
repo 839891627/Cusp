@@ -1,0 +1,568 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="routes-management" class="w-full min-h-screen bg-white flex">
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar" class="w-64 bg-neutral-50 border-r border-neutral-200 flex flex-col">
+    
+    <!-- Logo -->
+    <div class="p-6 border-b border-neutral-200">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-network-wired text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-base text-neutral-900">Cusp Proxy 2</h1>
+          <p class="text-xs text-neutral-600">v2.0.1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 p-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-chart-line text-sm"></i>
+            <span class="text-sm">Overview Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-neutral-900 text-white">
+            <i class="fa-solid fa-route text-sm"></i>
+            <span class="text-sm">Routes Management</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-shield text-sm"></i>
+            <span class="text-sm">Rules Editor</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            <span class="text-sm">Real-time Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-user-group text-sm"></i>
+            <span class="text-sm">Profiles</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-gear text-sm"></i>
+            <span class="text-sm">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors">
+            <i class="fa-solid fa-bars text-sm"></i>
+            <span class="text-sm">MenuBar Popover</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- System Status Footer -->
+    <div class="p-4 border-t border-neutral-200">
+      <div class="bg-white rounded-lg border border-neutral-200 p-3">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-2 h-2 bg-neutral-400 rounded-full"></div>
+          <span class="text-xs text-neutral-700">System Status</span>
+        </div>
+        <p class="text-xs text-neutral-600">Disconnected</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main Content -->
+  <main id="main-content" class="flex-1 flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <header id="header" class="bg-white border-b border-neutral-200 px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl text-neutral-900 mb-1">Routes Management</h1>
+          <p class="text-sm text-neutral-600">Configure network routing and traffic destinations</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-file-import text-xs"></i>
+            Import Routes
+          </button>
+          <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-sm text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-file-export text-xs"></i>
+            Export Routes
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i>
+            Add Route
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Routes Content -->
+    <div class="flex-1 overflow-y-auto p-8">
+      
+      <!-- Search and Filters -->
+      <div class="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 mb-6">
+        <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          
+          <!-- Search Bar -->
+          <div class="flex-1 w-full lg:max-w-md">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+              <input type="text" placeholder="Search routes by destination, gateway, or interface..." class="w-full pl-11 pr-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+            </div>
+          </div>
+
+          <!-- Segmented Filter -->
+          <div class="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg p-1">
+            <button class="px-4 py-2 rounded-md bg-neutral-900 text-white text-sm transition-colors">
+              All Routes
+            </button>
+            <button class="px-4 py-2 rounded-md hover:bg-neutral-100 text-neutral-700 text-sm transition-colors">
+              Included
+            </button>
+            <button class="px-4 py-2 rounded-md hover:bg-neutral-100 text-neutral-700 text-sm transition-colors">
+              Excluded
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Conflict Warning (if applicable) -->
+      <div class="bg-white border-l-4 border-neutral-900 rounded-lg p-4 mb-6 flex items-start gap-3">
+        <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-triangle-exclamation text-neutral-700"></i>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-neutral-900 mb-1">Route Conflict Detected</p>
+          <p class="text-xs text-neutral-600">2 routes have overlapping CIDR ranges. Review routes for 192.168.1.0/24 and 192.168.0.0/16.</p>
+        </div>
+        <button class="px-3 py-2 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors text-xs text-neutral-900 flex-shrink-0">
+          Review
+        </button>
+      </div>
+
+      <!-- Routes Table -->
+      <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+        
+        <!-- Table Header -->
+        <div class="bg-neutral-50 border-b border-neutral-200 px-6 py-4">
+          <div class="grid grid-cols-12 gap-4 items-center text-xs text-neutral-600">
+            <div class="col-span-1 flex items-center gap-2">
+              <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+            </div>
+            <div class="col-span-3">Destination</div>
+            <div class="col-span-2">Gateway</div>
+            <div class="col-span-2">Interface</div>
+            <div class="col-span-1 text-center">Priority</div>
+            <div class="col-span-2">Status</div>
+            <div class="col-span-1 text-right">Actions</div>
+          </div>
+        </div>
+
+        <!-- Table Rows -->
+        <div class="divide-y divide-neutral-200">
+          
+          <!-- Route Row 1 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">192.168.1.0/24</p>
+                <p class="text-xs text-neutral-600">Local network</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">192.168.1.1</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">en0</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">1</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-900">Enabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Row 2 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">10.0.0.0/8</p>
+                <p class="text-xs text-neutral-600">Private network</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">10.0.0.1</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">utun0</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">2</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-900">Enabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Row 3 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">*.google.com</p>
+                <p class="text-xs text-neutral-600">Domain-based route</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">proxy-gateway</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">utun1</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">3</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-600">Disabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Row 4 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">0.0.0.0/0</p>
+                <p class="text-xs text-neutral-600">Default route</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">192.168.1.1</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">en0</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">10</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-900">Enabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Row 5 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">172.16.0.0/12</p>
+                <p class="text-xs text-neutral-600">Private network</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">172.16.0.1</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">en1</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">5</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-900">Enabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Row 6 -->
+          <div class="px-6 py-4 hover:bg-neutral-50 transition-colors">
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <div class="col-span-1 flex items-center gap-2">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300">
+              </div>
+              <div class="col-span-3">
+                <p class="text-sm text-neutral-900 mb-1">*.netflix.com</p>
+                <p class="text-xs text-neutral-600">Domain-based route</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">proxy-gateway</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-sm text-neutral-900">utun1</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-neutral-100 rounded-lg text-sm text-neutral-900">4</span>
+              </div>
+              <div class="col-span-2">
+                <div class="flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                  </label>
+                  <span class="text-xs text-neutral-900">Enabled</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex items-center justify-end gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-pen text-neutral-700 text-xs"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+                  <i class="fa-solid fa-trash text-neutral-700 text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table Footer -->
+        <div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <select class="px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+                <option>Bulk Actions</option>
+                <option>Enable Selected</option>
+                <option>Disable Selected</option>
+                <option>Delete Selected</option>
+                <option>Export Selected</option>
+              </select>
+              <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-white transition-colors text-sm text-neutral-900">
+                Apply
+              </button>
+            </div>
+            <p class="text-sm text-neutral-600">Showing 6 of 8 routes</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Add/Edit Route Sheet (Hidden by default) -->
+  <div id="route-sheet" class="fixed inset-y-0 right-0 w-full max-w-xl bg-white border-l border-neutral-200 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col z-50 hidden">
+    
+    <!-- Sheet Header -->
+    <div class="bg-neutral-50 border-b border-neutral-200 px-6 py-5 flex items-center justify-between">
+      <div>
+        <h2 class="text-lg text-neutral-900 mb-1">Add New Route</h2>
+        <p class="text-xs text-neutral-600">Configure network routing destination</p>
+      </div>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+        <i class="fa-solid fa-xmark text-neutral-700"></i>
+      </button>
+    </div>
+
+    <!-- Sheet Content -->
+    <div class="flex-1 overflow-y-auto p-6">
+      
+      <!-- Route Type Selection -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-3 block">Route Type</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="px-4 py-3 rounded-lg border-2 border-neutral-900 bg-neutral-50 text-left transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fa-solid fa-network-wired text-neutral-900"></i>
+              <span class="text-sm text-neutral-900">CIDR Block</span>
+            </div>
+            <p class="text-xs text-neutral-600">IP address range</p>
+          </button>
+          <button class="px-4 py-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-left transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fa-solid fa-globe text-neutral-700"></i>
+              <span class="text-sm text-neutral-700">Domain</span>
+            </div>
+            <p class="text-xs text-neutral-600">Domain pattern</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Destination Input -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-2 block">Destination CIDR</label>
+        <input type="text" placeholder="e.g., 192.168.1.0/24" class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+        <p class="text-xs text-neutral-600 mt-2">Enter the IP address range in CIDR notation</p>
+      </div>
+
+      <!-- Gateway Input -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-2 block">Gateway</label>
+        <input type="text" placeholder="e.g., 192.168.1.1 or proxy-gateway" class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+        <p class="text-xs text-neutral-600 mt-2">Gateway IP or proxy identifier</p>
+      </div>
+
+      <!-- Interface Selection -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-2 block">Network Interface</label>
+        <select class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+          <option>Select interface...</option>
+          <option>en0 (Ethernet)</option>
+          <option>en1 (Wi-Fi)</option>
+          <option>utun0 (VPN)</option>
+          <option>utun1 (Proxy)</option>
+        </select>
+      </div>
+
+      <!-- Priority Input -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-2 block">Priority</label>
+        <input type="number" placeholder="1-100" value="1" class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900">
+        <p class="text-xs text-neutral-600 mt-2">Lower numbers = higher priority (1 is highest)</p>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-6">
+        <label class="text-sm text-neutral-900 mb-2 block">Description (Optional)</label>
+        <textarea rows="3" placeholder="Add notes about this route..." class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 resize-none"></textarea>
+      </div>
+
+      <!-- Enable on Save -->
+      <div class="mb-6">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-5 h-5 rounded border-neutral-300">
+          <div>
+            <p class="text-sm text-neutral-900">Enable route immediately</p>
+            <p class="text-xs text-neutral-600">Route will be active after saving</p>
+          </div>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Sheet Footer -->
+    <div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4 flex items-center justify-end gap-3">
+      <button class="px-4 py-2 rounded-lg border border-neutral-200 hover:bg-white transition-colors text-sm text-neutral-900">
+        Cancel
+      </button>
+      <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-sm text-white">
+        Save Route
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+                        </body>
+                        </html>
+                        

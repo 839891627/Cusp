@@ -2,13 +2,14 @@ import SwiftUI
 
 struct SubscriptionsView: View {
     @ObservedObject var viewModel: AppViewModel
+    @State private var pendingDeleteSource: SubscriptionSource?
 
     private var isChinese: Bool {
         viewModel.selectedLanguage == .simplifiedChinese
     }
 
     private var pageHeaderFont: Font {
-        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
+        .system(size: 28, weight: isChinese ? .bold : .semibold, design: .rounded)
     }
 
     private func t(_ en: String, _ zh: String) -> String {
@@ -34,6 +35,27 @@ struct SubscriptionsView: View {
             }
             .padding(CuspLayout.contentInset)
             .controlSize(.large)
+        }
+        .confirmationDialog(
+            t("Delete this source?", "确定删除该来源？"),
+            isPresented: Binding(
+                get: { pendingDeleteSource != nil },
+                set: { if !$0 { pendingDeleteSource = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(t("Delete", "删除"), role: .destructive) {
+                guard let pendingDeleteSource else {
+                    return
+                }
+                viewModel.deleteSubscription(id: pendingDeleteSource.id)
+                self.pendingDeleteSource = nil
+            }
+            Button(t("Cancel", "取消"), role: .cancel) {
+                pendingDeleteSource = nil
+            }
+        } message: {
+            Text(deleteConfirmationMessage)
         }
     }
 
@@ -94,7 +116,7 @@ struct SubscriptionsView: View {
                 }
                 .menuStyle(.borderlessButton)
 
-                Button(t("Refresh Enabled", "刷新已启用")) {
+                Button(t("Refresh Enabled Sources", "刷新已启用来源")) {
                     viewModel.refreshAllSubscriptions()
                 }
                 .flowGateSecondaryActionStyle()
@@ -147,7 +169,7 @@ struct SubscriptionsView: View {
 
                 Spacer()
 
-                Text(source.isEnabled ? t("ENABLED", "已启用") : t("DISABLED", "已停用"))
+                Text(source.isEnabled ? t("Enabled", "已启用") : t("Disabled", "已停用"))
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .flowGateSemanticCapsule(source.isEnabled ? .success : .neutral)
             }
@@ -187,26 +209,30 @@ struct SubscriptionsView: View {
                 .flowGateSecondaryActionStyle()
                 .disabled(source.urlString.isEmpty)
 
-                Button(t("Edit Source", "编辑来源")) {
-                    viewModel.loadSubscriptionIntoEditor(id: source.id)
-                }
-                .flowGateSecondaryActionStyle()
-
-                Button(source.isEnabled ? t("Disable", "停用") : t("Enable", "启用")) {
-                    viewModel.toggleSubscription(id: source.id)
-                }
-                .flowGateSecondaryActionStyle()
-
-                Button(t("Use In Nodes", "设为节点来源")) {
+                Button(t("Use as Node Source", "设为节点页来源")) {
                     viewModel.selectSourceFilter(id: source.id)
                 }
                 .flowGatePrimaryActionStyle()
                 .disabled(!source.isEnabled || viewModel.selectedSourceFilterID == source.id)
 
-                Button(t("Delete", "删除")) {
-                    viewModel.deleteSubscription(id: source.id)
+                Menu {
+                    Button(t("Edit Source", "编辑来源")) {
+                        viewModel.loadSubscriptionIntoEditor(id: source.id)
+                    }
+
+                    Button(source.isEnabled ? t("Disable", "停用") : t("Enable", "启用")) {
+                        viewModel.toggleSubscription(id: source.id)
+                    }
+
+                    Divider()
+
+                    Button(t("Delete", "删除"), role: .destructive) {
+                        pendingDeleteSource = source
+                    }
+                } label: {
+                    Label(t("More", "更多"), systemImage: "ellipsis.circle")
                 }
-                .flowGateDangerActionStyle()
+                .flowGateSecondaryActionStyle()
             }
         }
         .padding(14)
@@ -231,6 +257,17 @@ struct SubscriptionsView: View {
                 .monospacedDigit()
                 .foregroundStyle(CuspPalette.primaryText)
         }
+    }
+
+    private var deleteConfirmationMessage: String {
+        guard let pendingDeleteSource else {
+            return ""
+        }
+        let nodeCount = viewModel.catalogNodes.filter { $0.sourceID == pendingDeleteSource.id }.count
+        if isChinese {
+            return "将删除来源“\(pendingDeleteSource.name)”及其 \(nodeCount) 个节点。此操作不可撤销。"
+        }
+        return "This will delete \"\(pendingDeleteSource.name)\" and its \(nodeCount) nodes. This action cannot be undone."
     }
 
     private func statusText(for source: SubscriptionSource) -> String {

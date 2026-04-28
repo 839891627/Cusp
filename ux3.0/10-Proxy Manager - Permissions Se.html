@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - System Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset',
+                        'mac-prompt': '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tl-red { background-color: #FF5F56; }
+        .tl-yellow { background-color: #FFBD2E; }
+        .tl-green { background-color: #27C93F; }
+        
+        .mac-window {
+            width: 100%;
+            max-width: 1000px;
+            height: 680px;
+            background: rgba(236, 236, 236, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(223, 223, 223, 0.5);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .window-drag-area {
+            -webkit-app-region: drag;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Custom Toggle Switch for macOS style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .toggle-label {
+            background-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-knob {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden font-sans text-mac-text">
+
+    <!-- macOS Window Container -->
+    <div id="app-window" class="mac-window">
+        
+        <!-- Drag Area for macOS -->
+        <div class="window-drag-area"></div>
+
+        <!-- Sidebar (Onboarding Steps) -->
+        <div id="sidebar" class="sidebar pt-4 pb-6 px-4 flex flex-col justify-between relative z-20">
+            <div>
+                <!-- Traffic Lights -->
+                <div class="flex items-center mb-8 pl-1">
+                    <span class="traffic-light tl-red"></span>
+                    <span class="traffic-light tl-yellow"></span>
+                    <span class="traffic-light tl-green"></span>
+                </div>
+
+                <!-- App Icon / Title -->
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm">Cusp Proxy</h1>
+                        <p class="text-xs text-mac-textMuted">Version 3.0</p>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <nav class="space-y-1">
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        Welcome
+                    </div>
+                    <div class="px-3 py-2 rounded-md bg-mac-sidebarActive text-mac-text font-medium text-sm flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                        <div class="w-5 h-5 rounded-full bg-mac-accent text-white flex items-center justify-center text-[10px]">2</div>
+                        System Integration
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">3</div>
+                        Strategy Groups
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">4</div>
+                        Routing Rules
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">5</div>
+                        Logs & Setup
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Bottom Progress Indicator -->
+            <div class="px-2">
+                <div class="flex items-center justify-between text-xs text-mac-textMuted mb-2">
+                    <span>Setup Progress</span>
+                    <span>40%</span>
+                </div>
+                <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                    <div class="h-full bg-mac-accent w-2/5 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Detail View -->
+        <div id="detail-view" class="main-content relative z-20">
+            
+            <!-- Content Area -->
+            <div class="flex-1 flex flex-row">
+                
+                <!-- Left Side: Form/Permissions -->
+                <div class="flex-1 p-10 pt-16 overflow-y-auto flex flex-col relative z-10">
+                    
+                    <!-- Step Header -->
+                    <div class="mb-8">
+                        <div class="w-12 h-12 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center shadow-sm mb-5">
+                            <i class="fa-solid fa-shield-halved text-mac-text text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-semibold mb-2 text-mac-text">System Integration</h2>
+                        <p class="text-mac-textMuted text-sm">Step 2 of 2. We need a few permissions to ensure Cusp Proxy can route and filter traffic effectively on your Mac.</p>
+                    </div>
+
+                    <!-- Permissions Checklist -->
+                    <div class="space-y-4 max-w-md w-full">
+                        
+                        <!-- Row 1: Network Extension -->
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50/50 transition-colors">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-globe text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text mb-0.5">Network Extension</h4>
+                                    <p class="text-xs text-mac-textMuted leading-relaxed">Required to create a local VPN tunnel for seamless traffic capture.</p>
+                                    <a href="#" class="text-xs text-mac-accent hover:text-mac-accentHover mt-1 inline-block">Learn more</a>
+                                </div>
+                            </div>
+                            <div class="relative inline-block w-10 h-6 align-middle select-none mt-1 shrink-0">
+                                <input type="checkbox" name="toggle" id="toggle1" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5 left-0.5 z-10 toggle-knob" checked/>
+                                <label for="toggle1" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Local Proxy Binding -->
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50/50 transition-colors">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-plug text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text mb-0.5">Local Proxy Port Binding</h4>
+                                    <p class="text-xs text-mac-textMuted leading-relaxed">Allows Cusp to bind to ports (e.g., 7890) for local SOCKS5/HTTP proxies.</p>
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-100">
+                                            <i class="fa-solid fa-circle-exclamation"></i> Action Required
+                                        </span>
+                                        <a href="#" class="text-xs text-mac-accent hover:text-mac-accentHover">Fix issue</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="relative inline-block w-10 h-6 align-middle select-none mt-1 shrink-0">
+                                <input type="checkbox" name="toggle" id="toggle2" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5 left-0.5 z-10 toggle-knob"/>
+                                <label for="toggle2" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Packet Filtering -->
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50/50 transition-colors">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-filter text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text mb-0.5">Packet Filtering</h4>
+                                    <p class="text-xs text-mac-textMuted leading-relaxed">Enables advanced routing rules and real-time traffic inspection.</p>
+                                </div>
+                            </div>
+                            <div class="relative inline-block w-10 h-6 align-middle select-none mt-1 shrink-0">
+                                <input type="checkbox" name="toggle" id="toggle3" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5 left-0.5 z-10 toggle-knob"/>
+                                <label for="toggle3" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Auto-start -->
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50/50 transition-colors">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-power-off text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text mb-0.5">Auto-start on Login</h4>
+                                    <p class="text-xs text-mac-textMuted leading-relaxed">Launch Cusp Proxy silently in the menu bar when your Mac starts.</p>
+                                </div>
+                            </div>
+                            <div class="relative inline-block w-10 h-6 align-middle select-none mt-1 shrink-0">
+                                <input type="checkbox" name="toggle" id="toggle4" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5 left-0.5 z-10 toggle-knob" checked/>
+                                <label for="toggle4" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Side: System Prompt Simulation & Image -->
+                <div class="w-5/12 bg-gray-50 border-l border-gray-200 relative overflow-hidden flex flex-col items-center justify-center p-8">
+                    
+                    <!-- Background Visual (Abstract/Tech) -->
+                    <div class="absolute inset-0 opacity-40">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/53457bf1d6-580785962618c0be411f.png" alt="abstract soft tech pattern with subtle blue and purple gradient mesh, clean, modern, minimal" />
+                    </div>
+
+                    <!-- Inline System Prompt Simulation -->
+                    <div class="relative z-10 w-full max-w-sm bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-mac-prompt p-5 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm mb-4">
+                            <i class="fa-solid fa-network-wired text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-[15px] mb-2 leading-snug">"Cusp Proxy" Would Like to Add VPN Configurations</h3>
+                        <p class="text-[13px] text-mac-textMuted mb-6 leading-relaxed">
+                            All network activity on this Mac may be filtered or monitored when using a VPN connection.
+                        </p>
+                        
+                        <!-- Native-style Buttons -->
+                        <div class="w-full flex flex-col gap-2">
+                            <button class="w-full py-2 rounded-lg bg-mac-accent text-white font-medium text-[13px] shadow-sm hover:bg-mac-accentHover transition-colors">
+                                Allow
+                            </button>
+                            <button class="w-full py-2 rounded-lg bg-gray-100 text-mac-text font-medium text-[13px] hover:bg-gray-200 transition-colors">
+                                Don't Allow
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contextual Hint -->
+                    <div class="relative z-10 mt-8 flex items-center gap-2 text-xs text-mac-textMuted bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+                        <i class="fa-solid fa-info-circle text-blue-500"></i>
+                        <span>You will see this system prompt when enabling Network Extension.</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Action Bar (Footer) -->
+            <div class="h-16 border-t border-gray-200 bg-gray-50/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 rounded-br-12 relative z-20">
+                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-mac-textMuted hover:text-mac-text transition-colors">
+                    Skip Setup
+                </button>
+                
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-1.5 rounded-md text-sm font-medium text-mac-text bg-white border border-gray-200 shadow-mac-button hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                        Back
+                    </button>
+                    <button class="px-6 py-1.5 rounded-md text-sm font-medium text-white bg-mac-accent shadow-mac-button hover:bg-mac-accentHover transition-colors flex items-center gap-2">
+                        Next Step
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

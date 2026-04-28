@@ -20,6 +20,7 @@ final class LocalProxyManagerService {
 
     enum Error: LocalizedError {
         case missingBinary
+        case invalidBinaryChecksum
         case noEnabledNetworkServices
         case commandFailed(String)
 
@@ -27,6 +28,8 @@ final class LocalProxyManagerService {
             switch self {
             case .missingBinary:
                 return "mihomo binary was not found in the app resources."
+            case .invalidBinaryChecksum:
+                return "mihomo binary checksum did not match the pinned runtime manifest."
             case .noEnabledNetworkServices:
                 return "No enabled macOS network services were found."
             case .commandFailed(let message):
@@ -45,6 +48,7 @@ final class LocalProxyManagerService {
     }
 
     private(set) var availableNetworkServices: [String] = []
+    private(set) var residualSystemProxyServices: [String] = []
     private let processManager = ProcessManager()
     private let commandExecutor = CommandExecutor()
     private let credentialStore = SecureCredentialStore(service: "org.cusp.runtime")
@@ -53,7 +57,9 @@ final class LocalProxyManagerService {
 
     func prepare() async throws {
         let startedAt = Date()
+        cleanupStaleRuntimeConfiguration()
         availableNetworkServices = try await loadEnabledNetworkServices()
+        residualSystemProxyServices = try await detectResidualSystemProxyServices(in: availableNetworkServices)
         _ = transition(to: .disconnected, reason: "prepare completed", startedAt: startedAt)
     }
 
@@ -158,6 +164,7 @@ final class LocalProxyManagerService {
                 socksPort: CuspConstants.localSOCKSProxyPort
             ))
             availableNetworkServices = services
+            residualSystemProxyServices = []
             _ = transition(to: .connected, reason: "start completed", startedAt: startedAt)
         } catch {
             try? await run(SystemProxyCommandBuilder.disableCommands(services: services))
@@ -191,6 +198,17 @@ final class LocalProxyManagerService {
         }
     }
 
+    func restoreResidualSystemProxySettings() async throws {
+        let services = residualSystemProxyServices.isEmpty
+            ? try await detectResidualSystemProxyServices(in: availableNetworkServices)
+            : residualSystemProxyServices
+        guard !services.isEmpty else {
+            return
+        }
+        try await run(SystemProxyCommandBuilder.disableCommands(services: services))
+        residualSystemProxyServices = []
+    }
+
     private func locateMihomoBinary() throws -> URL {
         let fileManager = FileManager.default
         let candidates = [
@@ -202,6 +220,9 @@ final class LocalProxyManagerService {
 
         guard let url = candidates.first(where: { fileManager.isExecutableFile(atPath: $0.path) || fileManager.fileExists(atPath: $0.path) }) else {
             throw Error.missingBinary
+        }
+        guard MihomoRuntimeManifest.bundled.validateBinary(at: url) else {
+            throw Error.invalidBinaryChecksum
         }
 
         return url
@@ -257,6 +278,29 @@ final class LocalProxyManagerService {
         return NetworkServiceParser.parseEnabledServices(from: output)
     }
 
+    private func detectResidualSystemProxyServices(in services: [String]) async throws -> [String] {
+        guard !services.isEmpty,
+              !LocalPortWaiter.isListening(
+                host: CuspConstants.localProxyHost,
+                port: CuspConstants.localHTTPProxyPort
+              ) else {
+            return []
+        }
+
+        var results: [ProxyCommandResult] = []
+        for command in SystemProxyCommandBuilder.readCommands(services: services) {
+            let output = try await run(command)
+            results.append(ProxyCommandResult(command: command, output: output))
+        }
+
+        return SystemProxyResidualDetector.servicesWithResidualCuspProxy(
+            from: results,
+            host: CuspConstants.localProxyHost,
+            httpPort: CuspConstants.localHTTPProxyPort,
+            socksPort: CuspConstants.localSOCKSProxyPort
+        )
+    }
+
     private func run(_ commands: [ProxyCommand]) async throws {
         for command in commands {
             _ = try await run(command)
@@ -291,7 +335,7 @@ final class LocalProxyManagerService {
             let message = [errorOutput, output]
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .first { !$0.isEmpty } ?? "networksetup exited with code \(process.terminationStatus)."
-            throw Error.commandFailed(message)
+            throw Error.commandFailed(RuntimeLogSanitizer.sanitize(message))
         }
 
         return output
@@ -325,6 +369,14 @@ final class LocalProxyManagerService {
             try? FileManager.default.removeItem(at: runtimeConfigURL)
             self.runtimeConfigURL = nil
         }
+    }
+
+    private func cleanupStaleRuntimeConfiguration() {
+        let fileURL = try? runtimeDirectory().appendingPathComponent("config.yaml")
+        if let fileURL, FileManager.default.fileExists(atPath: fileURL.path) {
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+        runtimeConfigURL = nil
     }
 
     private func emitTransitionEvent(_ event: RuntimeTransitionEvent) {

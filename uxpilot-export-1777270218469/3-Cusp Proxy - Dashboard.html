@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F5F5F7',
+                            surface: 'rgba(255, 255, 255, 0.7)',
+                            surfaceDark: 'rgba(255, 255, 255, 0.9)',
+                            border: 'rgba(0, 0, 0, 0.05)',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            accent: '#007AFF',
+                            accentHover: '#0066CC',
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                        'mac-inner': 'inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F7;
+            background-image: url('data:image/svg+xml,%3Csvg width="100%25" height="100%25" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="p" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Ccircle cx="50" cy="50" r="1" fill="%23000000" fill-opacity="0.03" /%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23p)" /%3E%3C/svg%3E');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .mac-window {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #007AFF 0%, #0066CC 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .config-tile {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #007AFF;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #007AFF;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 40px;
+            height: 24px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(16px);
+        }
+
+        /* Sidebar Item Active State */
+        .sidebar-item-active {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+            color: #007AFF;
+            border-radius: 8px;
+        }
+        .sidebar-item-active i {
+            color: #007AFF;
+        }
+        
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="m-0 p-0 min-h-screen flex text-app-text overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-[240px] flex-shrink-0 border-r border-app-border bg-app-surface/50 mac-window flex flex-col h-screen">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-white to-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-app-accent text-[14px]"></i>
+            </div>
+            <span class="font-semibold text-[15px] tracking-tight">Cusp Proxy</span>
+        </div>
+
+        <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+            <a href="#" class="sidebar-item-active flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-colors">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-[14px]"></i>
+                Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-layer-group w-5 text-center text-[14px]"></i>
+                Profiles
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-server w-5 text-center text-[14px]"></i>
+                Nodes
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-route w-5 text-center text-[14px]"></i>
+                Rules
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-terminal w-5 text-center text-[14px]"></i>
+                Logs
+            </a>
+        </nav>
+
+        <div class="p-3 mt-auto">
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center text-[14px]"></i>
+                Settings
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 h-screen overflow-y-auto p-8">
+        <div class="max-w-[1000px] mx-auto space-y-6">
+            
+            <!-- Connection Status Header -->
+            <header id="connection-header" class="glass-panel rounded-[16px] p-6 flex items-center justify-between shadow-mac">
+                <div class="flex items-center gap-5">
+                    <div class="relative">
+                        <div class="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                            <i class="fa-solid fa-power-off text-green-500 text-[20px]"></i>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-[24px] font-semibold tracking-tight text-app-text leading-tight mb-1">Connected</h1>
+                        <div class="flex items-center gap-3 text-[13px] text-app-textMuted">
+                            <span class="flex items-center gap-1.5 bg-black/5 px-2 py-0.5 rounded-md">
+                                <i class="fa-solid fa-network-wired text-[11px]"></i>
+                                Global Mode
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-server text-[11px]"></i>
+                                US-West-01 (Auto)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="text-right mr-2">
+                        <div class="text-[12px] text-app-textMuted mb-1">System Proxy</div>
+                        <div class="text-[14px] font-medium text-app-text">Active</div>
+                    </div>
+                    <div class="relative inline-block w-12 align-middle select-none">
+                        <input type="checkbox" name="main-toggle" id="main-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" checked/>
+                        <label for="main-toggle" class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer w-12"></label>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Quick Stats Grid -->
+            <section id="quick-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Latency Tile -->
+                <div class="glass-panel rounded-[16px] p-5 shadow-mac flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 text-[13px] font-medium text-app-textMuted">
+                            <i class="fa-solid fa-stopwatch text-app-accent"></i>
+                            Latency
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-[32px] font-semibold tracking-tight text-app-text">42</span>
+                        <span class="text-[13px] font-medium text-app-textMuted">ms</span>
+                    </div>
+                </div>
+
+                <!-- Download Tile -->
+                <div class="glass-panel rounded-[16px] p-5 shadow-mac flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 text-[13px] font-medium text-app-textMuted">
+                            <i class="fa-solid fa-arrow-down text-green-500"></i>
+                            Download
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-[32px] font-semibold tracking-tight text-app-text">12.4</span>
+                        <span class="text-[13px] font-medium text-app-textMuted">MB/s</span>
+                    </div>
+                </div>
+
+                <!-- Upload Tile -->
+                <div class="glass-panel rounded-[16px] p-5 shadow-mac flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 text-[13px] font-medium text-app-textMuted">
+                            <i class="fa-solid fa-arrow-up text-blue-500"></i>
+                            Upload
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-[32px] font-semibold tracking-tight text-app-text">3.2</span>
+                        <span class="text-[13px] font-medium text-app-textMuted">MB/s</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speed Test Widget -->
+            <section id="speed-test-widget" class="glass-panel rounded-[16px] p-6 shadow-mac flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                <!-- Background decorative mesh -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Cg/%3E%3C/svg%3E');"></div>
+                
+                <!-- Speed Test Trigger -->
+                <div class="flex-shrink-0 w-full md:w-auto flex flex-col items-center justify-center relative z-10">
+                    <button class="relative w-36 h-36 rounded-full bg-white/60 border border-black/5 shadow-[0_8px_32px_rgba(0,0,0,0.08),inset_0_2px_4px_rgba(255,255,255,1)] flex flex-col items-center justify-center group hover:scale-105 transition-all duration-300">
+                        <div class="absolute inset-2 rounded-full border border-black/5 bg-white/40 shadow-inner flex flex-col items-center justify-center">
+                            <i class="fa-solid fa-gauge-high text-[32px] text-app-accent mb-1 group-hover:rotate-12 transition-transform duration-500"></i>
+                            <span class="text-[13px] font-bold text-app-text uppercase tracking-wide">Test Speed</span>
+                        </div>
+                        <!-- Animated Gauge Ring -->
+                        <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(0,122,255,0.1)" stroke-width="3" />
+                            <circle cx="50" cy="50" r="48" fill="none" stroke="#007AFF" stroke-width="3" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="240" class="group-hover:stroke-dashoffset-[60] transition-all duration-1500 ease-out" />
+                        </svg>
+                    </button>
+                    <div class="mt-4 text-[12px] text-app-textMuted font-medium flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        Server: US-West-01
+                    </div>
+                </div>
+
+                <!-- Live Results Panel -->
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full z-10">
+                    <!-- Ping Card -->
+                    <div class="bg-white/50 rounded-[12px] p-4 border border-black/5 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-black/5 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                        <div class="text-[11px] text-app-textMuted font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-tower-broadcast text-app-textMuted"></i> Ping
+                        </div>
+                        <div>
+                            <div class="flex items-baseline gap-1 mb-1">
+                                <span class="text-[32px] font-bold text-app-text tracking-tight">12</span>
+                                <span class="text-[12px] font-medium text-app-textMuted">ms</span>
+                            </div>
+                            <div class="text-[11px] font-medium text-green-500 flex items-center gap-1">
+                                <i class="fa-solid fa-wave-square"></i> Jitter: 1.2ms
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Card -->
+                    <div class="bg-white/50 rounded-[12px] p-4 border border-black/5 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-app-accent/10 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                        <div class="text-[11px] text-app-textMuted font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-down text-app-accent"></i> Download
+                        </div>
+                        <div>
+                            <div class="flex items-baseline gap-1 mb-2">
+                                <span class="text-[32px] font-bold text-app-accent tracking-tight">450.5</span>
+                                <span class="text-[12px] font-medium text-app-textMuted">Mbps</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-app-accent to-blue-400 w-[85%] rounded-full relative">
+                                    <div class="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Card -->
+                    <div class="bg-white/50 rounded-[12px] p-4 border border-black/5 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-purple-500/10 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                        <div class="text-[11px] text-app-textMuted font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-up text-purple-500"></i> Upload
+                        </div>
+                        <div>
+                            <div class="flex items-baseline gap-1 mb-2">
+                                <span class="text-[32px] font-bold text-purple-500 tracking-tight">85.2</span>
+                                <span class="text-[12px] font-medium text-app-textMuted">Mbps</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-purple-500 to-purple-400 w-[45%] rounded-full relative">
+                                    <div class="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Traffic Monitor Chart -->
+            <section id="traffic-monitor" class="glass-panel rounded-[16px] p-6 shadow-mac">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-[16px] font-semibold text-app-text">Network Traffic</h2>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 rounded-md bg-black/5 text-[12px] font-medium text-app-text">1H</button>
+                        <button class="px-3 py-1 rounded-md text-[12px] font-medium text-app-textMuted hover:bg-black/5 transition-colors">24H</button>
+                    </div>
+                </div>
+                <div id="traffic-chart" class="w-full h-[240px]"></div>
+            </section>
+
+            <!-- Recent Activity Log -->
+            <section id="recent-activity" class="glass-panel rounded-[16px] p-6 shadow-mac">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-[16px] font-semibold text-app-text">Recent Connections</h2>
+                    <a href="#" class="text-[13px] font-medium text-app-accent hover:text-app-accentHover transition-colors">View Logs</a>
+                </div>
+                
+                <div class="space-y-3">
+                    <!-- Log Item 1 -->
+                    <div class="flex items-center justify-between p-3 rounded-xl hover:bg-black/5 transition-colors group cursor-pointer border border-transparent hover:border-black/5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                <i class="fa-brands fa-google text-[14px]"></i>
+                            </div>
+                            <div>
+                                <div class="text-[14px] font-medium text-app-text mb-0.5">google.com</div>
+                                <div class="text-[12px] text-app-textMuted flex items-center gap-2">
+                                    <span>PROXY</span>
+                                    <span class="w-1 h-1 rounded-full bg-black/20"></span>
+                                    <span>US-West-01</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[13px] font-medium text-green-500 mb-0.5">Success</div>
+                            <div class="text-[11px] text-app-textMuted">Just now</div>
+                        </div>
+                    </div>
+
+                    <!-- Log Item 2 -->
+                    <div class="flex items-center justify-between p-3 rounded-xl hover:bg-black/5 transition-colors group cursor-pointer border border-transparent hover:border-black/5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                                <i class="fa-brands fa-github text-[14px]"></i>
+                            </div>
+                            <div>
+                                <div class="text-[14px] font-medium text-app-text mb-0.5">api.github.com</div>
+                                <div class="text-[12px] text-app-textMuted flex items-center gap-2">
+                                    <span>DIRECT</span>
+                                    <span class="w-1 h-1 rounded-full bg-black/20"></span>
+                                    <span>Bypass</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[13px] font-medium text-green-500 mb-0.5">Success</div>
+                            <div class="text-[11px] text-app-textMuted">2 mins ago</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        function initializeCharts() {
+            try {
+                var trace1 = {
+                    x: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'],
+                    y: [2, 5, 3, 8, 4, 12, 6],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Download',
+                    line: {
+                        color: '#28A745',
+                        width: 2,
+                        shape: 'spline',
+                        smoothing: 1.3
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(40, 167, 69, 0.1)'
+                };
+
+                var trace2 = {
+                    x: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'],
+                    y: [1, 2, 1, 3, 2, 4, 2],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Upload',
+                    line: {
+                        color: '#007AFF',
+                        width: 2,
+                        shape: 'spline',
+                        smoothing: 1.3
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(0, 122, 255, 0.1)'
+                };
+
+                var data = [trace1, trace2];
+
+                var layout = {
+                    margin: { t: 10, r: 10, b: 30, l: 30 },
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    showlegend: false,
+                    xaxis: {
+                        showgrid: false,
+                        tickfont: { color: '#86868B', size: 11 },
+                        linecolor: 'rgba(0,0,0,0.05)'
+                    },
+                    yaxis: {
+                        showgrid: true,
+                        gridcolor: 'rgba(0,0,0,0.05)',
+                        tickfont: { color: '#86868B', size: 11 },
+                        linecolor: 'rgba(0,0,0,0)'
+                    }
+                };
+
+                var config = { responsive: true, displayModeBar: false };
+
+                Plotly.newPlot('traffic-chart', data, layout, config);
+            } catch (e) {
+                console.error('Chart initialization failed', e);
+            }
+        }
+
+        window.addEventListener('load', initializeCharts);
+        setTimeout(initializeCharts, 1200);
+    </script>
+</body>
+</html>

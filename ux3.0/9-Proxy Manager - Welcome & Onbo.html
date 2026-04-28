@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tl-red { background-color: #FF5F56; }
+        .tl-yellow { background-color: #FFBD2E; }
+        .tl-green { background-color: #27C93F; }
+        
+        .mac-window {
+            width: 100%;
+            max-width: 1000px;
+            height: 680px;
+            background: rgba(236, 236, 236, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(223, 223, 223, 0.5);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .window-drag-area {
+            -webkit-app-region: drag;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Dark mode simulation class for the preview */
+        .preview-dark {
+            background: #1E1E1E !important;
+            color: #FFFFFF !important;
+            border-color: #3A3A3C !important;
+        }
+        .preview-dark .text-mac-text { color: #FFFFFF !important; }
+        .preview-dark .text-mac-textMuted { color: #98989D !important; }
+        .preview-dark .bg-white { background: #2D2D2D !important; }
+        .preview-dark .border-gray-200 { border-color: #3A3A3C !important; }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden font-sans text-mac-text">
+
+    <!-- macOS Window Container -->
+    <div id="app-window" class="mac-window">
+        
+        <!-- Drag Area for macOS -->
+        <div class="window-drag-area"></div>
+
+        <!-- Sidebar (Onboarding Steps) -->
+        <div id="sidebar" class="sidebar pt-4 pb-6 px-4 flex flex-col justify-between relative z-20">
+            <div>
+                <!-- Traffic Lights -->
+                <div class="flex items-center mb-8 pl-1">
+                    <span class="traffic-light tl-red"></span>
+                    <span class="traffic-light tl-yellow"></span>
+                    <span class="traffic-light tl-green"></span>
+                </div>
+
+                <!-- App Icon / Title -->
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm">Cusp Proxy</h1>
+                        <p class="text-xs text-mac-textMuted">Version 3.0</p>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <nav class="space-y-1">
+                    <div class="px-3 py-2 rounded-md bg-mac-sidebarActive text-mac-text font-medium text-sm flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                        <div class="w-5 h-5 rounded-full bg-mac-accent text-white flex items-center justify-center text-[10px]">1</div>
+                        Welcome
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">2</div>
+                        Import Nodes
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">3</div>
+                        Strategy Groups
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">4</div>
+                        Routing Rules
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors">
+                        <div class="w-5 h-5 rounded-full border border-mac-textMuted flex items-center justify-center text-[10px]">5</div>
+                        Logs & Setup
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Bottom Progress Indicator -->
+            <div class="px-2">
+                <div class="flex items-center justify-between text-xs text-mac-textMuted mb-2">
+                    <span>Setup Progress</span>
+                    <span>20%</span>
+                </div>
+                <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                    <div class="h-full bg-mac-accent w-1/5 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Detail View -->
+        <div id="detail-view" class="main-content relative z-20">
+            
+            <!-- Content Area (Scrollable if needed) -->
+            <div class="flex-1 overflow-y-auto p-10 pt-16 flex flex-col items-center justify-center">
+                
+                <!-- Hero Icon -->
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg mb-8 relative">
+                    <i class="fa-solid fa-bolt text-white text-4xl"></i>
+                    <div class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center border border-gray-100">
+                        <i class="fa-solid fa-check text-green-500 text-sm"></i>
+                    </div>
+                </div>
+
+                <div class="text-center max-w-lg mb-12">
+                    <h2 class="text-3xl font-semibold mb-3 tracking-tight text-mac-text">Welcome to Cusp Proxy 3.0</h2>
+                    <p class="text-mac-textMuted text-sm leading-relaxed">
+                        The professional macOS proxy client. Experience developer-grade features with real-time logs, advanced rule editing, and seamless node management, all within a native SwiftUI interface.
+                    </p>
+                </div>
+
+                <!-- Value Props Grid -->
+                <div class="grid grid-cols-2 gap-4 w-full max-w-2xl mb-12">
+                    <div class="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-server text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Advanced Nodes</h3>
+                            <p class="text-xs text-mac-textMuted">Import and manage complex proxy configurations with ease.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-layer-group text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Strategy Groups</h3>
+                            <p class="text-xs text-mac-textMuted">Group nodes for automated fallback, load balancing, and testing.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-route text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Smart Routing</h3>
+                            <p class="text-xs text-mac-textMuted">Domain, IP, and GEO-IP based rules for precise traffic control.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-terminal text-orange-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Real-time Logs</h3>
+                            <p class="text-xs text-mac-textMuted">Monitor connections, DNS queries, and rule matches instantly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Preview -->
+                <div class="w-full max-w-2xl">
+                    <h3 class="text-xs font-semibold text-mac-textMuted uppercase tracking-wider mb-3 ml-1">Appearance</h3>
+                    <div class="flex gap-4">
+                        <!-- Light Mode Card -->
+                        <div class="flex-1 rounded-xl border-2 border-mac-accent bg-white p-4 cursor-pointer relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-mac-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-4 h-4 rounded-full border border-mac-accent bg-mac-accent flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                </div>
+                                <span class="text-sm font-medium">Light Mode</span>
+                            </div>
+                            <!-- Mini UI Mockup Light -->
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 h-20 p-2 flex flex-col gap-2 shadow-sm">
+                                <div class="h-3 w-1/3 bg-gray-200 rounded"></div>
+                                <div class="flex gap-2">
+                                    <div class="h-10 w-10 bg-white border border-gray-200 rounded shadow-sm"></div>
+                                    <div class="flex-1 bg-white border border-gray-200 rounded shadow-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dark Mode Card -->
+                        <div class="flex-1 rounded-xl border border-gray-200 bg-white p-4 cursor-pointer relative overflow-hidden group hover:border-gray-300">
+                            <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-4 h-4 rounded-full border border-gray-300 bg-white"></div>
+                                <span class="text-sm font-medium">Dark Mode</span>
+                            </div>
+                            <!-- Mini UI Mockup Dark -->
+                            <div class="rounded-lg border border-[#3A3A3C] bg-[#1E1E1E] h-20 p-2 flex flex-col gap-2 shadow-sm">
+                                <div class="h-3 w-1/3 bg-[#3A3A3C] rounded"></div>
+                                <div class="flex gap-2">
+                                    <div class="h-10 w-10 bg-[#2D2D2D] border border-[#3A3A3C] rounded shadow-sm"></div>
+                                    <div class="flex-1 bg-[#2D2D2D] border border-[#3A3A3C] rounded shadow-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar (Footer) -->
+            <div class="h-16 border-t border-gray-200 bg-gray-50/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 rounded-br-12">
+                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-mac-textMuted hover:text-mac-text transition-colors">
+                    Skip Setup
+                </button>
+                
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-1.5 rounded-md text-sm font-medium text-mac-text bg-white border border-gray-200 shadow-mac-button hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-file-import text-xs"></i>
+                        Import Config
+                    </button>
+                    <button class="px-6 py-1.5 rounded-md text-sm font-medium text-white bg-mac-accent shadow-mac-button hover:bg-mac-accentHover transition-colors flex items-center gap-2">
+                        Continue
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

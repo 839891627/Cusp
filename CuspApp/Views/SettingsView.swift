@@ -9,7 +9,7 @@ struct SettingsView: View {
     private let controlsGroupTopSpacing: CGFloat = 2
 
     private var pageHeaderFont: Font {
-        .system(size: 32, weight: viewModel.selectedLanguage == .simplifiedChinese ? .bold : .semibold, design: .rounded)
+        .system(size: 28, weight: viewModel.selectedLanguage == .simplifiedChinese ? .bold : .semibold, design: .rounded)
     }
 
     var body: some View {
@@ -53,9 +53,9 @@ struct SettingsView: View {
     }
 
     private var subscriptionRefreshCard: some View {
-        settingsCard(title: viewModel.selectedLanguage == .simplifiedChinese ? "订阅自动更新" : "Subscription Auto Refresh") {
+        settingsCard(title: viewModel.selectedLanguage == .simplifiedChinese ? "订阅刷新" : "Subscription Refresh") {
             Picker(
-                viewModel.selectedLanguage == .simplifiedChinese ? "更新周期" : "Refresh Interval",
+                viewModel.selectedLanguage == .simplifiedChinese ? "刷新周期" : "Refresh Interval",
                 selection: $viewModel.selectedSubscriptionRefreshInterval
             ) {
                 ForEach(SubscriptionRefreshInterval.allCases) { interval in
@@ -123,9 +123,9 @@ struct SettingsView: View {
     }
 
     private var runtimeLogCard: some View {
-        settingsCard(title: viewModel.selectedLanguage == .simplifiedChinese ? "运行时日志" : "Runtime Logs") {
+        settingsCard(title: viewModel.selectedLanguage == .simplifiedChinese ? "运行时日志聚合" : "Runtime Log Aggregation") {
             Picker(
-                viewModel.selectedLanguage == .simplifiedChinese ? "FSM 重复日志聚合窗口" : "FSM duplicate log aggregation",
+                viewModel.selectedLanguage == .simplifiedChinese ? "FSM 重复日志聚合窗口" : "FSM Duplicate Log Aggregation Window",
                 selection: $viewModel.selectedRuntimeFSMLogAggregationWindow
             ) {
                 ForEach(RuntimeFSMLogAggregationWindow.allCases) { window in

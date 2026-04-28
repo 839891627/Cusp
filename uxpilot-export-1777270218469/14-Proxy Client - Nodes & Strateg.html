@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Nodes & Strategy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        macOS: {
+                            bg: '#F9FAFB',
+                            sidebar: '#F3F4F6',
+                            card: '#FFFFFF',
+                            textMain: '#0F172A',
+                            textMuted: '#6B7280',
+                            accent: '#3B82F6',
+                            success: '#10B981',
+                            border: '#E5E7EB',
+                            hover: '#E5E7EB',
+                            darkCard: '#1F2937'
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'mac-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F9FAFB;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* macOS Vibrancy emulation */
+        .vibrancy {
+            background: rgba(243, 244, 246, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .card-vibrancy {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3B82F6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 vibrancy border-r border-macOS-border flex flex-col justify-between h-full flex-shrink-0 z-20 relative">
+        <div class="p-6">
+            <!-- App Logo & Name -->
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-8 h-8 rounded-[8px] bg-macOS-accent flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                </div>
+                <span class="font-semibold text-lg tracking-tight text-macOS-textMain">Cusp</span>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="space-y-8">
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">Main</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white text-macOS-accent font-medium shadow-sm border border-macOS-border relative group">
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-macOS-accent rounded-r-full"></div>
+                            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-server w-5 text-center transition-colors"></i>
+                            <span>Nodes & Strategy</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-link w-5 text-center transition-colors"></i>
+                            <span>Subscriptions</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">System</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-gear w-5 text-center transition-colors"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-file-lines w-5 text-center transition-colors"></i>
+                            <span>Logs</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-gauge-high w-5 text-center transition-colors"></i>
+                            <span>Performance</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Status/Quick Action -->
+        <div class="p-4">
+            <div class="bg-macOS-darkCard rounded-[12px] p-4 text-white shadow-mac">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-macOS-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">System Proxy</p>
+                        <p class="text-xs text-gray-400">Active</p>
+                    </div>
+                </div>
+                <button class="w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                    Disconnect
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 flex flex-col h-full bg-macOS-bg overflow-hidden relative">
+        
+        <!-- Top Toolbar -->
+        <header id="toolbar" class="h-16 border-b border-macOS-border flex items-center justify-between px-8 bg-white/50 backdrop-blur-md z-10 flex-shrink-0">
+            <div class="flex items-center gap-6">
+                <!-- Strategy Segmented Control -->
+                <div class="bg-macOS-sidebar p-1 rounded-lg flex items-center border border-macOS-border/50 shadow-sm">
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Global</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md bg-white shadow-sm text-macOS-textMain">Rule</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Direct</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-macOS-textMuted text-sm"></i>
+                    <input type="text" placeholder="Search nodes..." class="pl-9 pr-4 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain placeholder-macOS-textMuted focus:outline-none focus:border-macOS-accent focus:ring-1 focus:ring-macOS-accent w-64 shadow-sm transition-all">
+                </div>
+                <div class="h-6 w-px bg-macOS-border mx-2"></div>
+                <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-macOS-hover text-macOS-textMuted transition-colors">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Layout Split -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Node Groups Sidebar (Inner Sidebar) -->
+            <div class="w-56 border-r border-macOS-border bg-white/30 flex flex-col overflow-y-auto">
+                <div class="p-4 space-y-1">
+                    <p class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider mb-3 px-2">Groups</p>
+                    
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-macOS-accent/10 text-macOS-accent font-medium text-sm border border-macOS-accent/20">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-bolt w-4 text-center"></i>
+                            <span>Auto Select</span>
+                        </div>
+                        <span class="text-xs bg-white px-1.5 py-0.5 rounded-md border border-macOS-border">24</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-hand-pointer w-4 text-center"></i>
+                            <span>Manual</span>
+                        </div>
+                        <span class="text-xs bg-macOS-sidebar px-1.5 py-0.5 rounded-md border border-macOS-border">12</span>
+                    </button>
+                    
+                    <div class="pt-4 pb-2">
+                        <p class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider px-2">Regions</p>
+                    </div>
+                    
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium text-sm">
+                        <div class="flex items-center gap-2">
+                            <span>🇸🇬</span>
+                            <span>Singapore</span>
+                        </div>
+                        <span class="text-xs bg-macOS-sidebar px-1.5 py-0.5 rounded-md border border-macOS-border">8</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium text-sm">
+                        <div class="flex items-center gap-2">
+                            <span>🇯🇵</span>
+                            <span>Japan</span>
+                        </div>
+                        <span class="text-xs bg-macOS-sidebar px-1.5 py-0.5 rounded-md border border-macOS-border">6</span>
+                    </button>
+
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium text-sm">
+                        <div class="flex items-center gap-2">
+                            <span>🇺🇸</span>
+                            <span>United States</span>
+                        </div>
+                        <span class="text-xs bg-macOS-sidebar px-1.5 py-0.5 rounded-md border border-macOS-border">10</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Node List -->
+            <div class="flex-1 flex flex-col bg-white overflow-hidden">
+                <!-- Filter Chips -->
+                <div class="px-6 py-3 border-b border-macOS-border flex items-center gap-2 bg-macOS-bg/50">
+                    <span class="text-xs font-medium text-macOS-textMuted mr-2">Filters:</span>
+                    <button class="px-3 py-1 text-xs font-medium bg-white border border-macOS-border rounded-full shadow-sm text-macOS-textMain flex items-center gap-1.5 hover:bg-macOS-hover transition-colors">
+                        Protocol: Trojan <i class="fa-solid fa-xmark text-macOS-textMuted"></i>
+                    </button>
+                    <button class="px-3 py-1 text-xs font-medium bg-white border border-macOS-border rounded-full shadow-sm text-macOS-textMain flex items-center gap-1.5 hover:bg-macOS-hover transition-colors">
+                        Latency < 100ms <i class="fa-solid fa-xmark text-macOS-textMuted"></i>
+                    </button>
+                    <button class="px-3 py-1 text-xs font-medium text-macOS-accent hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> Add Filter
+                    </button>
+                </div>
+
+                <!-- Table Header -->
+                <div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-macOS-border bg-macOS-sidebar/50 text-xs font-semibold text-macOS-textMuted uppercase tracking-wider">
+                    <div class="col-span-5 flex items-center gap-2">
+                        <span>Name</span>
+                        <i class="fa-solid fa-sort text-macOS-border hover:text-macOS-textMuted cursor-pointer"></i>
+                    </div>
+                    <div class="col-span-2 flex items-center gap-2">
+                        <span>Region</span>
+                        <i class="fa-solid fa-sort text-macOS-border hover:text-macOS-textMuted cursor-pointer"></i>
+                    </div>
+                    <div class="col-span-2 flex items-center gap-2">
+                        <span>Latency</span>
+                        <i class="fa-solid fa-sort-down text-macOS-accent cursor-pointer"></i>
+                    </div>
+                    <div class="col-span-3 flex items-center gap-2">
+                        <span>Status</span>
+                    </div>
+                </div>
+
+                <!-- Table Body (Scrollable) -->
+                <div class="flex-1 overflow-y-auto">
+                    
+                    <!-- Active Node Row -->
+                    <div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-macOS-border bg-macOS-accent/5 hover:bg-macOS-accent/10 transition-colors cursor-pointer group relative">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-macOS-accent"></div>
+                        <div class="col-span-5 flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-white border border-macOS-border flex items-center justify-center text-xs shadow-sm">
+                                🇸🇬
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-macOS-textMain">SG-Premium-01</span>
+                                <span class="text-xs text-macOS-textMuted">Trojan • Port 443</span>
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-center text-sm text-macOS-textMuted">
+                            Singapore
+                        </div>
+                        <div class="col-span-2 flex items-center gap-2">
+                            <span class="text-sm font-medium text-macOS-success">42 ms</span>
+                            <div class="w-12 h-4 bg-macOS-sidebar rounded overflow-hidden flex items-end opacity-50 group-hover:opacity-100 transition-opacity">
+                                <div class="w-1/5 h-1/2 bg-macOS-success ml-0.5"></div>
+                                <div class="w-1/5 h-2/3 bg-macOS-success ml-0.5"></div>
+                                <div class="w-1/5 h-1/3 bg-macOS-success ml-0.5"></div>
+                                <div class="w-1/5 h-3/4 bg-macOS-success ml-0.5"></div>
+                                <div class="w-1/5 h-1/2 bg-macOS-success ml-0.5"></div>
+                            </div>
+                        </div>
+                        <div class="col-span-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-macOS-success shadow-[0_0_4px_rgba(16,185,129,0.5)]"></span>
+                                <span class="text-sm text-macOS-textMain font-medium">Active</span>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-macOS-accent shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-solid fa-bolt text-xs"></i>
+                                </button>
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-[#F59E0B] shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-solid fa-star text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inactive Node Row 1 -->
+                    <div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-macOS-border hover:bg-macOS-hover/50 transition-colors cursor-pointer group">
+                        <div class="col-span-5 flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-white border border-macOS-border flex items-center justify-center text-xs shadow-sm">
+                                🇯🇵
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-macOS-textMain">JP-Tokyo-02</span>
+                                <span class="text-xs text-macOS-textMuted">Vmess • Port 8443</span>
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-center text-sm text-macOS-textMuted">
+                            Japan
+                        </div>
+                        <div class="col-span-2 flex items-center gap-2">
+                            <span class="text-sm font-medium text-macOS-success">68 ms</span>
+                        </div>
+                        <div class="col-span-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-macOS-border"></span>
+                                <span class="text-sm text-macOS-textMuted">Idle</span>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-macOS-accent shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-solid fa-bolt text-xs"></i>
+                                </button>
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-[#F59E0B] shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-regular fa-star text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inactive Node Row 2 (High Latency) -->
+                    <div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-macOS-border hover:bg-macOS-hover/50 transition-colors cursor-pointer group">
+                        <div class="col-span-5 flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-white border border-macOS-border flex items-center justify-center text-xs shadow-sm">
+                                🇺🇸
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-macOS-textMain">US-West-01</span>
+                                <span class="text-xs text-macOS-textMuted">Shadowsocks • Port 443</span>
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-center text-sm text-macOS-textMuted">
+                            United States
+                        </div>
+                        <div class="col-span-2 flex items-center gap-2">
+                            <span class="text-sm font-medium text-[#F59E0B]">185 ms</span>
+                        </div>
+                        <div class="col-span-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-macOS-border"></span>
+                                <span class="text-sm text-macOS-textMuted">Idle</span>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-macOS-accent shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-solid fa-bolt text-xs"></i>
+                                </button>
+                                <button class="w-6 h-6 rounded hover:bg-white text-macOS-textMuted hover:text-[#F59E0B] shadow-sm border border-transparent hover:border-macOS-border transition-all">
+                                    <i class="fa-regular fa-star text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Pane (Collapsible) -->
+            <div class="w-72 border-l border-macOS-border bg-macOS-bg flex flex-col overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-semibold text-macOS-textMain uppercase tracking-wider">Node Details</h3>
+                        <button class="text-macOS-textMuted hover:text-macOS-textMain">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-macOS-border mb-6">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-macOS-sidebar border border-macOS-border flex items-center justify-center text-2xl shadow-sm">
+                                🇸🇬
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-macOS-textMain">SG-Premium-01</h4>
+                                <div class="flex items-center gap-1.5 mt-0.5 text-xs text-macOS-success font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-macOS-success"></span> Active
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="w-full py-2.5 bg-macOS-accent hover:bg-blue-600 text-white rounded-lg font-medium text-sm transition-colors shadow-sm mb-2 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Disconnect
+                        </button>
+                        <button class="w-full py-2 bg-white hover:bg-macOS-hover text-macOS-textMain border border-macOS-border rounded-lg font-medium text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-gauge-high"></i> Test Latency
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <h5 class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider mb-2">Configuration</h5>
+                            <div class="bg-white rounded-[10px] border border-macOS-border overflow-hidden text-sm">
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Protocol</span>
+                                    <span class="font-medium text-macOS-textMain">Trojan</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Address</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-medium text-macOS-textMain">sg1.premium...</span>
+                                        <button class="text-macOS-textMuted hover:text-macOS-accent"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Port</span>
+                                    <span class="font-medium text-macOS-textMain">443</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 px-3">
+                                    <span class="text-macOS-textMuted">Encryption</span>
+                                    <span class="font-medium text-macOS-textMain">aes-256-gcm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider mb-2">Performance</h5>
+                            <div class="bg-white rounded-[10px] border border-macOS-border overflow-hidden text-sm">
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Current Latency</span>
+                                    <span class="font-medium text-macOS-success">42 ms</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 px-3">
+                                    <span class="text-macOS-textMuted">Last Used</span>
+                                    <span class="font-medium text-macOS-textMain">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

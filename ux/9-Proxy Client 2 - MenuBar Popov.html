@@ -1,0 +1,223 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="menubar-popover-screen" class="w-full bg-neutral-100 flex items-start justify-center p-8">
+
+  <!-- MenuBar Popover Window -->
+  <div class="w-96 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden">
+
+    <!-- Popover Header -->
+    <div class="bg-neutral-900 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+          <i class="fa-solid fa-network-wired text-neutral-900 text-xs"></i>
+        </div>
+        <div>
+          <h1 class="text-sm text-white">Cusp Proxy 2</h1>
+          <p class="text-xs text-neutral-400">MenuBar Control</p>
+        </div>
+      </div>
+      <button class="w-6 h-6 rounded hover:bg-neutral-800 flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark text-white text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Connection Toggle Section -->
+    <div class="px-4 py-4 border-b border-neutral-200">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 bg-neutral-400 rounded-full"></div>
+          <div>
+            <p class="text-sm text-neutral-900">Disconnected</p>
+            <p class="text-xs text-neutral-600">No active connection</p>
+          </div>
+        </div>
+        <button class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors text-xs text-white flex items-center gap-2">
+          <i class="fa-solid fa-power-off text-xs"></i>
+          Connect
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Profile Selector -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <label class="block text-xs text-neutral-600 mb-2">Active Profile</label>
+      <div class="relative">
+        <select class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 appearance-none pr-8">
+          <option>Default Profile</option>
+          <option>Work VPN</option>
+          <option>Personal Browsing</option>
+          <option>Streaming Optimized</option>
+        </select>
+        <i class="fa-solid fa-chevron-down text-neutral-600 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+      </div>
+    </div>
+
+    <!-- Quick Status Section -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <h3 class="text-xs text-neutral-600 mb-3">Quick Status</h3>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between py-2 px-3 bg-neutral-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-gauge text-neutral-700 text-xs"></i>
+            <span class="text-xs text-neutral-900">Latency</span>
+          </div>
+          <span class="text-xs text-neutral-600">--</span>
+        </div>
+        <div class="flex items-center justify-between py-2 px-3 bg-neutral-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-arrow-up text-neutral-700 text-xs"></i>
+            <span class="text-xs text-neutral-900">Upload</span>
+          </div>
+          <span class="text-xs text-neutral-600">0 KB/s</span>
+        </div>
+        <div class="flex items-center justify-between py-2 px-3 bg-neutral-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-arrow-down text-neutral-700 text-xs"></i>
+            <span class="text-xs text-neutral-900">Download</span>
+          </div>
+          <span class="text-xs text-neutral-600">0 KB/s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Error Display -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <div class="flex items-start gap-2 p-3 bg-neutral-50 rounded-lg">
+        <i class="fa-solid fa-circle-info text-neutral-600 text-xs mt-0.5"></i>
+        <div class="flex-1">
+          <p class="text-xs text-neutral-900 mb-1">Last Status</p>
+          <p class="text-xs text-neutral-600">No connection errors</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini Log Tail -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs text-neutral-600">Recent Events</h3>
+        <button class="text-xs text-neutral-900 hover:underline">View All</button>
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-start gap-2 text-xs">
+          <span class="text-neutral-600 whitespace-nowrap">14:32:15</span>
+          <span class="text-neutral-900">Application started</span>
+        </div>
+        <div class="flex items-start gap-2 text-xs">
+          <span class="text-neutral-600 whitespace-nowrap">14:32:18</span>
+          <span class="text-neutral-900">Configuration loaded</span>
+        </div>
+        <div class="flex items-start gap-2 text-xs">
+          <span class="text-neutral-600 whitespace-nowrap">14:32:20</span>
+          <span class="text-neutral-900">Waiting for connection</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <h3 class="text-xs text-neutral-600 mb-3">Quick Actions</h3>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="px-3 py-2 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors text-xs text-neutral-900 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-rotate-right text-xs"></i>
+          Reconnect
+        </button>
+        <button class="px-3 py-2 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors text-xs text-neutral-900 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-chart-line text-xs"></i>
+          Dashboard
+        </button>
+        <button class="px-3 py-2 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors text-xs text-neutral-900 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-lines text-xs"></i>
+          Logs
+        </button>
+        <button class="px-3 py-2 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors text-xs text-neutral-900 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-gear text-xs"></i>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Shortcuts -->
+    <div class="px-4 py-3 border-b border-neutral-200">
+      <h3 class="text-xs text-neutral-600 mb-2">Navigate To</h3>
+      <div class="space-y-1">
+        <button class="w-full px-3 py-2 rounded-lg hover:bg-neutral-50 transition-colors text-xs text-neutral-900 flex items-center gap-2 text-left">
+          <i class="fa-solid fa-chart-line text-neutral-700 text-xs w-4"></i>
+          <span>Overview Dashboard</span>
+        </button>
+        <button class="w-full px-3 py-2 rounded-lg hover:bg-neutral-50 transition-colors text-xs text-neutral-900 flex items-center gap-2 text-left">
+          <i class="fa-solid fa-route text-neutral-700 text-xs w-4"></i>
+          <span>Routes Management</span>
+        </button>
+        <button class="w-full px-3 py-2 rounded-lg hover:bg-neutral-50 transition-colors text-xs text-neutral-900 flex items-center gap-2 text-left">
+          <i class="fa-solid fa-shield text-neutral-700 text-xs w-4"></i>
+          <span>Rules Editor</span>
+        </button>
+        <button class="w-full px-3 py-2 rounded-lg hover:bg-neutral-50 transition-colors text-xs text-neutral-900 flex items-center gap-2 text-left">
+          <i class="fa-solid fa-user-group text-neutral-700 text-xs w-4"></i>
+          <span>Profiles</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Hint -->
+    <div class="px-4 py-3 bg-neutral-50">
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-neutral-600">Press</span>
+        <div class="flex items-center gap-1">
+          <kbd class="px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900">⌘</kbd>
+          <kbd class="px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900">K</kbd>
+        </div>
+        <span class="text-neutral-600">to quick connect</span>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="px-4 py-3 flex items-center justify-between bg-white border-t border-neutral-200">
+      <button class="text-xs text-neutral-600 hover:text-neutral-900 transition-colors flex items-center gap-1">
+        <i class="fa-solid fa-circle-question text-xs"></i>
+        Help
+      </button>
+      <button class="text-xs text-neutral-600 hover:text-neutral-900 transition-colors flex items-center gap-1">
+        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+        Quit
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Background Context Hint -->
+  <div class="fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 bg-neutral-900 rounded-lg shadow-lg">
+    <p class="text-xs text-white">This popover appears in the macOS menu bar</p>
+  </div>
+
+</div>
+
+                        </body>
+                        </html>
+                        

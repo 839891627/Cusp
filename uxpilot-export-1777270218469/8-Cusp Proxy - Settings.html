@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F5F5F7',
+                            surface: 'rgba(255, 255, 255, 0.7)',
+                            surfaceDark: 'rgba(255, 255, 255, 0.9)',
+                            border: 'rgba(0, 0, 0, 0.05)',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            accent: '#007AFF',
+                            accentHover: '#0066CC',
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                        'mac-inner': 'inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F7;
+            background-image: url('data:image/svg+xml,%3Csvg width="100%25" height="100%25" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="p" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Ccircle cx="50" cy="50" r="1" fill="%23000000" fill-opacity="0.03" /%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23p)" /%3E%3C/svg%3E');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .mac-window {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #007AFF 0%, #0066CC 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Sidebar Item Active State */
+        .sidebar-item-active {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+            color: #007AFF;
+            border-radius: 8px;
+        }
+        .sidebar-item-active i {
+            color: #007AFF;
+        }
+
+        /* Table Styles */
+        .mac-table-row {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .mac-table-row:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        .mac-table-row.selected {
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+
+        /* Segmented Control */
+        .segmented-control {
+            background: rgba(0,0,0,0.05);
+            padding: 2px;
+            border-radius: 6px;
+            display: inline-flex;
+        }
+        .segmented-item {
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1D1D1F;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .segmented-item.active {
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Custom Checkbox */
+        .mac-checkbox {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 3px;
+            background: white;
+            position: relative;
+            cursor: pointer;
+        }
+        .mac-checkbox:checked {
+            background: #007AFF;
+            border-color: #007AFF;
+        }
+        .mac-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Form Inputs */
+        .mac-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #1D1D1F;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+        .mac-input:focus {
+            outline: none;
+            border-color: rgba(0, 122, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            background: white;
+        }
+
+        /* Toggle Switch */
+        .mac-toggle {
+            appearance: none;
+            width: 36px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.3s;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .mac-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .mac-toggle:checked {
+            background: #34C759; /* iOS Green */
+        }
+        .mac-toggle:checked::after {
+            transform: translateX(16px);
+        }
+        
+        /* Pulse Animation for Live Tail */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
+        .live-dot {
+            animation: pulse-ring 2s infinite;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="m-0 p-0 min-h-screen flex text-app-text overflow-hidden">
+
+    <!-- Main Container - Centered Auth/Welcome Screen -->
+    <main id="auth-container" class="w-full max-w-[480px] px-6 py-12 flex flex-col items-center justify-center min-h-[100dvh]">
+        
+        <!-- Welcome Card -->
+        <div id="welcome-card" class="glass-panel w-full rounded-[20px] p-10 flex flex-col items-center text-center relative overflow-hidden">
+            
+            <!-- Subtle background glow -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+            <!-- App Icon -->
+            <div id="app-icon" class="w-24 h-24 mb-8 rounded-[22.5%] bg-gradient-to-br from-white to-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.12),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center relative group">
+                <i class="fa-solid fa-network-wired text-4xl text-app-accent drop-shadow-sm"></i>
+                <!-- Glossy overlay -->
+                <div class="absolute inset-0 rounded-[22.5%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
+            </div>
+
+            <!-- Typography -->
+            <div id="welcome-text" class="space-y-3 mb-10 w-full">
+                <h1 class="text-[28px] font-semibold tracking-tight text-app-text">Welcome to Cusp</h1>
+                <p class="text-[15px] text-app-textMuted leading-relaxed max-w-[280px] mx-auto">
+                    A clear, stable, and high-efficiency proxy client built natively for macOS.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div id="auth-actions" class="w-full space-y-3">
+                <button class="btn-primary w-full py-2.5 px-4 rounded-lg text-white font-medium text-[15px] transition-transform active:scale-[0.98] flex items-center justify-center gap-2" onclick="window.location.href='#dashboard'">
+                    Start Configuration
+                    <i class="fa-solid fa-arrow-right text-sm opacity-80"></i>
+                </button>
+            </div>
+
+            <!-- Footer Links -->
+            <div id="auth-footer" class="mt-8 pt-6 border-t border-black/5 w-full">
+                <div class="flex items-center justify-center gap-4 text-[13px] text-app-textMuted">
+                    <a href="#" class="hover:text-app-text transition-colors">Documentation</a>
+                    <span class="w-1 h-1 rounded-full bg-black/10"></span>
+                    <a href="#" class="hover:text-app-text transition-colors">Support</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Version Info -->
+        <div class="mt-6 text-[12px] text-app-textMuted font-medium tracking-wide">
+            Version 1.0.0 (Build 42)
+        </div>
+
+    </main>
+
+</body>
+</html>

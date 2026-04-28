@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Setup Wizard Step 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F5F5F7',
+                            surface: 'rgba(255, 255, 255, 0.7)',
+                            surfaceDark: 'rgba(255, 255, 255, 0.9)',
+                            border: 'rgba(0, 0, 0, 0.05)',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            accent: '#007AFF',
+                            accentHover: '#0066CC',
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                        'mac-inner': 'inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F7;
+            background-image: url('data:image/svg+xml,%3Csvg width="100%25" height="100%25" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="p" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Ccircle cx="50" cy="50" r="1" fill="%23000000" fill-opacity="0.03" /%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23p)" /%3E%3C/svg%3E');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* macOS style window effects */
+        .mac-window {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #007AFF 0%, #0066CC 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .config-tile {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        /* Custom Toggle Switch styling */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #007AFF;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #007AFF;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 40px;
+            height: 24px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(16px);
+        }
+    </style>
+</head>
+<body class="m-0 p-0 min-h-screen flex items-center justify-center text-app-text">
+
+    <!-- Main Container - Centered Wizard Screen -->
+    <main id="wizard-container" class="w-full max-w-[600px] px-6 py-12 flex flex-col items-center justify-center min-h-[100dvh]">
+        
+        <!-- Wizard Card -->
+        <div id="setup-wizard-card" class="glass-panel mac-window w-full rounded-[20px] p-8 flex flex-col relative overflow-hidden shadow-mac">
+            
+            <!-- Wizard Header -->
+            <div id="wizard-header" class="w-full mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-[22.5%] bg-gradient-to-br from-white to-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center">
+                            <i class="fa-solid fa-gear text-app-accent"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-[20px] font-semibold tracking-tight text-app-text leading-tight">Initial Configuration</h1>
+                            <p class="text-[13px] text-app-textMuted">Set up your local proxy preferences</p>
+                        </div>
+                    </div>
+                    <span class="text-[12px] font-medium text-app-textMuted bg-black/5 px-2.5 py-1 rounded-full">Step 1 of 2</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-app-accent w-1/2 rounded-full transition-all duration-500"></div>
+                </div>
+            </div>
+
+            <!-- Configuration Options List -->
+            <div id="config-list" class="w-full space-y-3 mb-8">
+                
+                <!-- Option 1: Global Mode -->
+                <div class="config-tile rounded-[14px] p-4 flex items-center justify-between group hover:bg-white/90 transition-all cursor-pointer border-app-accent/30 bg-white/80">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-app-accent/10 flex items-center justify-center text-app-accent mt-0.5">
+                            <i class="fa-solid fa-globe text-[16px]"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[14px] font-semibold text-app-text mb-0.5">Global Proxy Mode</h3>
+                            <p class="text-[12px] text-app-textMuted leading-snug max-w-[280px]">Route all system traffic through the proxy connection.</p>
+                        </div>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-app-accent flex items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-app-accent"></div>
+                    </div>
+                </div>
+
+                <!-- Option 2: Rule-based Mode -->
+                <div class="config-tile rounded-[14px] p-4 flex items-center justify-between group hover:bg-white/90 transition-all cursor-pointer">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-app-textMuted mt-0.5 group-hover:text-app-text transition-colors">
+                            <i class="fa-solid fa-list-check text-[16px]"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[14px] font-semibold text-app-text mb-0.5">Rule-based Mode</h3>
+                            <p class="text-[12px] text-app-textMuted leading-snug max-w-[280px]">Only route traffic matching specific rules and domains.</p>
+                        </div>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-black/10 flex items-center justify-center">
+                    </div>
+                </div>
+                
+                <!-- Option 3: Direct Mode -->
+                <div class="config-tile rounded-[14px] p-4 flex items-center justify-between group hover:bg-white/90 transition-all cursor-pointer">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-app-textMuted mt-0.5 group-hover:text-app-text transition-colors">
+                            <i class="fa-solid fa-arrow-right-arrow-left text-[16px]"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-[14px] font-semibold text-app-text mb-0.5">Direct Connection</h3>
+                            <p class="text-[12px] text-app-textMuted leading-snug max-w-[280px]">Bypass proxy entirely. Useful for initial setup and testing.</p>
+                        </div>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-black/10 flex items-center justify-center">
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Port Configuration -->
+            <div class="mb-8 p-4 rounded-[14px] bg-white/60 border border-black/5">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-[13px] font-medium text-app-text">Local SOCKS5 Port</label>
+                    <span class="text-[12px] text-app-textMuted">Default: 1080</span>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-plug text-app-textMuted text-[12px]"></i>
+                    </div>
+                    <input type="number" value="1080" class="w-full bg-white border border-black/10 rounded-lg py-2 pl-9 pr-3 text-[14px] text-app-text focus:outline-none focus:border-app-accent focus:ring-1 focus:ring-app-accent transition-all shadow-sm" placeholder="e.g. 1080">
+                </div>
+            </div>
+
+            <!-- Wizard Action Footer -->
+            <div id="wizard-footer" class="w-full pt-4 mt-auto border-t border-black/5 flex items-center justify-between">
+                <button class="px-4 py-2 rounded-lg text-[14px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 transition-colors">
+                    Back
+                </button>
+                
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-2 rounded-lg text-[14px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 transition-colors">
+                        Skip
+                    </button>
+                    <button class="btn-primary py-2 px-6 rounded-lg text-white font-medium text-[14px] transition-transform active:scale-[0.98] flex items-center gap-2">
+                        Next
+                        <i class="fa-solid fa-arrow-right text-[12px]"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

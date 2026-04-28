@@ -1,25 +1,25 @@
 import XCTest
 @testable import CuspShared
 
-final class TunnelRuntimeStateStoreTests: XCTestCase {
-    func testRoundTripsLastTunnelError() throws {
+final class RuntimeStateStoreTests: XCTestCase {
+    func testRoundTripsLastRuntimeError() throws {
         let suiteName = "CuspTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = SharedConfigurationStore(userDefaults: defaults)
 
-        store.saveLastTunnelError("mihomo failed to bind 1086")
+        store.saveLastRuntimeError("mihomo failed to bind 1086")
 
-        XCTAssertEqual(store.loadLastTunnelError(), "mihomo failed to bind 1086")
+        XCTAssertEqual(store.loadLastRuntimeError(), "mihomo failed to bind 1086")
     }
 
-    func testClearRemovesLastTunnelError() throws {
+    func testClearRemovesLastRuntimeError() throws {
         let suiteName = "CuspTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = SharedConfigurationStore(userDefaults: defaults)
 
-        store.saveLastTunnelError("temporary failure")
-        store.clearLastTunnelError()
+        store.saveLastRuntimeError("temporary failure")
+        store.clearLastRuntimeError()
 
-        XCTAssertNil(store.loadLastTunnelError())
+        XCTAssertNil(store.loadLastRuntimeError())
     }
 }

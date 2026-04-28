@@ -31,7 +31,7 @@ struct StrategyBoardSection: View {
     }
 
     private var pageHeaderFont: Font {
-        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
+        .system(size: 28, weight: isChinese ? .bold : .semibold, design: .rounded)
     }
 
     private func t(_ en: String, _ zh: String) -> String {
@@ -51,7 +51,7 @@ struct StrategyBoardSection: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
                 modeSelector
-                proxySectionHeader
+                nodeControlBar
                 if visibleNodes.isEmpty {
                     emptyState
                 } else {
@@ -77,18 +77,28 @@ struct StrategyBoardSection: View {
         }
     }
 
-    private var proxySectionHeader: some View {
+    private var nodeControlBar: some View {
         HStack(spacing: 8) {
-            Text(t("Proxy", "代理"))
+            Text(t("Nodes", "节点"))
                 .font(CuspPalette.sectionTitleFont)
                 .foregroundStyle(CuspPalette.sectionHeaderAccent)
 
             Spacer()
 
+            TextField(
+                t("Search node name or host", "搜索节点名称或主机"),
+                text: $searchText
+            )
+            .flowGateFilledInputField()
+            .frame(maxWidth: 260)
+
             if !searchText.isEmpty {
-                countBadge(text: isChinese ? "\(visibleNodes.count)/\(nodes.count)" : "\(visibleNodes.count)/\(nodes.count)")
-            } else {
-                countBadge(text: isChinese ? "\(nodes.count) 个节点" : "\(nodes.count) Nodes")
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                }
+                .flowGateSecondaryActionStyle()
             }
 
             Menu {
@@ -116,13 +126,19 @@ struct StrategyBoardSection: View {
                 onRunSpeedTest()
             } label: {
                 controlPill(
-                    title: isRunningSpeedTest ? speedTestControlTitle : t("Test All", "测试全部"),
+                    title: isRunningSpeedTest ? speedTestControlTitle : t("Run Speed Test", "运行测速"),
                     systemImage: isRunningSpeedTest ? "waveform.path.ecg" : "bolt.badge.clock",
                     isActive: isRunningSpeedTest
                 )
             }
             .buttonStyle(.plain)
             .disabled(isRunningSpeedTest || isApplyingRuntimeChange)
+
+            if !searchText.isEmpty {
+                countBadge(text: "\(visibleNodes.count)/\(nodes.count)")
+            } else {
+                countBadge(text: isChinese ? "\(nodes.count) 个节点" : "\(nodes.count) Nodes")
+            }
         }
     }
 

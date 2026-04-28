@@ -47,112 +47,19 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Import signing certificate
-        env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      - name: Build unsigned release artifacts
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -z "${BUILD_CERTIFICATE_BASE64}" || -z "${P12_PASSWORD}" || -z "${KEYCHAIN_PASSWORD}" ]]; then
-            echo "missing required signing secrets (BUILD_CERTIFICATE_BASE64 / P12_PASSWORD / KEYCHAIN_PASSWORD)" >&2
-            exit 1
-          fi
+          ./Scripts/release_unsigned_local.sh "${{ steps.tag.outputs.value }}"
 
-          CERT_PATH="$RUNNER_TEMP/build_certificate.p12"
-          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
-
-          echo "$BUILD_CERTIFICATE_BASE64" | base64 --decode > "$CERT_PATH"
-
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-
-          security import "$CERT_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security list-keychains -d user -s "$KEYCHAIN_PATH"
-
-      - name: Build and archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          xcodebuild \
-            -project Cusp.xcodeproj \
-            -scheme Cusp \
-            -configuration Release \
-            -archivePath "$RUNNER_TEMP/Cusp.xcarchive" \
-            archive
-
-      - name: Export app bundle
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/ExportOptions.plist" <<'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>developer-id</string>
-            <key>signingStyle</key>
-            <string>automatic</string>
-            <key>stripSwiftSymbols</key>
-            <true/>
-          </dict>
-          </plist>
-          EOF
-
-          xcodebuild \
-            -exportArchive \
-            -archivePath "$RUNNER_TEMP/Cusp.xcarchive" \
-            -exportPath "$RUNNER_TEMP/release" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
-
-      - name: Notarize and staple
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ -z "${APPLE_ID}" || -z "${APPLE_APP_SPECIFIC_PASSWORD}" || -z "${APPLE_TEAM_ID}" ]]; then
-            echo "missing required notarization secrets (APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID)" >&2
-            exit 1
-          fi
-
-          APP_PATH="$RUNNER_TEMP/release/Cusp.app"
-          ZIP_PATH="$RUNNER_TEMP/Cusp.app.zip"
-
-          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
-
-          xcrun notarytool submit "$ZIP_PATH" \
-            --apple-id "$APPLE_ID" \
-            --team-id "$APPLE_TEAM_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --wait
-
-          xcrun stapler staple "$APP_PATH"
-
-      - name: Build DMG and checksums
+      - name: Prepare release output
         id: package
         shell: bash
         run: |
           set -euo pipefail
-          TAG="${{ steps.tag.outputs.value }}"
-          APP_PATH="$RUNNER_TEMP/release/Cusp.app"
-          OUT_DIR="$RUNNER_TEMP/dist"
-          mkdir -p "$OUT_DIR"
-
-          ZIP_PATH="$OUT_DIR/Cusp-${TAG}.zip"
-          DMG_PATH="$OUT_DIR/Cusp-${TAG}.dmg"
-
-          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
-          hdiutil create -volname "Cusp" -srcfolder "$APP_PATH" -ov -format UDZO "$DMG_PATH"
-
-          (cd "$OUT_DIR" && shasum -a 256 "$(basename "$ZIP_PATH")" "$(basename "$DMG_PATH")" > SHA256SUMS.txt)
-
+          OUT_DIR="$GITHUB_WORKSPACE/build/dist"
+          test -d "$OUT_DIR"
           echo "out_dir=$OUT_DIR" >> "$GITHUB_OUTPUT"
 
       - name: Upload workflow artifacts
@@ -170,3 +77,4 @@ jobs:
             ${{ steps.package.outputs.out_dir }}/*.zip
             ${{ steps.package.outputs.out_dir }}/*.dmg
             ${{ steps.package.outputs.out_dir }}/SHA256SUMS.txt
+            ${{ steps.package.outputs.out_dir }}/UNSIGNED-NOTES.txt

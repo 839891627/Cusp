@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Real-time Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['"SF Mono"', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset',
+                        'mac-prompt': '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tl-red { background-color: #FF5F56; }
+        .tl-yellow { background-color: #FFBD2E; }
+        .tl-green { background-color: #27C93F; }
+        
+        .mac-window {
+            width: 100%;
+            max-width: 1440px;
+            height: 900px;
+            background: rgba(236, 236, 236, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(223, 223, 223, 0.5);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #F4F7FB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .window-drag-area {
+            -webkit-app-region: drag;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Custom Toggle Switch for macOS style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .toggle-label {
+            background-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-knob {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Logs Specific Styles */
+        .logs-split-container {
+            display: flex;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .logs-table-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #FFFFFF;
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .logs-inspector-area {
+            width: 380px;
+            background: #F9FAFB;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .log-row {
+            transition: background-color 0.15s;
+            cursor: pointer;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .log-row:hover {
+            background-color: #F8FAFC;
+        }
+        .log-row.active {
+            background-color: #EFF6FF;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .status-allow {
+            background-color: #DCFCE7;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+        }
+        .status-block {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+        .status-proxy {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+        }
+
+        .code-block {
+            font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+            background: #1E1E1E;
+            color: #D4D4D4;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        .mini-sparkline {
+            width: 40px;
+            height: 16px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden font-sans text-mac-text">
+
+    <!-- macOS Window Container -->
+    <div id="app-window" class="mac-window">
+        
+        <!-- Drag Area for macOS -->
+        <div class="window-drag-area"></div>
+
+        <!-- Sidebar Navigation -->
+        <div id="sidebar" class="sidebar pt-4 pb-6 px-4 flex flex-col justify-between relative z-20">
+            <div>
+                <!-- Traffic Lights -->
+                <div class="flex items-center mb-8 pl-1">
+                    <span class="traffic-light tl-red"></span>
+                    <span class="traffic-light tl-yellow"></span>
+                    <span class="traffic-light tl-green"></span>
+                </div>
+
+                <!-- App Icon / Title -->
+                <div class="flex items-center gap-3 mb-8 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm">Cusp Proxy</h1>
+                        <p class="text-[11px] text-mac-textMuted flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                            Connected
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="space-y-1">
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Overview Dashboard
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Nodes Management
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                        Strategy Groups
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                        Rules Editor
+                    </div>
+                    <div class="px-3 py-2 rounded-md bg-mac-sidebarActive text-mac-text font-medium text-sm flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                        <i class="fa-solid fa-terminal w-5 text-center text-mac-accent"></i>
+                        Real-time Logs
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-down w-5 text-center"></i>
+                        Subscription Management
+                    </div>
+                    
+                    <div class="pt-4 mt-4 border-t border-black/5">
+                        <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            Global Settings
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Bottom Status -->
+            <div class="px-2">
+                <div class="p-3 bg-white/50 rounded-lg border border-black/5 backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-mac-text">Global Routing</span>
+                        <div class="relative inline-block w-8 h-4 align-middle select-none">
+                            <input type="checkbox" name="toggle" id="globalToggle" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer top-0 left-0 z-10 toggle-knob" checked/>
+                            <label for="globalToggle" class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-mac-textMuted">Rule-based mode active</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content View - Real-time Logs -->
+        <div id="main-content" class="main-content relative z-20 overflow-hidden flex flex-col bg-white">
+            
+            <!-- Header Toolbar -->
+            <div class="h-14 border-b border-gray-200 bg-white/60 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30 pt-4 shrink-0">
+                <div class="flex items-center gap-4">
+                    <h2 class="font-semibold text-mac-text">Real-time Logs</h2>
+                    <div class="h-4 w-px bg-gray-300 mx-2"></div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-gray-200 text-mac-text shadow-sm hover:bg-gray-50 transition-colors text-red-500">
+                            <i class="fa-solid fa-pause text-[10px]"></i> Pause
+                        </button>
+                        <button class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-gray-200 text-mac-text shadow-sm hover:bg-gray-50 transition-colors">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
+                        <input type="text" placeholder="Search domains, IPs..." class="pl-7 pr-3 py-1.5 bg-gray-100 border-none rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-mac-accent/50 w-64 transition-all">
+                    </div>
+                    <button class="px-3 py-1.5 rounded-md text-xs font-medium text-mac-text bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-thumbtack text-[10px]"></i> Filters
+                        <i class="fa-solid fa-chevron-down text-[8px] ml-1"></i>
+                    </button>
+                    <button class="px-3 py-1.5 rounded-md text-xs font-medium text-mac-text bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-file-export text-[10px]"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Split View Layout -->
+            <div class="logs-split-container flex-1">
+                
+                <!-- Left Pane: Logs Table Area -->
+                <div class="logs-table-area">
+                    
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-12 gap-3 px-4 py-2 bg-gray-50 border-b border-gray-200 text-[10px] font-semibold text-mac-textMuted uppercase tracking-wider shrink-0 sticky top-0 z-10">
+                        <div class="col-span-1">Time</div>
+                        <div class="col-span-2">App / Process</div>
+                        <div class="col-span-3">Domain / IP</div>
+                        <div class="col-span-2">Rule / Decision</div>
+                        <div class="col-span-2">Node / Group</div>
+                        <div class="col-span-1 text-right">Latency</div>
+                        <div class="col-span-1 text-right">Traffic</div>
+                    </div>
+                    
+                    <!-- Table Body -->
+                    <div class="flex-1 overflow-auto text-xs font-mono">
+                        
+                        <!-- Log Row 1 (Active) -->
+                        <div class="grid grid-cols-12 gap-3 px-4 py-2.5 log-row active items-center">
+                            <div class="col-span-1 text-gray-500">14:22:01</div>
+                            <div class="col-span-2 flex items-center gap-2 font-sans">
+                                <i class="fa-brands fa-apple text-gray-600 text-sm"></i>
+                                <span class="truncate">Safari.app</span>
+                            </div>
+                            <div class="col-span-3 truncate font-medium text-mac-text">
+                                api.github.com:443
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5">
+                                <span class="text-[10px] text-gray-500 truncate">DOMAIN-SUFFIX github.com</span>
+                                <span class="status-badge status-proxy w-max">Proxy</span>
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5 font-sans">
+                                <span class="truncate text-mac-text text-[11px]">US-West-01</span>
+                                <span class="text-[10px] text-gray-500 truncate">Developer Strategy</span>
+                            </div>
+                            <div class="col-span-1 text-right text-gray-600">
+                                42ms
+                            </div>
+                            <div class="col-span-1 text-right flex flex-col items-end gap-0.5 text-[10px]">
+                                <span class="text-blue-600">↓ 1.2M</span>
+                                <span class="text-green-600">↑ 45K</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Log Row 2 -->
+                        <div class="grid grid-cols-12 gap-3 px-4 py-2.5 log-row items-center">
+                            <div class="col-span-1 text-gray-500">14:21:58</div>
+                            <div class="col-span-2 flex items-center gap-2 font-sans">
+                                <i class="fa-solid fa-terminal text-gray-600 text-sm"></i>
+                                <span class="truncate">curl</span>
+                            </div>
+                            <div class="col-span-3 truncate font-medium text-mac-text">
+                                192.168.1.100:8080
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5">
+                                <span class="text-[10px] text-gray-500 truncate">IP-CIDR 192.168.0.0/16</span>
+                                <span class="status-badge status-allow w-max">Direct</span>
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5 font-sans">
+                                <span class="truncate text-mac-text text-[11px]">-</span>
+                                <span class="text-[10px] text-gray-500 truncate">Bypass LAN</span>
+                            </div>
+                            <div class="col-span-1 text-right text-gray-600">
+                                1ms
+                            </div>
+                            <div class="col-span-1 text-right flex flex-col items-end gap-0.5 text-[10px]">
+                                <span class="text-blue-600">↓ 8K</span>
+                                <span class="text-green-600">↑ 2K</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Log Row 3 -->
+                        <div class="grid grid-cols-12 gap-3 px-4 py-2.5 log-row items-center">
+                            <div class="col-span-1 text-gray-500">14:21:45</div>
+                            <div class="col-span-2 flex items-center gap-2 font-sans">
+                                <i class="fa-brands fa-spotify text-green-500 text-sm"></i>
+                                <span class="truncate">Spotify.app</span>
+                            </div>
+                            <div class="col-span-3 truncate font-medium text-mac-text">
+                                audio-sp-sjc.spotify.com:443
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5">
+                                <span class="text-[10px] text-gray-500 truncate">DOMAIN-KEYWORD spotify</span>
+                                <span class="status-badge status-proxy w-max">Proxy</span>
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5 font-sans">
+                                <span class="truncate text-mac-text text-[11px]">UK-London-02</span>
+                                <span class="text-[10px] text-gray-500 truncate">Streaming Media</span>
+                            </div>
+                            <div class="col-span-1 text-right text-gray-600">
+                                115ms
+                            </div>
+                            <div class="col-span-1 text-right flex flex-col items-end gap-0.5 text-[10px]">
+                                <span class="text-blue-600">↓ 4.5M</span>
+                                <span class="text-green-600">↑ 120K</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Log Row 4 -->
+                        <div class="grid grid-cols-12 gap-3 px-4 py-2.5 log-row items-center bg-red-50/30">
+                            <div class="col-span-1 text-gray-500">14:21:12</div>
+                            <div class="col-span-2 flex items-center gap-2 font-sans">
+                                <i class="fa-solid fa-shield-virus text-gray-600 text-sm"></i>
+                                <span class="truncate">System</span>
+                            </div>
+                            <div class="col-span-3 truncate font-medium text-mac-text">
+                                telemetry.example-tracker.com:443
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5">
+                                <span class="text-[10px] text-gray-500 truncate">DOMAIN-SUFFIX tracker.com</span>
+                                <span class="status-badge status-block w-max">Reject</span>
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5 font-sans">
+                                <span class="truncate text-mac-text text-[11px]">-</span>
+                                <span class="text-[10px] text-gray-500 truncate">AdBlock Filters</span>
+                            </div>
+                            <div class="col-span-1 text-right text-gray-600">
+                                0ms
+                            </div>
+                            <div class="col-span-1 text-right flex flex-col items-end gap-0.5 text-[10px]">
+                                <span class="text-gray-400">Blocked</span>
+                            </div>
+                        </div>
+                        
+                         <!-- Log Row 5 -->
+                        <div class="grid grid-cols-12 gap-3 px-4 py-2.5 log-row items-center">
+                            <div class="col-span-1 text-gray-500">14:20:55</div>
+                            <div class="col-span-2 flex items-center gap-2 font-sans">
+                                <i class="fa-brands fa-slack text-purple-600 text-sm"></i>
+                                <span class="truncate">Slack.app</span>
+                            </div>
+                            <div class="col-span-3 truncate font-medium text-mac-text">
+                                wss://mp-us-east-1.slack-msgs.com:443
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5">
+                                <span class="text-[10px] text-gray-500 truncate">MATCH</span>
+                                <span class="status-badge status-proxy w-max">Proxy</span>
+                            </div>
+                            <div class="col-span-2 flex flex-col gap-0.5 font-sans">
+                                <span class="truncate text-mac-text text-[11px]">US-East-04</span>
+                                <span class="text-[10px] text-gray-500 truncate">Default Fallback</span>
+                            </div>
+                            <div class="col-span-1 text-right text-gray-600">
+                                68ms
+                            </div>
+                            <div class="col-span-1 text-right flex flex-col items-end gap-0.5 text-[10px]">
+                                <span class="text-blue-600">↓ 250K</span>
+                                <span class="text-green-600">↑ 15K</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Bottom Status Bar for Logs -->
+                    <div class="h-8 border-t border-gray-200 bg-gray-50 flex items-center justify-between px-4 text-[10px] text-mac-textMuted shrink-0 font-sans">
+                        <div class="flex items-center gap-4">
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-[8px] text-green-500"></i> Live Stream Active</span>
+                            <span>Showing 1,024 events in last 5 minutes</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span>Total In: <strong class="text-mac-text">45.2 MB</strong></span>
+                            <span>Total Out: <strong class="text-mac-text">3.8 MB</strong></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Pane: Log Inspector -->
+                <div class="logs-inspector-area">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-white sticky top-0 z-10 flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-mac-text">Connection Details</h3>
+                        <button class="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="p-4 space-y-6">
+                        
+                        <!-- Overview Header -->
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-brands fa-apple text-xl text-gray-700"></i>
+                                <div>
+                                    <h4 class="text-base font-bold text-mac-text">api.github.com:443</h4>
+                                    <p class="text-xs text-mac-textMuted font-mono mt-0.5">Safari.app (PID: 4892)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="status-badge status-proxy px-2 py-1 text-xs">Proxy</span>
+                                <span class="text-xs text-gray-500 font-mono">14:22:01.452</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Routing Info -->
+                        <div class="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                            <h5 class="text-xs font-semibold text-mac-textMuted uppercase tracking-wider mb-3">Routing Decision</h5>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-gray-500">Matched Rule</span>
+                                    <div class="text-right">
+                                        <span class="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-mac-text">DOMAIN-SUFFIX github.com</span>
+                                        <div class="text-[10px] text-blue-600 mt-1 hover:underline cursor-pointer">View in Rules Editor →</div>
+                                    </div>
+                                </div>
+                                <div class="h-px bg-gray-100"></div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-gray-500">Strategy Group</span>
+                                    <span class="text-xs font-medium text-mac-text">Developer Strategy</span>
+                                </div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-gray-500">Selected Node</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                        <span class="text-xs font-medium text-mac-text">US-West-01 (Los Angeles)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Network Metrics -->
+                        <div class="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                            <h5 class="text-xs font-semibold text-mac-textMuted uppercase tracking-wider mb-3">Performance & Traffic</h5>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <div class="text-[10px] text-gray-500 mb-1">Latency (TCP Ping)</div>
+                                    <div class="text-lg font-semibold text-mac-text">42 <span class="text-xs font-normal text-gray-500">ms</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-gray-500 mb-1">Duration</div>
+                                    <div class="text-lg font-semibold text-mac-text">14.2 <span class="text-xs font-normal text-gray-500">s</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-gray-500"><i class="fa-solid fa-arrow-down text-blue-500 mr-1"></i> Download</span>
+                                    <span class="font-mono text-mac-text">1.24 MB</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-gray-500"><i class="fa-solid fa-arrow-up text-green-500 mr-1"></i> Upload</span>
+                                    <span class="font-mono text-mac-text">45.8 KB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DNS Resolution -->
+                        <div>
+                            <h5 class="text-xs font-semibold text-mac-textMuted uppercase tracking-wider mb-2 px-1">DNS Resolution</h5>
+                            <div class="code-block">
+> Query: api.github.com (A)
+> Server: 1.1.1.1:53 (DoH)
+> Latency: 12ms
+
+Answer:
+api.github.com.     60  IN  A   140.82.112.6
+api.github.com.     60  IN  A   140.82.113.6
+                            </div>
+                        </div>
+                        
+                        <!-- Raw Request Metadata -->
+                        <div>
+                            <h5 class="text-xs font-semibold text-mac-textMuted uppercase tracking-wider mb-2 px-1">Request Metadata</h5>
+                            <div class="code-block">
+{
+  "id": "req_8f9a2b1c",
+  "network": "tcp",
+  "type": "HTTPS",
+  "source": "192.168.1.45:54321",
+  "destination": "140.82.112.6:443",
+  "host": "api.github.com",
+  "user_agent": "Safari/605.1.15",
+  "tls_sni": "api.github.com",
+  "tls_version": "TLSv1.3",
+  "cipher_suite": "TLS_AES_128_GCM_SHA256"
+}
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+
+</body>
+</html>

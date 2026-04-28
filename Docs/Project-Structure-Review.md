@@ -4,7 +4,7 @@
 
 ```text
 CuspApp/
-  Services/      # 本地代理、VPN 管理、环境检查
+  Services/      # 本地代理、系统代理切换、环境检查
   UI/            # 基础 UI 组件
   ViewModels/    # 当前主要为 AppViewModel
   Views/         # 主窗口页面与菜单栏视图逻辑
@@ -88,4 +88,3 @@ Sources/CuspShared/
 1. 先做“无行为变化”的拆分（extract type / move file）。
 2. 每拆一块补对应测试，确保 `swift test` 持续通过。
 3. 菜单栏和主窗口状态读取改为统一快照，减少闪烁和状态竞争。
-

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Subscriptions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        macOS: {
+                            bg: '#F9FAFB',
+                            sidebar: '#F3F4F6',
+                            card: '#FFFFFF',
+                            textMain: '#0F172A',
+                            textMuted: '#6B7280',
+                            accent: '#3B82F6',
+                            success: '#10B981',
+                            border: '#E5E7EB',
+                            hover: '#E5E7EB',
+                            darkCard: '#1F2937'
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'mac-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F9FAFB;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .vibrancy {
+            background: rgba(243, 244, 246, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .card-vibrancy {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3B82F6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 vibrancy border-r border-macOS-border flex flex-col justify-between h-full flex-shrink-0 z-20 relative">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-8 h-8 rounded-[8px] bg-macOS-accent flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                </div>
+                <span class="font-semibold text-lg tracking-tight text-macOS-textMain">Cusp</span>
+            </div>
+
+            <div class="space-y-8">
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">Main</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-chart-pie w-5 text-center transition-colors"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-server w-5 text-center transition-colors"></i>
+                            <span>Nodes & Strategy</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white text-macOS-accent font-medium shadow-sm border border-macOS-border relative group">
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-macOS-accent rounded-r-full"></div>
+                            <i class="fa-solid fa-link w-5 text-center"></i>
+                            <span>Subscriptions</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">System</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-gear w-5 text-center transition-colors"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-file-lines w-5 text-center transition-colors"></i>
+                            <span>Logs</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <div class="bg-macOS-darkCard rounded-[12px] p-4 text-white shadow-mac">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-macOS-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">System Proxy</p>
+                        <p class="text-xs text-gray-400">Active</p>
+                    </div>
+                </div>
+                <button class="w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                    Disconnect
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 flex flex-col h-full bg-macOS-bg overflow-hidden relative">
+        
+        <!-- Top Toolbar -->
+        <header id="toolbar" class="h-16 border-b border-macOS-border flex items-center justify-between px-8 bg-white/50 backdrop-blur-md z-10 flex-shrink-0">
+            <div class="flex items-center gap-6">
+                <!-- Mode Selector (Segmented Control) -->
+                <div class="bg-macOS-sidebar p-1 rounded-lg flex items-center border border-macOS-border/50 shadow-sm">
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Global</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md bg-white shadow-sm text-macOS-textMain">Rule</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Direct</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="text-sm text-macOS-textMuted flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-macOS-success shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+                    Connected to <span class="font-medium text-macOS-textMain">SG-Premium-01</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout Split -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Subscription List -->
+            <div class="flex-1 flex flex-col bg-white overflow-hidden">
+                <div class="px-8 py-6">
+                    <h1 class="text-2xl font-semibold text-macOS-textMain mb-6">Subscriptions</h1>
+
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-12 gap-4 px-4 py-3 border-b border-macOS-border text-sm font-semibold text-macOS-textMain">
+                        <div class="col-span-4">Name</div>
+                        <div class="col-span-3">Status</div>
+                        <div class="col-span-2">Nodes</div>
+                        <div class="col-span-3 text-right">Last Updated</div>
+                    </div>
+
+                    <!-- Table Body -->
+                    <div class="flex flex-col">
+                        <!-- Row 1: Active -->
+                        <div class="grid grid-cols-12 gap-4 px-4 py-4 border-b border-macOS-border hover:bg-macOS-hover/30 transition-colors cursor-pointer group relative items-center">
+                            <div class="col-span-4 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-macOS-sidebar border border-macOS-border flex items-center justify-center text-macOS-textMain">
+                                    <i class="fa-solid fa-globe"></i>
+                                </div>
+                                <span class="font-medium text-macOS-textMain">Premium Provider A</span>
+                            </div>
+                            <div class="col-span-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-macOS-success shadow-[0_0_4px_rgba(16,185,129,0.5)]"></span>
+                                <span class="text-sm text-macOS-textMain">OK</span>
+                            </div>
+                            <div class="col-span-2 text-sm text-macOS-textMuted">
+                                42 nodes
+                            </div>
+                            <div class="col-span-3 flex items-center justify-end gap-4">
+                                <span class="text-sm text-macOS-textMuted">Today, 10:45 AM</span>
+                                
+                                <!-- Context Actions (Hover) -->
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 absolute right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-macOS-border shadow-sm">
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Edit">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Pause">
+                                        <i class="fa-solid fa-pause text-xs"></i>
+                                    </button>
+                                    <div class="w-px h-4 bg-macOS-border mx-1"></div>
+                                    <button class="w-7 h-7 rounded hover:bg-red-50 text-red-500 flex items-center justify-center" title="Delete">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Error -->
+                        <div class="grid grid-cols-12 gap-4 px-4 py-4 border-b border-macOS-border hover:bg-macOS-hover/30 transition-colors cursor-pointer group relative items-center bg-red-50/30">
+                            <div class="col-span-4 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-macOS-sidebar border border-macOS-border flex items-center justify-center text-macOS-textMain">
+                                    <i class="fa-solid fa-server"></i>
+                                </div>
+                                <span class="font-medium text-macOS-textMain">Backup Nodes</span>
+                            </div>
+                            <div class="col-span-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.5)]"></span>
+                                <span class="text-sm text-red-600 font-medium">Timeout</span>
+                            </div>
+                            <div class="col-span-2 text-sm text-macOS-textMuted">
+                                12 nodes (stale)
+                            </div>
+                            <div class="col-span-3 flex items-center justify-end gap-4">
+                                <span class="text-sm text-macOS-textMuted">Yesterday, 2:30 PM</span>
+                                
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 absolute right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-macOS-border shadow-sm">
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Retry">
+                                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                                    </button>
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Edit">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <div class="w-px h-4 bg-macOS-border mx-1"></div>
+                                    <button class="w-7 h-7 rounded hover:bg-red-50 text-red-500 flex items-center justify-center" title="Delete">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Paused -->
+                        <div class="grid grid-cols-12 gap-4 px-4 py-4 border-b border-macOS-border hover:bg-macOS-hover/30 transition-colors cursor-pointer group relative items-center opacity-60">
+                            <div class="col-span-4 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-macOS-sidebar border border-macOS-border flex items-center justify-center text-macOS-textMain">
+                                    <i class="fa-solid fa-cloud"></i>
+                                </div>
+                                <span class="font-medium text-macOS-textMain">Free Tier</span>
+                            </div>
+                            <div class="col-span-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-macOS-border"></span>
+                                <span class="text-sm text-macOS-textMuted">Paused</span>
+                            </div>
+                            <div class="col-span-2 text-sm text-macOS-textMuted">
+                                8 nodes
+                            </div>
+                            <div class="col-span-3 flex items-center justify-end gap-4">
+                                <span class="text-sm text-macOS-textMuted">Oct 12, 2023</span>
+                                
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 absolute right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-macOS-border shadow-sm">
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Resume">
+                                        <i class="fa-solid fa-play text-xs"></i>
+                                    </button>
+                                    <button class="w-7 h-7 rounded hover:bg-macOS-hover text-macOS-textMuted flex items-center justify-center" title="Edit">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <div class="w-px h-4 bg-macOS-border mx-1"></div>
+                                    <button class="w-7 h-7 rounded hover:bg-red-50 text-red-500 flex items-center justify-center" title="Delete">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Pane -->
+            <div class="w-80 border-l border-macOS-border bg-macOS-bg flex flex-col overflow-y-auto hidden lg:flex">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-semibold text-macOS-textMain uppercase tracking-wider">Subscription Details</h3>
+                        <button class="text-macOS-textMuted hover:text-macOS-textMain">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[12px] p-5 shadow-sm border border-macOS-border mb-6">
+                        <h4 class="font-semibold text-macOS-textMain mb-1">Backup Nodes</h4>
+                        <div class="flex items-center gap-1.5 text-xs text-red-500 font-medium mb-4">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Error: Timeout
+                        </div>
+                        
+                        <div class="bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700 mb-4">
+                            Connection timed out after 10000ms. Please check the URL or your network connection.
+                        </div>
+
+                        <button class="w-full py-2 bg-white hover:bg-macOS-hover text-macOS-textMain border border-macOS-border rounded-lg font-medium text-sm transition-colors shadow-sm flex items-center justify-center gap-2 mb-2">
+                            <i class="fa-solid fa-rotate-right"></i> Retry Update
+                        </button>
+                        <button class="w-full py-2 bg-white hover:bg-macOS-hover text-macOS-textMain border border-macOS-border rounded-lg font-medium text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-copy"></i> Copy URL
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <h5 class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider mb-2">Information</h5>
+                            <div class="bg-white rounded-[10px] border border-macOS-border overflow-hidden text-sm">
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Format</span>
+                                    <span class="font-medium text-macOS-textMain">Base64</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 px-3 border-b border-macOS-border">
+                                    <span class="text-macOS-textMuted">Nodes Parsed</span>
+                                    <span class="font-medium text-macOS-textMain">12</span>
+                                </div>
+                                <div class="flex flex-col py-2 px-3">
+                                    <span class="text-macOS-textMuted mb-1">URL Source</span>
+                                    <span class="font-medium text-macOS-textMain text-xs truncate break-all">https://api.backup-nodes.com/sub?token=abc123xyz</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="text-xs font-semibold text-macOS-textMuted uppercase tracking-wider mb-2">Update Log</h5>
+                            <div class="bg-white rounded-[10px] border border-macOS-border overflow-hidden text-xs p-3 space-y-2 font-mono">
+                                <div class="text-red-600">[14:30:05] Error: Request timeout</div>
+                                <div class="text-macOS-textMuted">[14:29:55] Fetching subscription...</div>
+                                <div class="text-macOS-textMuted border-t border-macOS-border pt-2 mt-2">[02:30:00] Auto-update started</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Sheet Modal (Add Subscription) -->
+    <div id="add-sub-modal" class="fixed inset-0 bg-macOS-textMain/20 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-mac-lg border border-macOS-border w-[480px] overflow-hidden">
+            <div class="px-6 py-4 border-b border-macOS-border bg-macOS-sidebar/50 flex justify-between items-center">
+                <h2 class="font-semibold text-macOS-textMain">Add Subscription</h2>
+                <button class="text-macOS-textMuted hover:text-macOS-textMain" onclick="document.getElementById('add-sub-modal').classList.add('hidden')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-macOS-textMain mb-1.5">Name</label>
+                    <input type="text" placeholder="e.g. Premium Nodes" class="w-full px-3 py-2 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain placeholder-macOS-textMuted focus:outline-none focus:border-macOS-accent focus:ring-1 focus:ring-macOS-accent shadow-sm transition-all">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-macOS-textMain mb-1.5">Subscription URL</label>
+                    <textarea rows="3" placeholder="https://" class="w-full px-3 py-2 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain placeholder-macOS-textMuted focus:outline-none focus:border-macOS-accent focus:ring-1 focus:ring-macOS-accent shadow-sm transition-all resize-none"></textarea>
+                    <p class="text-xs text-macOS-textMuted mt-1.5">Supports Base64, Clash, and standard subscription formats.</p>
+                </div>
+                
+                <div class="flex items-center justify-between pt-2">
+                    <span class="text-sm font-medium text-macOS-textMain">Auto Update</span>
+                    <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                        <option>Every 12 hours</option>
+                        <option>Every 24 hours</option>
+                        <option>Never</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 bg-macOS-bg border-t border-macOS-border flex justify-end gap-3">
+                <button class="px-4 py-2 bg-white hover:bg-macOS-hover text-macOS-textMain border border-macOS-border rounded-lg text-sm font-medium shadow-sm transition-colors" onclick="document.getElementById('add-sub-modal').classList.add('hidden')">
+                    Cancel
+                </button>
+                <button class="px-4 py-2 bg-macOS-accent hover:bg-blue-600 text-white rounded-lg text-sm font-medium shadow-sm transition-colors">
+                    Add Subscription
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

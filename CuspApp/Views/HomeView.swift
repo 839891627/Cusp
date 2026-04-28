@@ -10,10 +10,6 @@ struct HomeView: View {
         viewModel.selectedLanguage == .simplifiedChinese
     }
 
-    private var pageHeaderFont: Font {
-        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
-    }
-
     private func t(_ en: String, _ zh: String) -> String {
         isChinese ? zh : en
     }
@@ -47,13 +43,9 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: CuspLayout.sectionSpacing) {
-                header
-
-                topPanel
-
-                trafficPanel
-
-                processTrafficPanel
+                statusSection
+                metricsSection
+                diagnosticsSection
 
                 if let action = viewModel.lastActionMessage {
                     messageBanner(text: action, color: CuspPalette.success)
@@ -68,6 +60,34 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .controlSize(.large)
         }
+    }
+
+    private var statusSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle(t("Runtime Status", "运行状态"))
+            topPanel
+        }
+    }
+
+    private var metricsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle(t("Operational Metrics", "运行指标"))
+            trafficPanel
+            processTrafficPanel
+        }
+    }
+
+    private var diagnosticsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle(t("Recovery & Diagnostics", "恢复与诊断"))
+            recoveryPanel
+        }
+    }
+
+    private func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(CuspPalette.sectionTitleFont)
+            .foregroundStyle(CuspPalette.secondaryText)
     }
 
     private var topPanel: some View {
@@ -91,18 +111,6 @@ struct HomeView: View {
         }
         .frame(height: overviewTopSectionHeight)
         .flowGatePanelCard()
-    }
-
-    private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(t("Overview", "总览"))
-                    .font(pageHeaderFont)
-                    .foregroundStyle(CuspPalette.primaryText)
-            }
-
-            Spacer()
-        }
     }
 
     private var overviewMetricGrid: some View {
@@ -203,6 +211,59 @@ struct HomeView: View {
         .flowGatePanelCard()
     }
 
+    private var recoveryPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: hasResidualProxy ? "exclamationmark.triangle.fill" : "checkmark.shield.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(hasResidualProxy ? CuspPalette.warning : CuspPalette.success)
+                Text(t("Recovery & Troubleshooting", "恢复与排障"))
+                    .font(.system(.headline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(CuspPalette.primaryText)
+            }
+
+            Text(recoverySummaryText)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(CuspPalette.secondaryText)
+
+            HStack(spacing: 10) {
+                Button(t("Restore System Proxy", "恢复系统代理")) {
+                    viewModel.restoreResidualSystemProxySettings()
+                }
+                .flowGateSecondaryActionStyle()
+                .disabled(!hasResidualProxy)
+
+                Button(t("Copy System Commands", "复制系统命令")) {
+                    viewModel.copySystemProxyCommand()
+                }
+                .flowGateSecondaryActionStyle()
+
+                Button(t("Open Install Guide", "打开安装指南")) {
+                    viewModel.openUnsignedInstallGuide()
+                }
+                .flowGatePrimaryActionStyle()
+            }
+        }
+        .flowGatePanelCard()
+    }
+
+    private var hasResidualProxy: Bool {
+        !viewModel.residualSystemProxyServices.isEmpty
+    }
+
+    private var recoverySummaryText: String {
+        if hasResidualProxy {
+            return t(
+                "Cusp found leftover proxy settings on \(viewModel.residualSystemProxyServices.joined(separator: ", ")). Restore before browsing to avoid broken networking.",
+                "Cusp 检测到残留代理设置：\(viewModel.residualSystemProxyServices.joined(separator: ", "))。请先恢复，避免断网。"
+            )
+        }
+        return t(
+            "No residual proxy settings detected. Use this panel when permissions fail or setup is blocked.",
+            "未检测到残留代理。若遇到权限失败或安装阻塞，可从这里快速排障。"
+        )
+    }
+
     private func metricCard(title: String, value: String, tint: Color, monospaced: Bool = true) -> some View {
         let cardShape = RoundedRectangle(cornerRadius: CuspLayout.nestedCornerRadius, style: .continuous)
         return VStack(alignment: .leading, spacing: 6) {
@@ -226,53 +287,16 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, minHeight: overviewCardMinHeight, alignment: .topLeading)
         .padding(.horizontal, 13)
         .padding(.vertical, 10)
-        .background(
-            LinearGradient(
-                colors: [
-                    CuspPalette.raisedCardFill.opacity(0.93),
-                    CuspPalette.raisedCardFill.opacity(0.76)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background(CuspPalette.raisedCardFill)
         .overlay(
             cardShape
                 .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.22),
-                            tint.opacity(0.28),
-                            tint.opacity(0.10)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
+                    tint.opacity(0.22),
                     lineWidth: 1
                 )
         )
-        .overlay(
-            cardShape
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            tint.opacity(0.11),
-                            .clear
-                        ],
-                        center: .topTrailing,
-                        startRadius: 6,
-                        endRadius: 72
-                    )
-                )
-        )
-        .overlay(
-            cardShape
-                .stroke(Color.white.opacity(0.04), lineWidth: 0.7)
-                .blur(radius: 0.4)
-        )
         .clipShape(cardShape)
-        .shadow(color: tint.opacity(0.14), radius: 6, x: 0, y: 3)
-        .shadow(color: Color.black.opacity(0.18), radius: 5, x: 0, y: 3)
+        .shadow(color: Color.black.opacity(0.14), radius: 4, x: 0, y: 2)
     }
 
     private var overviewGridHeight: CGFloat {

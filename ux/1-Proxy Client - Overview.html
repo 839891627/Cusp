@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        macOS: {
+                            bg: '#F9FAFB',
+                            sidebar: '#F3F4F6',
+                            card: '#FFFFFF',
+                            textMain: '#0F172A',
+                            textMuted: '#6B7280',
+                            accent: '#3B82F6',
+                            success: '#10B981',
+                            border: '#E5E7EB',
+                            hover: '#E5E7EB',
+                            darkCard: '#1F2937'
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'mac-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F9FAFB;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* macOS Vibrancy emulation */
+        .vibrancy {
+            background: rgba(243, 244, 246, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .card-vibrancy {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3B82F6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3B82F6;
+        }
+        
+        /* MenuBar specific styles */
+        .menubar-popover {
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.65);
+        }
+        
+        /* Dark mode transition */
+        .dark-transition {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Switch styling */
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 36px;
+          height: 20px;
+        }
+        .switch input { 
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #E5E7EB;
+          transition: .4s;
+          border-radius: 20px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          left: 2px;
+          bottom: 2px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        input:checked + .slider {
+          background-color: #10B981;
+        }
+        input:checked + .slider:before {
+          transform: translateX(16px);
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden dark-transition" id="app-body">
+
+    <!-- MenuBar Popover (Simulated Absolute Position) -->
+    <div id="menubar-popover" class="fixed top-2 right-8 w-[320px] rounded-[16px] shadow-mac-lg border border-macOS-border/50 menubar-popover z-50 overflow-hidden flex flex-col hidden bg-[#1E1E1E]/80 backdrop-blur-xl dark-transition">
+        <!-- System Status Bar Header (Simulated) -->
+        <div class="h-6 w-full flex items-center justify-between px-3 text-[12px] font-medium text-white/90 border-b border-white/10 bg-black/20">
+            <div class="flex items-center gap-3">
+                <i class="fa-brands fa-apple"></i>
+                <span>Cusp</span>
+                <span>File</span>
+                <span>Edit</span>
+                <span>View</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-wifi text-[10px]"></i>
+                <i class="fa-solid fa-battery-full text-[10px]"></i>
+                <span>Tue 9:41 AM</span>
+            </div>
+        </div>
+
+        <!-- Popover Header -->
+        <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-[8px] bg-macOS-accent flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-bolt text-[12px]"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-[14px] text-white tracking-tight">Cusp Proxy</span>
+                    <span class="text-[11px] text-[#A0A0A0]">Connected</span>
+                </div>
+            </div>
+            <!-- Proxy Toggle Switch -->
+            <label class="switch">
+              <input type="checkbox" checked id="proxy-master-switch">
+              <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Network Monitor -->
+        <div class="px-5 py-4 border-b border-white/10">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-[11px] font-medium text-[#A0A0A0] uppercase tracking-wider">Traffic</span>
+                <span class="text-[10px] text-[#A0A0A0] bg-white/5 px-2 py-0.5 rounded-[4px] border border-white/10">Real-time</span>
+            </div>
+            <div class="flex justify-between bg-black/20 p-3 rounded-[10px] border border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-full bg-[#10B981]/15 flex items-center justify-center">
+                        <i class="fa-solid fa-arrow-down text-[#10B981] text-[11px]"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[13px] font-semibold text-white">4.2 <span class="text-[10px] text-[#A0A0A0] font-normal">MB/s</span></span>
+                    </div>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-full bg-[#3B82F6]/15 flex items-center justify-center">
+                        <i class="fa-solid fa-arrow-up text-[#3B82F6] text-[11px]"></i>
+                    </div>
+                    <div class="flex flex-col text-right">
+                        <span class="text-[13px] font-semibold text-white">1.8 <span class="text-[10px] text-[#A0A0A0] font-normal">MB/s</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proxy Mode Selector -->
+        <div class="px-5 py-4 border-b border-white/10">
+            <div class="bg-black/30 p-1 rounded-[8px] flex items-center border border-white/5 shadow-inner">
+                <button class="flex-1 py-1.5 text-[12px] font-medium rounded-[6px] text-[#A0A0A0] hover:text-white transition-colors">Global</button>
+                <button class="flex-1 py-1.5 text-[12px] font-medium rounded-[6px] bg-[#323845] shadow-sm text-white border border-white/10">Rule</button>
+                <button class="flex-1 py-1.5 text-[12px] font-medium rounded-[6px] text-[#A0A0A0] hover:text-white transition-colors">Direct</button>
+            </div>
+            
+            <!-- Quick Node Select -->
+            <div class="mt-4 flex flex-col gap-2">
+                <span class="text-[11px] font-medium text-[#A0A0A0] uppercase tracking-wider">Active Node</span>
+                <div class="flex items-center justify-between bg-black/20 p-2.5 rounded-[8px] border border-white/10 cursor-pointer hover:bg-white/5 transition-colors group">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2 h-2 rounded-full bg-macOS-success shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
+                        <div class="flex flex-col">
+                            <span class="text-[12px] font-medium text-white">SG-Premium-01</span>
+                            <span class="text-[10px] text-[#A0A0A0]">Ping: 42ms</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[#A0A0A0] text-[10px] group-hover:text-white transition-colors"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="p-3 space-y-0.5 bg-black/10">
+            <button class="w-full text-left px-3 py-2 rounded-[6px] text-[12px] font-medium text-white hover:bg-macOS-accent hover:text-white transition-colors flex items-center gap-3 group">
+                <i class="fa-solid fa-chart-pie text-[#A0A0A0] group-hover:text-white w-4 text-center"></i> Show Dashboard
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-[6px] text-[12px] font-medium text-white hover:bg-macOS-accent hover:text-white transition-colors flex items-center gap-3 group">
+                <i class="fa-solid fa-gear text-[#A0A0A0] group-hover:text-white w-4 text-center"></i> Preferences...
+            </button>
+            <div class="h-px bg-white/10 my-1.5 mx-2"></div>
+            <button class="w-full text-left px-3 py-2 rounded-[6px] text-[12px] font-medium text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-colors flex items-center gap-3 group">
+                <i class="fa-solid fa-power-off text-[#FF0000] group-hover:text-white w-4 text-center"></i> Quit Cusp
+            </button>
+        </div>
+    </div>
+    
+    <!-- MenuBar Trigger (For demo purposes) -->
+    <button onclick="document.getElementById('menubar-popover').classList.toggle('hidden')" class="fixed top-4 right-4 z-40 w-8 h-8 rounded-full bg-white shadow-mac border border-macOS-border flex items-center justify-center text-macOS-textMuted hover:text-macOS-textMain transition-colors">
+        <i class="fa-solid fa-bars text-sm"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 vibrancy border-r border-macOS-border flex flex-col justify-between h-full flex-shrink-0 z-20 relative">
+        <div class="p-6">
+            <!-- App Logo & Name -->
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-8 h-8 rounded-[8px] bg-macOS-accent flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                </div>
+                <span class="font-semibold text-lg tracking-tight text-macOS-textMain">Cusp</span>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="space-y-8">
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">Main</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white text-macOS-accent font-medium shadow-sm border border-macOS-border relative group">
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-macOS-accent rounded-r-full"></div>
+                            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-server w-5 text-center transition-colors"></i>
+                            <span>Nodes & Strategy</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-link w-5 text-center transition-colors"></i>
+                            <span>Subscriptions</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">System</p>
+                    <nav class="space-y-1">
+                        <a href="#" onclick="showSettings()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-gear w-5 text-center transition-colors"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-file-lines w-5 text-center transition-colors"></i>
+                            <span>Logs</span>
+                        </a>
+                        <a href="#" onclick="document.getElementById('about-modal').classList.remove('hidden')" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group mt-1">
+                            <i class="fa-solid fa-circle-info w-5 text-center transition-colors"></i>
+                            <span>About</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Status/Quick Action -->
+        <div class="p-4">
+            <div class="bg-macOS-darkCard rounded-[12px] p-4 text-white shadow-mac">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-macOS-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">System Proxy</p>
+                        <p class="text-xs text-gray-400">Active</p>
+                    </div>
+                </div>
+                <button class="w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                    Disconnect
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 flex flex-col h-full bg-macOS-bg overflow-hidden relative">
+        
+        <!-- Top Toolbar -->
+        <header id="toolbar" class="h-16 border-b border-macOS-border flex items-center justify-between px-8 bg-white/50 backdrop-blur-md z-10 flex-shrink-0">
+            <div class="flex items-center gap-6">
+                <!-- Mode Selector (Segmented Control) -->
+                <div class="bg-macOS-sidebar p-1 rounded-lg flex items-center border border-macOS-border/50 shadow-sm">
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Global</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md bg-white shadow-sm text-macOS-textMain">Rule</button>
+                    <button class="px-4 py-1.5 text-sm font-medium rounded-md text-macOS-textMuted hover:text-macOS-textMain transition-colors">Direct</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="text-sm text-macOS-textMuted flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-macOS-success shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+                    Connected to <span class="font-medium text-macOS-textMain">SG-Premium-01</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-8" id="main-scroll-area">
+            <div class="max-w-6xl mx-auto space-y-6" id="overview-view">
+
+                <!-- Hero Status Card -->
+                <section id="status-hero" class="bg-white rounded-[16px] shadow-mac p-8 border border-macOS-border/50 relative overflow-hidden">
+                    <!-- Decorative background element -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-macOS-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                    
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
+                        
+                        <div class="flex items-center gap-6">
+                            <!-- Large Status Indicator -->
+                            <div class="relative flex items-center justify-center">
+                                <div class="w-24 h-24 rounded-full bg-macOS-success/10 flex items-center justify-center border border-macOS-success/20">
+                                    <div class="w-16 h-16 rounded-full bg-macOS-success shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center text-white text-2xl">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                </div>
+                                <!-- Connection line animation effect -->
+                                <svg class="absolute -right-12 w-12 h-2 text-macOS-success/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                    <path d="M0,5 L100,5" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" class="animate-[dash_1s_linear_infinite]"/>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h1 class="text-3xl font-bold tracking-tight text-macOS-textMain mb-1">Connected</h1>
+                                <div class="flex items-center gap-3 text-macOS-textMuted text-sm">
+                                    <span class="flex items-center gap-1.5 bg-macOS-sidebar px-2.5 py-1 rounded-md border border-macOS-border">
+                                        <i class="fa-brands fa-aws text-[#FF9900]"></i> AWS Singapore
+                                    </span>
+                                    <span>•</span>
+                                    <span class="font-mono">192.168.1.104</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="flex gap-6 bg-macOS-bg p-4 rounded-[12px] border border-macOS-border/60">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-macOS-textMuted font-medium uppercase tracking-wider mb-1">Latency</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-semibold text-macOS-success">42</span>
+                                    <span class="text-sm font-medium text-macOS-textMuted">ms</span>
+                                </div>
+                            </div>
+                            <div class="w-px bg-macOS-border"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-macOS-textMuted font-medium uppercase tracking-wider mb-1">Uptime</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-semibold text-macOS-textMain">12:45</span>
+                                    <span class="text-sm font-medium text-macOS-textMuted">hr</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Traffic Charts & Details Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Traffic Graph Section -->
+                    <section id="traffic-charts" class="lg:col-span-2 bg-white rounded-[16px] shadow-mac p-6 border border-macOS-border/50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-semibold text-macOS-textMain">Network Traffic</h2>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-3 text-sm">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
+                                        <span class="text-macOS-textMuted">DL: <span class="font-medium text-macOS-textMain">4.2 MB/s</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></span>
+                                        <span class="text-macOS-textMuted">UL: <span class="font-medium text-macOS-textMain">1.8 MB/s</span></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Time toggle -->
+                                <div class="bg-macOS-sidebar rounded-md flex p-0.5 border border-macOS-border/50">
+                                    <button class="px-2 py-1 text-xs font-medium bg-white rounded shadow-sm text-macOS-textMain">1H</button>
+                                    <button class="px-2 py-1 text-xs font-medium text-macOS-textMuted hover:text-macOS-textMain">24H</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart Container -->
+                        <div id="mainTrafficChart" class="h-[300px] w-full"></div>
+                    </section>
+
+                    <!-- Speed Test Details Section (Integrated into Overview) -->
+                    <section id="speed-test-details" class="lg:col-span-1 bg-white rounded-[16px] shadow-mac p-6 border border-macOS-border/50 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-semibold text-macOS-textMain">Network Speed</h2>
+                            <button class="w-8 h-8 rounded-full bg-macOS-sidebar hover:bg-macOS-hover border border-macOS-border flex items-center justify-center transition-colors text-macOS-textMuted">
+                                <i class="fa-solid fa-rotate-right text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div class="space-y-4 mb-6">
+                                <div class="bg-macOS-bg p-4 rounded-[12px] border border-macOS-border/50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-[#10B981]/10 flex items-center justify-center">
+                                            <i class="fa-solid fa-arrow-down text-[#10B981] text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-macOS-textMuted font-medium">Download</p>
+                                            <div class="flex items-baseline gap-1">
+                                                <span class="text-xl font-semibold text-macOS-textMain">452</span>
+                                                <span class="text-xs text-macOS-textMuted">Mbps</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-macOS-bg p-4 rounded-[12px] border border-macOS-border/50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-[#3B82F6]/10 flex items-center justify-center">
+                                            <i class="fa-solid fa-arrow-up text-[#3B82F6] text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-macOS-textMuted font-medium">Upload</p>
+                                            <div class="flex items-baseline gap-1">
+                                                <span class="text-xl font-semibold text-macOS-textMain">128</span>
+                                                <span class="text-xs text-macOS-textMuted">Mbps</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-macOS-bg p-4 rounded-[12px] border border-macOS-border/50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center">
+                                            <i class="fa-solid fa-stopwatch text-[#8B5CF6] text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-macOS-textMuted font-medium">Ping</p>
+                                            <div class="flex items-baseline gap-1">
+                                                <span class="text-xl font-semibold text-macOS-textMain">38</span>
+                                                <span class="text-xs text-macOS-textMuted">ms</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mini Speed Curve -->
+                            <div class="mt-auto">
+                                <p class="text-xs text-macOS-textMuted mb-2 px-1">Real-time Ping</p>
+                                <div id="speedTestChart" class="h-[100px] w-full bg-macOS-sidebar rounded-[12px] border border-macOS-border/50 overflow-hidden"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+            
+            <!-- Settings View (Hidden by default) -->
+            <div class="max-w-4xl mx-auto space-y-6 hidden" id="settings-view">
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-macOS-textMain">Settings</h1>
+                    <p class="text-sm text-macOS-textMuted">Manage application preferences and appearance.</p>
+                </div>
+                
+                <section class="bg-white rounded-[16px] shadow-mac p-6 border border-macOS-border/50">
+                    <h2 class="text-lg font-semibold text-macOS-textMain mb-4">Appearance</h2>
+                    
+                    <div class="flex items-center justify-between py-3 border-b border-macOS-border/50">
+                        <div>
+                            <p class="font-medium text-macOS-textMain text-sm">Dark Mode</p>
+                            <p class="text-xs text-macOS-textMuted mt-0.5">Toggle between light and dark glass aesthetic.</p>
+                        </div>
+                        <label class="switch">
+                          <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                          <span class="slider"></span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-[16px] shadow-mac-lg border border-macOS-border w-full max-w-sm overflow-hidden animate-[fade-in_0.2s_ease-out]">
+            <div class="p-6 flex flex-col items-center text-center">
+                <div class="w-16 h-16 rounded-[14px] bg-macOS-accent flex items-center justify-center text-white shadow-md mb-4">
+                    <i class="fa-solid fa-bolt text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-macOS-textMain mb-1">Cusp Proxy</h2>
+                <p class="text-sm font-medium text-macOS-textMuted mb-6">Version 2.4.1 (Build 842)</p>
+                
+                <div class="w-full bg-macOS-sidebar rounded-[10px] p-4 mb-6 border border-macOS-border/50">
+                    <p class="text-xs text-macOS-textMuted leading-relaxed">
+                        A high-performance macOS native proxy client focusing on clarity and stability.
+                        <br><br>
+                        &copy; 2024 Cusp Technologies.<br>All rights reserved.
+                    </p>
+                </div>
+
+                <div class="w-full flex flex-col gap-3">
+                    <button class="w-full py-2.5 bg-macOS-accent text-white font-medium rounded-[10px] shadow-sm hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate text-sm"></i> Check for Updates
+                    </button>
+                    <button onclick="document.getElementById('about-modal').classList.add('hidden')" class="w-full py-2 text-sm font-medium text-macOS-textMuted hover:text-macOS-textMain transition-colors">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Initialization Script -->
+    <script>
+        // Simple View Routing
+        function showSettings() {
+            document.getElementById('overview-view').classList.add('hidden');
+            document.getElementById('settings-view').classList.remove('hidden');
+        }
+        
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const body = document.getElementById('app-body');
+            const isDark = document.getElementById('dark-mode-toggle').checked;
+            
+            if(isDark) {
+                body.classList.add('bg-gray-900');
+                body.classList.remove('bg-macOS-bg');
+                // Basic dark mode simulation for demo
+                document.querySelectorAll('.bg-white').forEach(el => {
+                    el.classList.add('bg-gray-800', 'border-gray-700', 'text-white');
+                    el.classList.remove('bg-white', 'border-macOS-border/50');
+                });
+                document.querySelectorAll('.text-macOS-textMain').forEach(el => {
+                    el.classList.add('text-white');
+                    el.classList.remove('text-macOS-textMain');
+                });
+            } else {
+                body.classList.remove('bg-gray-900');
+                body.classList.add('bg-macOS-bg');
+                // Revert
+                document.querySelectorAll('.bg-gray-800').forEach(el => {
+                    el.classList.remove('bg-gray-800', 'border-gray-700', 'text-white');
+                    el.classList.add('bg-white', 'border-macOS-border/50');
+                });
+                document.querySelectorAll('.text-white').forEach(el => {
+                    if(!el.closest('.bg-macOS-accent') && !el.closest('.bg-macOS-darkCard')) {
+                        el.classList.remove('text-white');
+                        el.classList.add('text-macOS-textMain');
+                    }
+                });
+            }
+        }
+
+        function initializeCharts() {
+            try {
+                // Generate dummy data for smooth spline curves
+                const xData = Array.from({length: 60}, (_, i) => i);
+                const dlData = xData.map(x => Math.sin(x/5) * 2 + Math.random() * 1.5 + 2);
+                const ulData = xData.map(x => Math.cos(x/4) * 1 + Math.random() * 0.8 + 1);
+
+                const trace1 = {
+                    x: xData,
+                    y: dlData,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Download',
+                    line: {
+                        shape: 'spline',
+                        smoothing: 1.3,
+                        color: '#10B981',
+                        width: 2
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(16, 185, 129, 0.1)'
+                };
+
+                const trace2 = {
+                    x: xData,
+                    y: ulData,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Upload',
+                    line: {
+                        shape: 'spline',
+                        smoothing: 1.3,
+                        color: '#3B82F6',
+                        width: 2
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(59, 130, 246, 0.1)'
+                };
+
+                const layout = {
+                    margin: { t: 10, r: 10, b: 20, l: 30 },
+                    plot_bgcolor: 'transparent',
+                    paper_bgcolor: 'transparent',
+                    showlegend: false,
+                    xaxis: {
+                        showgrid: false,
+                        zeroline: false,
+                        showticklabels: false
+                    },
+                    yaxis: {
+                        showgrid: true,
+                        gridcolor: 'rgba(229, 231, 235, 0.5)',
+                        zeroline: false,
+                        tickfont: {
+                            color: '#9CA3AF',
+                            size: 10
+                        }
+                    },
+                    hovermode: 'x unified'
+                };
+
+                const config = {
+                    responsive: true,
+                    displayModeBar: false
+                };
+
+                Plotly.newPlot('mainTrafficChart', [trace1, trace2], layout, config);
+
+                // Speed Test Chart (Mini Ping Curve)
+                const speedX = Array.from({length: 40}, (_, i) => i);
+                const speedData = speedX.map(x => {
+                    return 38 + Math.sin(x) * 5 + Math.random() * 3; // fluctuating ping around 38
+                });
+
+                const speedTrace = {
+                    x: speedX,
+                    y: speedData,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Ping',
+                    line: {
+                        shape: 'spline',
+                        smoothing: 1.3,
+                        color: '#8B5CF6',
+                        width: 2
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(139, 92, 246, 0.15)'
+                };
+
+                const speedLayout = {
+                    margin: { t: 0, r: 0, b: 0, l: 0 },
+                    plot_bgcolor: 'transparent',
+                    paper_bgcolor: 'transparent',
+                    showlegend: false,
+                    xaxis: { showgrid: false, zeroline: false, showticklabels: false },
+                    yaxis: { 
+                        showgrid: false, 
+                        zeroline: false,
+                        showticklabels: false,
+                        range: [20, 60]
+                    },
+                    hovermode: false
+                };
+
+                if(document.getElementById('speedTestChart')) {
+                    Plotly.newPlot('speedTestChart', [speedTrace], speedLayout, config);
+                }
+
+            } catch (e) {
+                console.error('Error initializing chart:', e);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(initializeCharts, 1200);
+        });
+    </script>
+</body>
+</html>

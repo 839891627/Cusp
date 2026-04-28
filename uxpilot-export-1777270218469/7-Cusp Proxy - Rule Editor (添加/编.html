@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Rule Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F5F5F7',
+                            surface: 'rgba(255, 255, 255, 0.7)',
+                            surfaceDark: 'rgba(255, 255, 255, 0.9)',
+                            border: 'rgba(0, 0, 0, 0.05)',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            accent: '#007AFF',
+                            accentHover: '#0066CC',
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                        'mac-inner': 'inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F7;
+            background-image: url('data:image/svg+xml,%3Csvg width="100%25" height="100%25" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="p" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Ccircle cx="50" cy="50" r="1" fill="%23000000" fill-opacity="0.03" /%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23p)" /%3E%3C/svg%3E');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .mac-window {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #007AFF 0%, #0066CC 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Sidebar Item Active State */
+        .sidebar-item-active {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+            color: #007AFF;
+            border-radius: 8px;
+        }
+        .sidebar-item-active i {
+            color: #007AFF;
+        }
+
+        /* Table Styles */
+        .mac-table-row {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .mac-table-row:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        .mac-table-row.selected {
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+
+        /* Segmented Control */
+        .segmented-control {
+            background: rgba(0,0,0,0.05);
+            padding: 2px;
+            border-radius: 6px;
+            display: inline-flex;
+        }
+        .segmented-item {
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1D1D1F;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .segmented-item.active {
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Custom Checkbox */
+        .mac-checkbox {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 3px;
+            background: white;
+            position: relative;
+            cursor: pointer;
+        }
+        .mac-checkbox:checked {
+            background: #007AFF;
+            border-color: #007AFF;
+        }
+        .mac-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 50;
+        }
+        
+        .modal-sheet {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 1);
+            transform: scale(1);
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+        }
+
+        /* Form Inputs */
+        .mac-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #1D1D1F;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+        .mac-input:focus {
+            outline: none;
+            border-color: rgba(0, 122, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            background: white;
+        }
+
+        /* Toggle Switch */
+        .mac-toggle {
+            appearance: none;
+            width: 36px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.3s;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .mac-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .mac-toggle:checked {
+            background: #34C759; /* iOS Green */
+        }
+        .mac-toggle:checked::after {
+            transform: translateX(16px);
+        }
+
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="m-0 p-0 min-h-screen flex text-app-text overflow-hidden">
+
+    <!-- Background Context (Rules Table) - Dimmed -->
+    <div class="absolute inset-0 flex z-0 opacity-40 grayscale-[20%] pointer-events-none">
+        <!-- Sidebar Navigation (Verbatim from Nodes) -->
+        <aside id="sidebar" class="w-[240px] flex-shrink-0 border-r border-app-border bg-app-surface/50 mac-window flex flex-col h-screen">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-white to-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-app-accent text-[14px]"></i>
+                </div>
+                <span class="font-semibold text-[15px] tracking-tight">Cusp Proxy</span>
+            </div>
+
+            <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-[14px]"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-layer-group w-5 text-center text-[14px]"></i>
+                    Profiles
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-server w-5 text-center text-[14px]"></i>
+                    Nodes
+                </a>
+                <a href="#" class="sidebar-item-active flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-colors">
+                    <i class="fa-solid fa-route w-5 text-center text-[14px]"></i>
+                    Rules
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-terminal w-5 text-center text-[14px]"></i>
+                    Logs
+                </a>
+            </nav>
+
+            <div class="p-3 mt-auto">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                    <i class="fa-solid fa-gear w-5 text-center text-[14px]"></i>
+                    Settings
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area: Rules Management -->
+        <main id="main-content" class="flex-1 h-screen flex flex-col bg-[#F5F5F7] relative">
+            
+            <!-- Toolbar (SwiftUI Control Bar Style) -->
+            <header id="rules-toolbar" class="sticky top-0 z-20 bg-app-surface/80 backdrop-blur-xl border-b border-app-border px-6 py-4 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-[20px] font-semibold tracking-tight text-app-text">Rules</h1>
+                    
+                    <!-- Segmented Control -->
+                    <div class="segmented-control ml-4">
+                        <div class="segmented-item active">All</div>
+                        <div class="segmented-item">Enabled</div>
+                        <div class="segmented-item">Disabled</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Search -->
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-app-textMuted text-[12px]"></i>
+                        <input type="text" placeholder="Search target, type, policy..." class="w-[240px] pl-8 pr-3 py-1.5 bg-white/60 border border-black/5 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-app-accent/50 focus:bg-white transition-all shadow-sm">
+                    </div>
+
+                    <!-- Filter Popover Trigger -->
+                    <button class="btn-secondary px-3 py-1.5 rounded-lg text-[13px] font-medium text-app-text flex items-center gap-2 hover:bg-white transition-colors relative group">
+                        <i class="fa-solid fa-filter text-[12px] text-app-textMuted group-hover:text-app-text"></i> Filter
+                    </button>
+
+                    <!-- Add Rule Button -->
+                    <button class="btn-primary px-4 py-1.5 rounded-lg text-[13px] font-medium text-white flex items-center gap-2 hover:opacity-90 transition-opacity ml-2">
+                        <i class="fa-solid fa-plus text-[12px]"></i> 添加规则
+                    </button>
+                </div>
+            </header>
+
+            <!-- Rules Table Container -->
+            <div class="flex-1 overflow-auto p-6">
+                <div class="glass-panel rounded-[12px] shadow-mac overflow-hidden bg-white/50 border-black/5">
+                    
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-12 gap-4 px-4 py-2 border-b border-app-border bg-white/40 text-[12px] font-semibold text-app-textMuted uppercase tracking-wider sticky top-0 z-10">
+                        <div class="col-span-1 flex items-center justify-center">
+                            <input type="checkbox" class="mac-checkbox">
+                        </div>
+                        <div class="col-span-1">Status</div>
+                        <div class="col-span-2">Type (类型)</div>
+                        <div class="col-span-4">Target (目标)</div>
+                        <div class="col-span-3">Policy/Action (策略)</div>
+                        <div class="col-span-1 text-right">Actions</div>
+                    </div>
+
+                    <!-- Table Body -->
+                    <div class="flex flex-col">
+                        <!-- Rule Row 1 -->
+                        <div class="grid grid-cols-12 gap-4 px-4 py-3 mac-table-row items-center group relative">
+                            <div class="col-span-1 flex items-center justify-center">
+                                <input type="checkbox" class="mac-checkbox">
+                            </div>
+                            <div class="col-span-1 flex items-center">
+                                <div class="w-8 h-4 bg-green-500 rounded-full relative cursor-pointer shadow-inner">
+                                    <div class="w-3.5 h-3.5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                                </div>
+                            </div>
+                            <div class="col-span-2 text-[13px] font-medium text-app-text flex items-center gap-2">
+                                <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-semibold border border-blue-200">DOMAIN-SUFFIX</span>
+                            </div>
+                            <div class="col-span-4 text-[13px] text-app-text font-mono">
+                                google.com
+                            </div>
+                            <div class="col-span-3 text-[13px] font-medium text-app-text flex items-center gap-2">
+                                <i class="fa-solid fa-bolt text-app-textMuted text-[12px]"></i> PROXY
+                            </div>
+                            <div class="col-span-1 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="text-app-textMuted hover:text-app-accent px-2 py-1 rounded hover:bg-black/5 text-[12px]">编辑</button>
+                                <button class="text-app-textMuted hover:text-app-text px-2 py-1 rounded hover:bg-black/5 text-[12px]"><i class="fa-solid fa-ellipsis"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="rule-editor-overlay" class="fixed inset-0 modal-overlay flex items-center justify-center p-6 sm:p-12">
+        
+        <!-- Modal Sheet (Rule Editor) -->
+        <div class="modal-sheet w-full max-w-[640px] rounded-[14px] flex flex-col max-h-full overflow-hidden shadow-mac relative" role="dialog" aria-modal="true">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-app-border flex items-center justify-between bg-white/40 sticky top-0 z-10">
+                <div class="flex flex-col">
+                    <h2 class="text-[16px] font-semibold text-app-text tracking-tight">Add New Rule</h2>
+                    <span class="text-[12px] text-app-textMuted mt-0.5">Configure routing logic for incoming traffic</span>
+                </div>
+                <button class="w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-app-textMuted hover:text-app-text transition-colors" aria-label="Close">
+                    <i class="fa-solid fa-xmark text-[14px]"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable Form) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 bg-white/20">
+                
+                <!-- Section 1: Basic -->
+                <div id="section-basic" class="space-y-4">
+                    <h3 class="text-[13px] font-semibold text-app-textMuted uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-[12px]"></i> Basic Configuration
+                    </h3>
+                    
+                    <div class="bg-white/60 border border-black/5 rounded-[10px] p-4 space-y-4 shadow-sm">
+                        <!-- Enabled Toggle -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <label class="text-[14px] font-medium text-app-text">Enable Rule</label>
+                                <span class="text-[12px] text-app-textMuted">Rule will be active immediately upon saving</span>
+                            </div>
+                            <input type="checkbox" class="mac-toggle" checked>
+                        </div>
+                        
+                        <div class="h-px bg-black/5"></div>
+                        
+                        <!-- Rule Name (Optional) -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-app-text flex justify-between">
+                                Rule Name <span class="text-app-textMuted font-normal text-[12px]">(Optional)</span>
+                            </label>
+                            <input type="text" class="mac-input" placeholder="e.g., Block Ads, Route Netflix">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Type & Target -->
+                <div id="section-type-target" class="space-y-4">
+                    <h3 class="text-[13px] font-semibold text-app-textMuted uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-[12px]"></i> Match Criteria
+                    </h3>
+                    
+                    <div class="bg-white/60 border border-black/5 rounded-[10px] p-4 space-y-5 shadow-sm">
+                        
+                        <!-- Rule Type Picker -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[13px] font-medium text-app-text">Rule Type</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 bg-white border border-app-accent rounded-lg cursor-pointer shadow-[0_0_0_1px_rgba(0,122,255,0.2)]">
+                                    <input type="radio" name="rule_type" class="hidden" checked>
+                                    <i class="fa-solid fa-globe text-app-accent text-[12px]"></i>
+                                    <span class="text-[13px] font-medium text-app-accent">DOMAIN</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 bg-white/50 border border-black/10 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                    <input type="radio" name="rule_type" class="hidden">
+                                    <i class="fa-solid fa-network-wired text-app-textMuted text-[12px]"></i>
+                                    <span class="text-[13px] font-medium text-app-text">IP-CIDR</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 bg-white/50 border border-black/10 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                    <input type="radio" name="rule_type" class="hidden">
+                                    <i class="fa-solid fa-magnifying-glass text-app-textMuted text-[12px]"></i>
+                                    <span class="text-[13px] font-medium text-app-text">KEYWORD</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 bg-white/50 border border-black/10 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                    <input type="radio" name="rule_type" class="hidden">
+                                    <i class="fa-solid fa-layer-group text-app-textMuted text-[12px]"></i>
+                                    <span class="text-[13px] font-medium text-app-text">Other...</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Sub-type toggle (if applicable) -->
+                            <div class="mt-2 flex items-center gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="mac-checkbox" checked>
+                                    <span class="text-[12px] text-app-text">Match Suffix (-SUFFIX)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="mac-checkbox">
+                                    <span class="text-[12px] text-app-text">Match Keyword (-KEYWORD)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Target Input -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-app-text">Target Value</label>
+                            <div class="relative">
+                                <input type="text" class="mac-input font-mono text-[13px] pl-3 pr-8" placeholder="e.g., google.com, 192.168.1.0/24">
+                                <!-- Validation Icon (Success) -->
+                                <i class="fa-solid fa-check-circle absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-[14px]"></i>
+                            </div>
+                            <span class="text-[11px] text-app-textMuted mt-1"><i class="fa-solid fa-circle-info mr-1"></i> Matches exact domain or subdomains if suffix is checked.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Policy -->
+                <div id="section-policy" class="space-y-4">
+                    <h3 class="text-[13px] font-semibold text-app-textMuted uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-route text-[12px]"></i> Action & Policy
+                    </h3>
+                    
+                    <div class="bg-white/60 border border-black/5 rounded-[10px] p-4 space-y-4 shadow-sm">
+                        
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[13px] font-medium text-app-text">Action</label>
+                            <div class="relative">
+                                <select class="mac-input appearance-none pr-8 cursor-pointer bg-white">
+                                    <option value="proxy" selected>PROXY (Route through proxy)</option>
+                                    <option value="direct">DIRECT (Bypass proxy)</option>
+                                    <option value="reject">REJECT (Block traffic)</option>
+                                    <option value="group">Select Proxy Group...</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-app-textMuted text-[10px] pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Proxy Group Selector (Conditional, shown if PROXY or Group is selected) -->
+                        <div class="flex flex-col gap-2 pt-2 border-t border-black/5">
+                            <label class="text-[13px] font-medium text-app-text">Specific Proxy Group <span class="text-app-textMuted font-normal text-[12px]">(Optional)</span></label>
+                            <div class="relative">
+                                <select class="mac-input appearance-none pr-8 cursor-pointer bg-black/[0.02]">
+                                    <option value="" selected>Default Proxy Node</option>
+                                    <option value="us">US Nodes Auto</option>
+                                    <option value="hk">HK Nodes Auto</option>
+                                    <option value="streaming">Streaming Media</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-app-textMuted text-[10px] pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Advanced (Collapsible) -->
+                <div id="section-advanced" class="space-y-2">
+                    <button class="flex items-center gap-2 text-[13px] font-medium text-app-textMuted hover:text-app-text transition-colors w-full text-left">
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i> Advanced Settings
+                    </button>
+                    <!-- Content hidden by default in UI, visible here for structure -->
+                    <div class="hidden bg-white/40 border border-black/5 rounded-[10px] p-4 space-y-4 shadow-sm mt-2">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-app-text">Remarks / Comments</label>
+                            <input type="text" class="mac-input" placeholder="Add notes about this rule...">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer (Sticky) -->
+            <div class="px-6 py-4 border-t border-app-border bg-white/60 backdrop-blur-xl flex items-center justify-between sticky bottom-0 z-10">
+                <!-- Keyboard Shortcuts Legend -->
+                <div class="flex items-center gap-3 text-[12px] text-app-textMuted">
+                    <span class="flex items-center gap-1"><kbd class="font-sans px-1.5 py-0.5 bg-black/5 rounded border border-black/10 text-[11px]">esc</kbd> Cancel</span>
+                    <span class="flex items-center gap-1"><kbd class="font-sans px-1.5 py-0.5 bg-black/5 rounded border border-black/10 text-[11px]">⌘</kbd> <kbd class="font-sans px-1.5 py-0.5 bg-black/5 rounded border border-black/10 text-[11px]">S</kbd> Save</span>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                    <button class="btn-secondary px-4 py-1.5 rounded-lg text-[13px] font-medium text-app-text hover:bg-white transition-colors">
+                        Cancel
+                    </button>
+                    <button class="btn-primary px-5 py-1.5 rounded-lg text-[13px] font-medium text-white shadow-mac flex items-center gap-2 hover:opacity-90 transition-opacity">
+                        Save Rule
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

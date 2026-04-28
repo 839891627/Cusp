@@ -2,7 +2,7 @@
 
 ## Layer Overview
 
-- `CuspApp/Services`: bridge layer for platform/runtime side effects (proxy runtime, VPN manager, launch-at-login, secure credential access).
+- `CuspApp/Services`: bridge layer for platform/runtime side effects (local proxy runtime, system proxy switching, launch-at-login, secure credential access).
 - `CuspApp/ViewModels`: application state and orchestration.
 - `CuspApp/Views` + `CuspApp/UI`: SwiftUI presentation and reusable view components.
 - `Sources/CuspShared`: pure domain logic used by app/tests (parsing, config building, catalogs, rules, probes).

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - MenuBar Popover</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['"SF Mono"', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset',
+                        'mac-prompt': '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05)',
+                        'mac-popover': '0 10px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Simulated Desktop Background just for presentation */
+        .desktop-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: blur(20px);
+        }
+
+        /* macOS Menu Bar Popover specific styles */
+        .mac-popover {
+            width: 380px;
+            background: rgba(244, 247, 251, 0.85); /* F4F7FB with opacity */
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.3) inset, 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .popover-arrow {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid rgba(244, 247, 251, 0.95);
+            filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.1));
+            z-index: 10;
+        }
+
+        /* Custom Toggle Switch for macOS style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .toggle-label {
+            background-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-knob {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.4); }
+            70% { box-shadow: 0 0 0 4px rgba(39, 201, 63, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+        }
+
+        .mac-select {
+            appearance: none;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 4px 24px 4px 8px;
+            font-size: 12px;
+            color: #2D2D2D;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 4px center;
+            background-repeat: no-repeat;
+            background-size: 14px 14px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        
+        .mac-select:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 2px rgba(0,122,255,0.2);
+        }
+
+        .menu-item {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #2D2D2D;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        
+        .menu-item:hover {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .menu-item:hover .text-muted {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .menu-item.active {
+            background: rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        .text-muted {
+            color: #6B6B6B;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6B6B6B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 12px;
+            margin-top: 8px;
+        }
+        
+        .popover-header {
+            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(244,247,251,0.8) 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="font-sans text-mac-text">
+
+    <div class="desktop-bg"></div>
+
+    <!-- macOS Menu Bar Popover Container -->
+    <div id="popover-window" class="mac-popover">
+        <div class="popover-arrow"></div>
+
+        <!-- Header / Status Area -->
+        <div class="popover-header p-4 pb-3 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm leading-tight">Cusp Proxy</h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-[#34C759] inline-block pulse-dot"></span>
+                            <span class="text-[11px] font-medium text-[#34C759]">Running</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Toggle -->
+                <div class="relative inline-block w-10 h-5 align-middle select-none">
+                    <input type="checkbox" id="mainToggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 appearance-none cursor-pointer top-0 left-0 z-10 toggle-knob" checked/>
+                    <label for="mainToggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                </div>
+            </div>
+
+            <!-- Current Node Selection -->
+            <div class="flex items-center justify-between bg-white/60 p-2 rounded-lg border border-black/5 mt-1">
+                <span class="text-xs font-medium text-mac-textMuted px-1">Active Group</span>
+                <select class="mac-select w-40 font-medium">
+                    <option>Global Routing</option>
+                    <option selected>Rule Based (Auto)</option>
+                    <option>Direct Connection</option>
+                    <option>Reject All</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="overflow-y-auto max-h-[500px] pb-2">
+            
+            <!-- Traffic Mini Graph -->
+            <div class="px-4 py-3 border-b border-black/5">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-medium text-mac-textMuted">Traffic (Last 5m)</span>
+                    <div class="flex gap-3 text-[10px] font-mono">
+                        <span class="text-blue-500">↓ 12.4 MB/s</span>
+                        <span class="text-purple-500">↑ 3.1 MB/s</span>
+                    </div>
+                </div>
+                <div id="mini-traffic-chart" class="w-full h-[60px]"></div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="px-2 py-2">
+                <div class="section-title">Quick Actions</div>
+                <div class="flex flex-col gap-0.5 px-1 mt-1">
+                    <div class="menu-item">
+                        <i class="fa-solid fa-rotate w-4 text-center text-muted"></i>
+                        <span>Reload Rules</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-broom w-4 text-center text-muted"></i>
+                        <span>Flush DNS Cache</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-satellite-dish w-4 text-center text-muted"></i>
+                        <span>Update Subscriptions</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts / Activity -->
+            <div class="px-2 py-2 border-t border-black/5">
+                <div class="section-title flex justify-between items-center">
+                    <span>Recent Activity</span>
+                    <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">2</span>
+                </div>
+                <div class="px-1 mt-1 space-y-1">
+                    <div class="p-2 rounded-lg bg-white/50 border border-black/5 hover:bg-white cursor-pointer transition-colors flex gap-2">
+                        <i class="fa-solid fa-shield-halved text-orange-500 text-[10px] mt-0.5"></i>
+                        <div>
+                            <div class="text-[11px] font-medium">Rule Match Blocked</div>
+                            <div class="text-[10px] text-mac-textMuted truncate w-[300px]">ads.example.com blocked by REJECT rule</div>
+                        </div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/50 border border-black/5 hover:bg-white cursor-pointer transition-colors flex gap-2">
+                        <i class="fa-solid fa-server text-blue-500 text-[10px] mt-0.5"></i>
+                        <div>
+                            <div class="text-[11px] font-medium">Node Switched</div>
+                            <div class="text-[10px] text-mac-textMuted truncate w-[300px]">Auto-switched to HK-Premium-02 (Latency: 45ms)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Links Navigation -->
+            <div class="px-2 py-2 border-t border-black/5">
+                <div class="section-title">Open Window</div>
+                <div class="flex flex-col gap-0.5 px-1 mt-1">
+                    <div class="menu-item active">
+                        <i class="fa-solid fa-chart-pie w-4 text-center text-muted"></i>
+                        <span>Overview Dashboard</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-server w-4 text-center text-muted"></i>
+                        <span>Nodes Management</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-layer-group w-4 text-center text-muted"></i>
+                        <span>Strategy Groups</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-shield-halved w-4 text-center text-muted"></i>
+                        <span>Rules Editor</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-terminal w-4 text-center text-muted"></i>
+                        <span>Real-time Logs</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-cloud-arrow-down w-4 text-center text-muted"></i>
+                        <span>Subscription Management</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fa-solid fa-gear w-4 text-center text-mac-accent"></i>
+                        <span>Global Settings</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Footer Actions -->
+        <div class="p-2 bg-white/80 border-t border-black/5 flex justify-between items-center px-4 backdrop-blur-md">
+            <button class="text-[11px] text-mac-textMuted hover:text-mac-text transition-colors">
+                <i class="fa-solid fa-power-off mr-1"></i> Quit Cusp
+            </button>
+            <span class="text-[10px] text-mac-textMuted font-mono">v3.0.1</span>
+        </div>
+    </div>
+
+    <script>
+        function initializeCharts() {
+            try {
+                // Mini Traffic Sparkline Chart
+                var trace1 = {
+                    x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                    y: [12, 15, 14, 22, 30, 25, 28, 45, 50, 42, 38, 40, 35, 30, 25, 20, 15, 18, 12, 12],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Download',
+                    line: {
+                        shape: 'spline',
+                        smoothing: 1.3,
+                        color: 'rgba(59, 130, 246, 0.8)', // blue-500
+                        width: 1.5
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(59, 130, 246, 0.1)'
+                };
+
+                var trace2 = {
+                    x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                    y: [4, 5, 3, 8, 10, 8, 12, 15, 18, 14, 12, 15, 10, 8, 6, 5, 4, 6, 3, 3],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Upload',
+                    line: {
+                        shape: 'spline',
+                        smoothing: 1.3,
+                        color: 'rgba(168, 85, 247, 0.8)', // purple-500
+                        width: 1.5
+                    },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(168, 85, 247, 0.1)'
+                };
+
+                var layout = {
+                    margin: { t: 0, r: 0, b: 0, l: 0 },
+                    showlegend: false,
+                    xaxis: {
+                        showgrid: false,
+                        zeroline: false,
+                        showticklabels: false,
+                        fixedrange: true
+                    },
+                    yaxis: {
+                        showgrid: false,
+                        zeroline: false,
+                        showticklabels: false,
+                        fixedrange: true
+                    },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    hovermode: 'x unified',
+                    hoverlabel: {
+                        bgcolor: 'rgba(255,255,255,0.9)',
+                        font: { size: 10, family: '-apple-system, sans-serif' },
+                        bordercolor: 'rgba(0,0,0,0.1)'
+                    }
+                };
+
+                var config = {
+                    responsive: true,
+                    displayModeBar: false,
+                    displaylogo: false
+                };
+
+                Plotly.newPlot('mini-traffic-chart', [trace1, trace2], layout, config);
+                
+            } catch(e) {
+                console.error("Chart initialization failed", e);
+            }
+        }
+
+        window.addEventListener('load', initializeCharts);
+        setTimeout(initializeCharts, 1200);
+    </script>
+</body>
+</html>

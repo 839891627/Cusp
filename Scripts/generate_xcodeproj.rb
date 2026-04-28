@@ -77,7 +77,7 @@ app_target.build_configurations.each do |config|
   settings['CLANG_ENABLE_MODULES'] = 'YES'
   settings['CODE_SIGN_STYLE'] = 'Automatic'
   settings['ENABLE_HARDENED_RUNTIME'] = 'YES'
-  settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.example.Cusp'
+  settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.arvincjl.Cusp'
   settings['INFOPLIST_FILE'] = 'CuspApp/Info.plist'
   settings['CODE_SIGN_ENTITLEMENTS'] = 'CuspApp/Cusp.entitlements'
   settings['GENERATE_INFOPLIST_FILE'] = 'NO'

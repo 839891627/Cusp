@@ -1,0 +1,227 @@
+
+                <html>
+                <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script>
+                        window.FontAwesomeConfig = {
+                            autoReplaceSvg: 'nest', // Options: 'nest', 'remove', 'replace'
+                        };
+                    </script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <style>
+                    </style>
+                    <script>
+                    tailwind.config = {
+                    theme: {
+                        extend: {
+                        colors: {
+                            primary: {"50":"#fafafa","100":"#f5f5f5","200":"#e5e5e5","300":"#d4d4d4","400":"#a3a3a3","500":"#737373","600":"#525252","700":"#404040","800":"#262626","900":"#171717","950":"#0a0a0a"}
+                        }
+                        }
+                    }
+                    }
+                </script>
+                </head>
+
+                <body>
+                        <div id="config-import-screen" class="w-full h-[900px] bg-white flex items-center justify-center p-6">
+  <div class="w-full max-w-3xl mx-auto">
+    
+    <!-- Logo and Header -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-neutral-900 rounded-2xl mb-5">
+        <i class="fa-solid fa-file-import text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl text-neutral-900 mb-3">Import Configuration</h1>
+      <p class="text-base text-neutral-600 max-w-xl mx-auto">Import your proxy configuration from a file, URL, or paste directly to get started quickly</p>
+    </div>
+
+    <!-- Import Methods -->
+    <div class="bg-neutral-50 rounded-2xl border border-neutral-200 p-8 mb-8">
+      
+      <!-- Drag and Drop Area -->
+      <div class="bg-white border-2 border-dashed border-neutral-300 rounded-xl p-8 mb-6 hover:border-neutral-400 transition-colors">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-cloud-arrow-up text-neutral-600 text-xl"></i>
+          </div>
+          <h3 class="text-base text-neutral-900 mb-2">Drag & Drop Configuration File</h3>
+          <p class="text-sm text-neutral-600 mb-4">Drop your .json, .yaml, or .conf file here</p>
+          <button class="bg-neutral-900 text-white px-6 py-2.5 rounded-lg hover:bg-neutral-800 transition-colors text-sm flex items-center gap-2 mx-auto">
+            <i class="fa-solid fa-folder-open"></i>
+            Browse Files
+          </button>
+        </div>
+      </div>
+
+      <!-- URL Import -->
+      <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-link text-neutral-600 text-sm"></i>
+          </div>
+          <h3 class="text-base text-neutral-900">Import from URL</h3>
+        </div>
+        <div class="flex gap-3">
+          <input type="url" placeholder="https://example.com/config.json" class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent text-sm">
+          <button class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800 transition-colors text-sm">
+            <i class="fa-solid fa-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Paste Configuration -->
+      <div class="bg-white rounded-xl border border-neutral-200 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-paste text-neutral-600 text-sm"></i>
+          </div>
+          <h3 class="text-base text-neutral-900">Paste Configuration</h3>
+        </div>
+        <textarea placeholder="Paste your configuration JSON, YAML, or plain text here..." rows="6" class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent text-sm resize-none"></textarea>
+        <div class="flex justify-end mt-3">
+          <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800 transition-colors text-sm flex items-center gap-2">
+            <i class="fa-solid fa-check"></i>
+            Validate
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Validation Summary -->
+    <div class="bg-neutral-100 rounded-xl border border-neutral-200 p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 bg-neutral-300 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-hourglass-half text-neutral-600 text-sm"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-base text-neutral-900 mb-2">Validation Summary</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-user-group text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">Profiles</span>
+              </div>
+              <p class="text-xs text-neutral-600">No configuration loaded</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-route text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">Routes</span>
+              </div>
+              <p class="text-xs text-neutral-600">No routes detected</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-shield text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">Rules</span>
+              </div>
+              <p class="text-xs text-neutral-600">No rules found</p>
+            </div>
+          </div>
+          <p class="text-sm text-neutral-600">
+            <i class="fa-solid fa-info-circle text-neutral-500 mr-1"></i>
+            Import a configuration file to see validation results
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State (Hidden by default) -->
+    <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-6 mb-6 hidden">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-exclamation-triangle text-neutral-600 text-sm"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-base text-neutral-900 mb-2">Configuration Error</h3>
+          <div class="bg-neutral-100 rounded-lg p-3 mb-3">
+            <p class="text-sm text-neutral-800">Invalid JSON format on line 15: Expected ',' or '}' after property value</p>
+          </div>
+          <button class="text-sm text-neutral-900 underline hover:no-underline">
+            View detailed error log
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success State (Hidden by default) -->
+    <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-6 mb-6 hidden">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-check-circle text-neutral-600 text-sm"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-base text-neutral-900 mb-2">Configuration Valid</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-user-group text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">3 Profiles</span>
+              </div>
+              <p class="text-xs text-neutral-700">Personal, Work, Gaming</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-route text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">12 Routes</span>
+              </div>
+              <p class="text-xs text-neutral-700">All routes validated</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-neutral-200">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-shield text-neutral-600 text-sm"></i>
+                <span class="text-sm text-neutral-900">8 Rules</span>
+              </div>
+              <p class="text-xs text-neutral-700">Domain and IP rules</p>
+            </div>
+          </div>
+          
+          <!-- Default Profile Toggle -->
+          <div class="bg-white rounded-lg p-4 border border-neutral-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-neutral-900 mb-1">Set as Default Profile</p>
+                <p class="text-xs text-neutral-700">Use "Personal" profile as the default configuration</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-neutral-900 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+      <button disabled class="flex-1 bg-neutral-200 text-neutral-400 px-8 py-4 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-right"></i>
+        Import & Continue
+      </button>
+      <button class="flex-1 bg-white text-neutral-900 px-8 py-4 rounded-xl border-2 border-neutral-200 hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back
+      </button>
+    </div>
+
+    <!-- Help Text -->
+    <div class="text-center">
+      <p class="text-xs text-neutral-500 mb-2">
+        <i class="fa-solid fa-circle-info mr-1"></i>
+        Supported formats: JSON, YAML, Shadowsocks, V2Ray, Clash
+      </p>
+      <button class="text-xs text-neutral-900 underline hover:no-underline">
+        View configuration examples
+      </button>
+    </div>
+
+  </div>
+</div>
+                        </body>
+                        </html>
+                        

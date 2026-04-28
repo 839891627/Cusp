@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Subscription Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        mac: {
+                            bg: '#ECECEC',
+                            sidebar: '#DFDFDF',
+                            sidebarActive: '#C8C8C8',
+                            text: '#2D2D2D',
+                            textMuted: '#6B6B6B',
+                            border: '#CFCFCF',
+                            accent: '#007AFF',
+                            accentHover: '#0062CC',
+                            dark: {
+                                bg: '#1E1E1E',
+                                sidebar: '#2D2D2D',
+                                sidebarActive: '#404040',
+                                text: '#FFFFFF',
+                                textMuted: '#98989D',
+                                border: '#3A3A3C'
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'mac-window': '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1)',
+                        'mac-button': '0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.1) inset',
+                        'mac-prompt': '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tl-red { background-color: #FF5F56; }
+        .tl-yellow { background-color: #FFBD2E; }
+        .tl-green { background-color: #27C93F; }
+        
+        .mac-window {
+            width: 100%;
+            max-width: 1440px;
+            height: 900px;
+            background: rgba(236, 236, 236, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(223, 223, 223, 0.5);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #F4F7FB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .window-drag-area {
+            -webkit-app-region: drag;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Custom Toggle Switch for macOS style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .toggle-label {
+            background-color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .toggle-knob {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        /* Dashboard specific styles based on references */
+        .dash-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Reference Modal/Card Style */
+        .ref-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .ref-input {
+            background: #F9FAFB;
+            border: 1px solid #F3F4F6;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .ref-input:focus {
+            background: #FFFFFF;
+            border-color: #E5E7EB;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .ref-btn-outline {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .ref-btn-primary {
+            background: #111827;
+            color: #FFFFFF;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .ref-list-item {
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .ref-list-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden font-sans text-mac-text">
+
+    <!-- macOS Window Container -->
+    <div id="app-window" class="mac-window">
+        
+        <!-- Drag Area for macOS -->
+        <div class="window-drag-area"></div>
+
+        <!-- Sidebar Navigation -->
+        <div id="sidebar" class="sidebar pt-4 pb-6 px-4 flex flex-col justify-between relative z-20">
+            <div>
+                <!-- Traffic Lights -->
+                <div class="flex items-center mb-8 pl-1">
+                    <span class="traffic-light tl-red"></span>
+                    <span class="traffic-light tl-yellow"></span>
+                    <span class="traffic-light tl-green"></span>
+                </div>
+
+                <!-- App Icon / Title -->
+                <div class="flex items-center gap-3 mb-8 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-semibold text-sm">Cusp Proxy</h1>
+                        <p class="text-[11px] text-mac-textMuted flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                            Connected
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="space-y-1">
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Overview Dashboard
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Nodes Management
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                        Strategy Groups
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                        Rules Editor
+                    </div>
+                    <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                        <i class="fa-solid fa-terminal w-5 text-center"></i>
+                        Real-time Logs
+                    </div>
+                    <div class="px-3 py-2 rounded-md bg-mac-sidebarActive text-mac-text font-medium text-sm flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                        <i class="fa-solid fa-cloud-arrow-down w-5 text-center text-mac-accent"></i>
+                        Subscription Management
+                    </div>
+                    
+                    <div class="pt-4 mt-4 border-t border-black/5">
+                        <div class="px-3 py-2 rounded-md text-mac-textMuted font-medium text-sm flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            Global Settings
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Bottom Status -->
+            <div class="px-2">
+                <div class="p-3 bg-white/50 rounded-lg border border-black/5 backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-mac-text">Global Routing</span>
+                        <div class="relative inline-block w-8 h-4 align-middle select-none">
+                            <input type="checkbox" name="toggle" id="globalToggle" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer top-0 left-0 z-10 toggle-knob" checked/>
+                            <label for="globalToggle" class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-mac-textMuted">Rule-based mode active</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content View - Subscription Management -->
+        <div id="main-content" class="main-content relative z-20 overflow-hidden flex flex-col bg-gradient-to-br from-[#F4F7FB] to-[#E8F0FE]">
+            
+            <!-- Header Toolbar -->
+            <div class="h-14 border-b border-gray-200 bg-white/60 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30 pt-4 shrink-0">
+                <div class="flex items-center gap-4">
+                    <h2 class="font-semibold text-mac-text">Subscription Management</h2>
+                    <div class="h-4 w-px bg-gray-300 mx-2"></div>
+                    
+                    <!-- Segmented Control -->
+                    <div class="flex bg-gray-200/60 p-0.5 rounded-lg border border-gray-300/50">
+                        <button class="px-3 py-1 text-xs font-medium rounded-md bg-white text-mac-text shadow-sm border border-gray-200">Active Sources</button>
+                        <button class="px-3 py-1 text-xs font-medium rounded-md text-mac-textMuted hover:text-mac-text transition-colors">Sync Logs</button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="text-xs flex items-center gap-2 mr-2">
+                        <span class="text-mac-textMuted">Quota:</span>
+                        <span class="font-medium text-mac-text">450GB / 1TB</span>
+                        <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden ml-1">
+                            <div class="h-full bg-mac-accent w-[45%]"></div>
+                        </div>
+                    </div>
+                    <button class="px-3 py-1.5 rounded-md text-sm font-medium text-mac-text bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-rotate text-xs"></i>
+                        Update All
+                    </button>
+                    <button class="px-3 py-1.5 rounded-md text-sm font-medium text-white bg-mac-accent shadow-sm hover:bg-mac-accentHover transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        Add Source
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 items-center">
+                
+                <!-- Main Ref Card mimicking the modal structure -->
+                <div class="ref-card w-full max-w-4xl flex flex-col overflow-hidden bg-white">
+                    <!-- Card Header -->
+                    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+                        <h3 class="text-lg font-semibold text-mac-text flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-down text-mac-textMuted text-sm"></i>
+                            Managed Sources
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <button class="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-mac-text hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-clock-rotate-left mr-1"></i> Rollback History
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sources List -->
+                    <div class="p-6 space-y-6">
+                        
+                        <!-- Premium Source Block -->
+                        <div>
+                            <div class="flex justify-between items-end mb-3">
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text">Premium Providers</h4>
+                                    <p class="text-xs text-mac-textMuted mt-0.5">High-speed commercial proxy networks with auto-sync.</p>
+                                </div>
+                                <span class="text-[10px] text-mac-textMuted bg-gray-100 px-2 py-1 rounded">2 Active</span>
+                            </div>
+
+                            <div class="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                                <!-- Table Header -->
+                                <div class="grid grid-cols-12 gap-4 px-4 py-2 bg-gray-50/80 border-b border-gray-100 text-[11px] font-medium text-mac-textMuted tracking-wider uppercase">
+                                    <div class="col-span-4">Source Name</div>
+                                    <div class="col-span-3">Status / Next Sync</div>
+                                    <div class="col-span-3">Usage</div>
+                                    <div class="col-span-2 text-right">Actions</div>
+                                </div>
+
+                                <!-- Item 1 -->
+                                <div class="grid grid-cols-12 gap-4 px-4 py-3 items-center ref-list-item hover:bg-gray-50/50 transition-colors bg-white">
+                                    <div class="col-span-4 flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                                            <i class="fa-solid fa-bolt text-blue-500 text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm text-mac-text flex items-center gap-2">
+                                                Nexitally Pro
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] bg-green-50 border border-green-100 text-green-600 uppercase font-semibold">Active</span>
+                                            </div>
+                                            <div class="text-[11px] text-mac-textMuted truncate mt-0.5 max-w-[200px]" title="https://api.nexitally.com/sub?target=clash&url=...">https://api.nexitally.com/sub?...</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-mac-text flex items-center gap-1.5">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Last: 2 mins ago
+                                        </div>
+                                        <div class="text-[11px] text-mac-textMuted mt-0.5">Interval: Every 12h</div>
+                                    </div>
+
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-mac-text">342 Nodes</div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <div class="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-mac-accent w-[65%]"></div>
+                                            </div>
+                                            <span class="text-[10px] text-mac-textMuted">65%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-span-2 flex justify-end items-center gap-2">
+                                        <button class="w-7 h-7 rounded bg-gray-50 border border-gray-200 flex items-center justify-center text-mac-text hover:bg-gray-100 transition-colors" title="Manual Refresh">
+                                            <i class="fa-solid fa-rotate-right text-xs"></i>
+                                        </button>
+                                        <button class="w-7 h-7 rounded bg-gray-50 border border-gray-200 flex items-center justify-center text-mac-text hover:bg-gray-100 transition-colors" title="Settings">
+                                            <i class="fa-solid fa-ellipsis text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Item 2 -->
+                                <div class="grid grid-cols-12 gap-4 px-4 py-3 items-center ref-list-item hover:bg-gray-50/50 transition-colors bg-white">
+                                    <div class="col-span-4 flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
+                                            <i class="fa-solid fa-paper-plane text-purple-500 text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm text-mac-text flex items-center gap-2">
+                                                AmyTelecom
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] bg-green-50 border border-green-100 text-green-600 uppercase font-semibold">Active</span>
+                                            </div>
+                                            <div class="text-[11px] text-mac-textMuted truncate mt-0.5 max-w-[200px]">https://sub.amytele.com/v1/...</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-yellow-600 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Diff Conflict
+                                        </div>
+                                        <div class="text-[11px] text-mac-textMuted mt-0.5 cursor-pointer hover:text-mac-accent">Review changes</div>
+                                    </div>
+
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-mac-text">128 Nodes</div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <div class="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-mac-text w-[15%]"></div>
+                                            </div>
+                                            <span class="text-[10px] text-mac-textMuted">15%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-span-2 flex justify-end items-center gap-2">
+                                        <button class="w-7 h-7 rounded bg-gray-50 border border-gray-200 flex items-center justify-center text-mac-text hover:bg-gray-100 transition-colors" title="Manual Refresh">
+                                            <i class="fa-solid fa-rotate-right text-xs"></i>
+                                        </button>
+                                        <button class="w-7 h-7 rounded bg-gray-50 border border-gray-200 flex items-center justify-center text-mac-text hover:bg-gray-100 transition-colors" title="Settings">
+                                            <i class="fa-solid fa-ellipsis text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 flex justify-start">
+                                <button class="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-mac-text bg-white hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
+                                    <i class="fa-solid fa-plus text-[10px]"></i> Add Premium Source
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Free / Custom Block -->
+                        <div class="pt-4">
+                            <div class="flex justify-between items-end mb-3">
+                                <div>
+                                    <h4 class="text-sm font-medium text-mac-text">Custom & Local Files</h4>
+                                    <p class="text-xs text-mac-textMuted mt-0.5">Manually managed node lists or local YAML configs.</p>
+                                </div>
+                                <span class="text-[10px] text-mac-textMuted bg-gray-100 px-2 py-1 rounded">1 Active</span>
+                            </div>
+
+                            <div class="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                                <div class="grid grid-cols-12 gap-4 px-4 py-3 items-center bg-white">
+                                    <div class="col-span-4 flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0">
+                                            <i class="fa-regular fa-file-code text-mac-textMuted text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm text-mac-text">Local Fallback Nodes</div>
+                                            <div class="text-[11px] text-mac-textMuted mt-0.5">~/Config/Proxy/fallback.yaml</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-mac-text">File Watcher</div>
+                                        <div class="text-[11px] text-mac-textMuted mt-0.5">Auto-reload on change</div>
+                                    </div>
+
+                                    <div class="col-span-3">
+                                        <div class="text-xs text-mac-text">12 Nodes</div>
+                                    </div>
+
+                                    <div class="col-span-2 flex justify-end items-center gap-2">
+                                        <button class="w-7 h-7 rounded bg-gray-50 border border-gray-200 flex items-center justify-center text-mac-text hover:bg-gray-100 transition-colors" title="Settings">
+                                            <i class="fa-solid fa-ellipsis text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Secondary Panel: Diff Preview / Conflict Resolution -->
+                <div class="w-full max-w-4xl grid grid-cols-3 gap-6">
+                    <!-- Provider Metadata -->
+                    <div class="col-span-1 ref-card p-5 bg-white flex flex-col">
+                        <h4 class="text-sm font-medium text-mac-text mb-4 pb-2 border-b border-gray-100">Provider Metadata</h4>
+                        <div class="space-y-4 flex-1">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">N</div>
+                                <div>
+                                    <div class="text-sm font-medium text-mac-text">Nexitally</div>
+                                    <div class="text-xs text-mac-textMuted">Pro Plan</div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-mac-textMuted">Reset Date</span>
+                                    <span class="text-mac-text font-medium">15th of month</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-mac-textMuted">Max Devices</span>
+                                    <span class="text-mac-text font-medium">5 Online</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-mac-textMuted">Subscription Exp.</span>
+                                    <span class="text-mac-text font-medium">2026-12-01</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 py-1.5 text-xs font-medium rounded border border-gray-200 text-mac-text hover:bg-gray-50 transition-colors">
+                            Manage Tags/Mapping
+                        </button>
+                    </div>
+
+                    <!-- Sync Status & Diff -->
+                    <div class="col-span-2 ref-card p-5 bg-white">
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                            <h4 class="text-sm font-medium text-mac-text">Pending Sync Changes</h4>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-yellow-50 border border-yellow-100 text-yellow-600 font-medium">Review Needed</span>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 p-3 mb-4">
+                            <div class="text-xs text-mac-textMuted mb-2">AmyTelecom is attempting to update nodes:</div>
+                            <div class="flex gap-4 text-xs font-mono">
+                                <div class="text-red-500"><i class="fa-solid fa-minus text-[10px] mr-1"></i> 3 Removed</div>
+                                <div class="text-green-500"><i class="fa-solid fa-plus text-[10px] mr-1"></i> 5 Added</div>
+                                <div class="text-blue-500"><i class="fa-solid fa-pen text-[10px] mr-1"></i> 12 Modified</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-2">
+                            <button class="px-4 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-mac-text bg-white hover:bg-gray-50 transition-colors">Reject</button>
+                            <button class="px-4 py-1.5 text-xs font-medium rounded-md bg-mac-text text-white hover:bg-black transition-colors">Approve & Apply</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

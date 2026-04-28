@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cusp Proxy - Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        macOS: {
+                            bg: '#F9FAFB',
+                            sidebar: '#F3F4F6',
+                            card: '#FFFFFF',
+                            textMain: '#0F172A',
+                            textMuted: '#6B7280',
+                            accent: '#3B82F6',
+                            success: '#10B981',
+                            border: '#E5E7EB',
+                            hover: '#E5E7EB',
+                            darkCard: '#1F2937'
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'mac-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F9FAFB;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .vibrancy {
+            background: rgba(243, 244, 246, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .card-vibrancy {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3B82F6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3B82F6;
+        }
+        
+        /* Native macOS Settings Layout Styles based on reference */
+        .settings-sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: #0F172A;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .settings-sidebar-item:hover {
+            background-color: #E5E7EB;
+        }
+        .settings-sidebar-item.active {
+            background-color: #E5E7EB;
+            font-weight: 600;
+        }
+        
+        .settings-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 16px;
+        }
+        
+        .settings-group {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-row-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0F172A;
+        }
+        
+        .settings-row-desc {
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden">
+
+    <!-- Sidebar (Global Navigation) -->
+    <aside id="sidebar" class="w-64 vibrancy border-r border-macOS-border flex flex-col justify-between h-full flex-shrink-0 z-20 relative">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-8 h-8 rounded-[8px] bg-macOS-accent flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                </div>
+                <span class="font-semibold text-lg tracking-tight text-macOS-textMain">Cusp</span>
+            </div>
+
+            <div class="space-y-8">
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">Main</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-chart-pie w-5 text-center transition-colors"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-server w-5 text-center transition-colors"></i>
+                            <span>Nodes & Strategy</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-link w-5 text-center"></i>
+                            <span>Subscriptions</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-macOS-textMuted uppercase tracking-wider mb-3 px-3">System</p>
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white text-macOS-accent font-medium shadow-sm border border-macOS-border relative group">
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-macOS-accent rounded-r-full"></div>
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-macOS-textMuted hover:bg-macOS-hover hover:text-macOS-textMain transition-colors font-medium group">
+                            <i class="fa-solid fa-file-lines w-5 text-center transition-colors"></i>
+                            <span>Logs</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <div class="bg-macOS-darkCard rounded-[12px] p-4 text-white shadow-mac">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-macOS-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">System Proxy</p>
+                        <p class="text-xs text-gray-400">Active</p>
+                    </div>
+                </div>
+                <button class="w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                    Disconnect
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 flex flex-col h-full bg-macOS-bg overflow-hidden relative">
+        
+        <!-- Top Toolbar -->
+        <header id="toolbar" class="h-16 border-b border-macOS-border flex items-center justify-between px-8 bg-white/50 backdrop-blur-md z-10 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-semibold text-macOS-textMain">Preferences</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-macOS-textMuted text-sm"></i>
+                    <input type="text" placeholder="Search settings..." class="w-64 pl-9 pr-4 py-1.5 bg-white border border-macOS-border rounded-lg text-sm text-macOS-textMain focus:outline-none focus:border-macOS-accent focus:ring-1 focus:ring-macOS-accent shadow-sm transition-all">
+                </div>
+            </div>
+        </header>
+
+        <!-- Settings Layout Split -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Settings Sidebar -->
+            <div class="w-64 border-r border-macOS-border bg-macOS-sidebar/50 flex flex-col overflow-y-auto hidden md:flex p-4">
+                <div class="space-y-1">
+                    <div class="settings-sidebar-item active" onclick="switchTab('general')">
+                        <i class="fa-solid fa-sliders w-5 text-center text-macOS-textMuted"></i>
+                        <span>General</span>
+                    </div>
+                    <div class="settings-sidebar-item" onclick="switchTab('appearance')">
+                        <i class="fa-solid fa-desktop w-5 text-center text-macOS-textMuted"></i>
+                        <span>Appearance</span>
+                    </div>
+                    <div class="settings-sidebar-item" onclick="switchTab('network')">
+                        <i class="fa-solid fa-network-wired w-5 text-center text-macOS-textMuted"></i>
+                        <span>Network</span>
+                    </div>
+                    <div class="settings-sidebar-item" onclick="switchTab('rules')">
+                        <i class="fa-solid fa-list-check w-5 text-center text-macOS-textMuted"></i>
+                        <span>Rules</span>
+                    </div>
+                    <div class="settings-sidebar-item" onclick="switchTab('advanced')">
+                        <i class="fa-solid fa-terminal w-5 text-center text-macOS-textMuted"></i>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="settings-sidebar-item" onclick="switchTab('about')">
+                        <i class="fa-solid fa-circle-info w-5 text-center text-macOS-textMuted"></i>
+                        <span>About</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Content Area -->
+            <div class="flex-1 overflow-y-auto bg-white p-8">
+                
+                <!-- General Settings -->
+                <div id="tab-general" class="max-w-3xl mx-auto">
+                    <div class="flex items-center gap-2 mb-6">
+                        <h2 class="text-2xl font-semibold text-macOS-textMain">General</h2>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Launch at Login</div>
+                                <div class="settings-row-desc">Automatically start Cusp when you log into macOS</div>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-launch" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-accent"/>
+                                <label for="toggle-launch" class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-accent cursor-pointer"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Menu Bar Icon</div>
+                                <div class="settings-row-desc">Display Cusp status in the system menu bar</div>
+                            </div>
+                            <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                                <option>Icon Only</option>
+                                <option>Icon & Speed</option>
+                                <option>Hidden</option>
+                            </select>
+                        </div>
+
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Language</div>
+                                <div class="settings-row-desc">Interface language for the application</div>
+                            </div>
+                            <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                                <option>System Default</option>
+                                <option>English</option>
+                                <option>Chinese (Simplified)</option>
+                                <option>Japanese</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-section-title">Updates</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Automatically check for updates</div>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-updates" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-accent"/>
+                                <label for="toggle-updates" class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-accent cursor-pointer"></label>
+                            </div>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Update Channel</div>
+                                <div class="settings-row-desc">Receive beta updates for new features</div>
+                            </div>
+                            <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                                <option>Stable</option>
+                                <option>Beta</option>
+                            </select>
+                        </div>
+                        <div class="settings-row bg-macOS-sidebar/30">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-circle-check text-macOS-success"></i>
+                                <span class="text-sm text-macOS-textMuted">Cusp is up to date (v2.1.0)</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-white border border-macOS-border rounded-lg text-sm text-macOS-textMain hover:bg-macOS-hover transition-colors shadow-sm font-medium">Check Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Settings -->
+                <div id="tab-appearance" class="max-w-3xl mx-auto hidden">
+                    <div class="flex items-center gap-2 mb-6">
+                        <h2 class="text-2xl font-semibold text-macOS-textMain">Appearance</h2>
+                    </div>
+
+                    <h3 class="settings-section-title">Theme</h3>
+                    <div class="settings-group p-6">
+                        <div class="flex gap-6">
+                            <!-- Light Mode Card -->
+                            <div class="flex-1 cursor-pointer group">
+                                <div class="border-2 border-macOS-accent rounded-xl p-2 bg-macOS-sidebar mb-3 shadow-sm transition-all group-hover:shadow-md">
+                                    <div class="bg-white rounded-lg border border-macOS-border h-32 flex flex-col overflow-hidden">
+                                        <!-- Mock Light UI -->
+                                        <div class="h-6 border-b border-macOS-border bg-macOS-sidebar/50 flex items-center px-2 gap-1">
+                                            <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                                            <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                                            <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                                        </div>
+                                        <div class="flex-1 flex p-2 gap-2">
+                                            <div class="w-1/4 bg-macOS-sidebar rounded border border-macOS-border"></div>
+                                            <div class="w-3/4 bg-macOS-sidebar/30 rounded border border-macOS-border"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border border-macOS-accent flex items-center justify-center">
+                                        <div class="w-2 h-2 rounded-full bg-macOS-accent"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-macOS-textMain">Light</span>
+                                </div>
+                            </div>
+
+                            <!-- Dark Mode Card -->
+                            <div class="flex-1 cursor-pointer group">
+                                <div class="border-2 border-transparent rounded-xl p-2 bg-macOS-sidebar mb-3 transition-all group-hover:border-macOS-border">
+                                    <div class="bg-macOS-darkCard rounded-lg border border-gray-700 h-32 flex flex-col overflow-hidden">
+                                        <!-- Mock Dark UI -->
+                                        <div class="h-6 border-b border-gray-700 bg-gray-800 flex items-center px-2 gap-1">
+                                            <div class="w-2 h-2 rounded-full bg-gray-600"></div>
+                                            <div class="w-2 h-2 rounded-full bg-gray-600"></div>
+                                            <div class="w-2 h-2 rounded-full bg-gray-600"></div>
+                                        </div>
+                                        <div class="flex-1 flex p-2 gap-2">
+                                            <div class="w-1/4 bg-gray-800 rounded border border-gray-700"></div>
+                                            <div class="w-3/4 bg-gray-800/50 rounded border border-gray-700"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border border-macOS-border flex items-center justify-center">
+                                    </div>
+                                    <span class="text-sm font-medium text-macOS-textMain">Dark</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Auto Mode Card -->
+                            <div class="flex-1 cursor-pointer group">
+                                <div class="border-2 border-transparent rounded-xl p-2 bg-macOS-sidebar mb-3 transition-all group-hover:border-macOS-border">
+                                    <div class="relative rounded-lg h-32 overflow-hidden flex">
+                                        <!-- Split UI -->
+                                        <div class="w-1/2 bg-white border border-macOS-border border-r-0 rounded-l-lg flex flex-col">
+                                            <div class="h-6 border-b border-macOS-border bg-macOS-sidebar/50 flex items-center px-2 gap-1">
+                                                <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                                            </div>
+                                            <div class="flex-1 p-2">
+                                                <div class="w-full h-full bg-macOS-sidebar rounded border border-macOS-border"></div>
+                                            </div>
+                                        </div>
+                                        <div class="w-1/2 bg-macOS-darkCard border border-gray-700 border-l-0 rounded-r-lg flex flex-col">
+                                            <div class="h-6 border-b border-gray-700 bg-gray-800 flex items-center px-2 justify-end gap-1">
+                                                <div class="w-2 h-2 rounded-full bg-gray-600"></div>
+                                            </div>
+                                            <div class="flex-1 p-2">
+                                                <div class="w-full h-full bg-gray-800 rounded border border-gray-700"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border border-macOS-border flex items-center justify-center">
+                                    </div>
+                                    <span class="text-sm font-medium text-macOS-textMain">Auto</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Settings (Hidden by default, shown via JS if implemented) -->
+                <div id="tab-network" class="max-w-3xl mx-auto hidden">
+                    <div class="flex items-center gap-2 mb-6">
+                        <h2 class="text-2xl font-semibold text-macOS-textMain">Network</h2>
+                    </div>
+
+                    <h3 class="settings-section-title">Proxy Configuration</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">System Proxy Mode</div>
+                                <div class="settings-row-desc">How Cusp handles system-wide traffic</div>
+                            </div>
+                            <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                                <option>Rule Based (Recommended)</option>
+                                <option>Global Proxy</option>
+                                <option>Direct (Bypass All)</option>
+                            </select>
+                        </div>
+                        <div class="settings-row">
+                            <div class="w-full">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="settings-row-label">Bypass Domain List</div>
+                                </div>
+                                <textarea rows="3" class="w-full px-3 py-2 text-sm bg-macOS-sidebar/50 border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent font-mono resize-none">localhost, 127.0.0.1, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, *.local</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-section-title">DNS Settings</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Enable DNS over HTTPS (DoH)</div>
+                                <div class="settings-row-desc">Encrypt DNS queries for better privacy</div>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-doh" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-accent"/>
+                                <label for="toggle-doh" class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-accent cursor-pointer"></label>
+                            </div>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Primary DNS Server</div>
+                            </div>
+                            <input type="text" value="https://cloudflare-dns.com/dns-query" class="w-64 px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                        </div>
+                    </div>
+
+                    <h3 class="settings-section-title">Protocol Support</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Enable IPv6</div>
+                                <div class="settings-row-desc">Route IPv6 traffic through proxy when supported</div>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="toggle-ipv6" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-border"/>
+                                <label for="toggle-ipv6" class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-border cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules Settings -->
+                <div id="tab-rules" class="max-w-3xl mx-auto hidden">
+                    <div class="flex items-center gap-2 mb-6">
+                        <h2 class="text-2xl font-semibold text-macOS-textMain">Rules</h2>
+                    </div>
+
+                    <div class="bg-macOS-sidebar/30 border border-macOS-border rounded-lg p-4 mb-6 flex items-start gap-3">
+                        <i class="fa-solid fa-circle-info text-macOS-accent mt-0.5"></i>
+                        <p class="text-sm text-macOS-textMuted">Rules define which traffic goes through the proxy and which connects directly. They are processed in order from top to bottom.</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="settings-section-title mb-0">Rule Providers</h3>
+                        <button class="px-3 py-1.5 bg-white border border-macOS-border rounded-lg text-sm text-macOS-textMain hover:bg-macOS-hover transition-colors shadow-sm font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-xs"></i> Add Provider
+                        </button>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-row cursor-move hover:bg-macOS-sidebar/30">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-grip-vertical text-macOS-textMuted/50"></i>
+                                <div>
+                                    <div class="settings-row-label">AdBlock Rules</div>
+                                    <div class="settings-row-desc">1,402 rules • Updates daily</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-medium px-2 py-1 bg-red-100 text-red-700 rounded-md">REJECT</span>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-accent"/>
+                                    <label class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-accent cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-row cursor-move hover:bg-macOS-sidebar/30">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-grip-vertical text-macOS-textMuted/50"></i>
+                                <div>
+                                    <div class="settings-row-label">Apple Services</div>
+                                    <div class="settings-row-desc">45 rules • Direct connection for Apple domains</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-700 rounded-md">DIRECT</span>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-macOS-accent"/>
+                                    <label class="toggle-label block overflow-hidden h-5 rounded-full bg-macOS-accent cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-row cursor-move hover:bg-macOS-sidebar/30">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-grip-vertical text-macOS-textMuted/50"></i>
+                                <div>
+                                    <div class="settings-row-label">Global Default</div>
+                                    <div class="settings-row-desc">Fallback rule for unmatched traffic</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-md">PROXY</span>
+                                <i class="fa-solid fa-lock text-macOS-textMuted/50" title="Cannot be disabled"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div id="tab-advanced" class="max-w-3xl mx-auto hidden">
+                    <div class="flex items-center gap-2 mb-6">
+                        <h2 class="text-2xl font-semibold text-macOS-textMain">Advanced</h2>
+                    </div>
+
+                    <h3 class="settings-section-title">Logging</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Log Level</div>
+                                <div class="settings-row-desc">Determine the verbosity of application logs</div>
+                            </div>
+                            <select class="px-3 py-1.5 text-sm bg-white border border-macOS-border rounded-lg text-macOS-textMain focus:outline-none focus:border-macOS-accent shadow-sm">
+                                <option>Error</option>
+                                <option selected>Warning</option>
+                                <option>Info</option>
+                                <option>Debug</option>
+                            </select>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Open Log Directory</div>
+                                <div class="settings-row-desc">View log files in Finder</div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-white border border-macOS-border rounded-lg text-sm text-macOS-textMain hover:bg-macOS-hover transition-colors shadow-sm font-medium">Open Finder</button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-section-title">Diagnostics</h3>
+                    <div class="settings-group">
+                        <div class="settings-row">
+                            <div>
+                                <div class="settings-row-label">Run Network Diagnostics</div>
+                                <div class="settings-row-desc">Test connectivity and resolve common issues</div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-white border border-macOS-border rounded-lg text-sm text-macOS-textMain hover:bg-macOS-hover transition-colors shadow-sm font-medium">Start Test</button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-section-title text-red-600">Danger Zone</h3>
+                    <div class="settings-group border-red-200">
+                        <div class="settings-row bg-red-50/30">
+                            <div>
+                                <div class="settings-row-label text-red-700">Reset Configuration</div>
+                                <div class="settings-row-desc">Restore all settings to default values. This cannot be undone.</div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 transition-colors shadow-sm font-medium">Reset All</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Settings -->
+                <div id="tab-about" class="max-w-3xl mx-auto hidden">
+                    <div class="flex flex-col items-center justify-center py-12 mb-8 border-b border-macOS-border">
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-mac-lg flex items-center justify-center text-white mb-6">
+                            <i class="fa-solid fa-bolt text-4xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-macOS-textMain mb-2">Cusp</h2>
+                        <p class="text-macOS-textMuted font-mono text-sm mb-6">Version 2.1.0 (Build 2405)</p>
+                        <button class="px-4 py-2 bg-macOS-sidebar border border-macOS-border rounded-lg text-sm text-macOS-textMain hover:bg-macOS-hover transition-colors font-medium">
+                            Check for Updates
+                        </button>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-row cursor-pointer hover:bg-macOS-sidebar/30">
+                            <div class="settings-row-label">Documentation</div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-macOS-textMuted text-sm"></i>
+                        </div>
+                        <div class="settings-row cursor-pointer hover:bg-macOS-sidebar/30">
+                            <div class="settings-row-label">Report an Issue</div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-macOS-textMuted text-sm"></i>
+                        </div>
+                        <div class="settings-row cursor-pointer hover:bg-macOS-sidebar/30">
+                            <div class="settings-row-label">Privacy Policy</div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-macOS-textMuted text-sm"></i>
+                        </div>
+                        <div class="settings-row cursor-pointer hover:bg-macOS-sidebar/30">
+                            <div class="settings-row-label">License Agreement</div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-macOS-textMuted text-sm"></i>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-xs text-macOS-textMuted mt-8">
+                        © 2024 Cusp Technologies. All rights reserved.<br>
+                        Made with <i class="fa-solid fa-heart text-red-500 mx-1"></i> for macOS
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simple tab switching logic
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.getElementById('tab-general').classList.add('hidden');
+            document.getElementById('tab-appearance').classList.add('hidden');
+            document.getElementById('tab-network').classList.add('hidden');
+            document.getElementById('tab-rules').classList.add('hidden');
+            document.getElementById('tab-advanced').classList.add('hidden');
+            document.getElementById('tab-about').classList.add('hidden');
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            // Update sidebar active state
+            const items = document.querySelectorAll('.settings-sidebar-item');
+            items.forEach(item => item.classList.remove('active'));
+            
+            // Find and activate the clicked item (based on onclick attribute)
+            const clickedItem = Array.from(items).find(item => item.getAttribute('onclick').includes(tabId));
+            if (clickedItem) {
+                clickedItem.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

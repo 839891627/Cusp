@@ -142,7 +142,7 @@ private struct ProcessesView: View {
     }
 
     private var pageHeaderFont: Font {
-        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
+        .system(size: 28, weight: isChinese ? .bold : .semibold, design: .rounded)
     }
 
     private var visibleEntries: [ProcessTrafficEntry] {
@@ -459,7 +459,7 @@ private struct LogsView: View {
             }
             .flowGateSecondaryActionStyle()
 
-            Button(t("Clear", "清空")) {
+            Button(t("Clear Logs", "清空日志")) {
                 viewModel.clearLogs()
             }
             .flowGateDangerActionStyle()
@@ -572,7 +572,7 @@ private struct RulesView: View {
     }
 
     private var pageHeaderFont: Font {
-        .system(size: 32, weight: isChinese ? .bold : .semibold, design: .rounded)
+        .system(size: 28, weight: isChinese ? .bold : .semibold, design: .rounded)
     }
 
     var body: some View {
@@ -642,19 +642,22 @@ private struct RulesView: View {
                     }
                 }
                 .menuStyle(.borderlessButton)
-                Button(t("Import", "导入")) {
+                Button(t("Import Rules", "导入规则")) {
                     viewModel.importRulesFromFile()
                 }
                 .flowGateSecondaryActionStyle()
-                Button("YAML") {
-                    viewModel.exportRules(asYAML: true)
+                Menu {
+                    Button(t("Export YAML", "导出 YAML")) {
+                        viewModel.exportRules(asYAML: true)
+                    }
+                    Button(t("Export CONF", "导出 CONF")) {
+                        viewModel.exportRules(asYAML: false)
+                    }
+                } label: {
+                    Label(t("Export", "导出"), systemImage: "square.and.arrow.up")
                 }
-                .flowGateSecondaryActionStyle()
-                Button("CONF") {
-                    viewModel.exportRules(asYAML: false)
-                }
-                .flowGateSecondaryActionStyle()
-                Button(t("Reset Preset", "恢复预设")) {
+                .menuStyle(.borderlessButton)
+                Button(t("Reset to Preset", "重置为预设")) {
                     viewModel.resetRoutingRulesToPreset()
                 }
                 .flowGateSecondaryActionStyle()
@@ -724,23 +727,23 @@ private struct RulesView: View {
 }
 
 enum CuspPalette {
-    static let pageTitleFont = Font.system(size: 32, weight: .bold, design: .rounded)
+    static let pageTitleFont = Font.system(size: 28, weight: .bold, design: .rounded)
     static let sectionTitleFont = Font.system(.headline, design: .rounded, weight: .semibold)
     static let panelCornerRadius: CGFloat = 24
     static let panelStroke = Color.white.opacity(0.11)
     static let metricLabelFont = Font.system(size: 10, weight: .semibold, design: .rounded)
     static let metricValueFont = Font.system(size: 15, weight: .semibold, design: .rounded)
     static let metricValueMonoFont = Font.system(size: 15, weight: .semibold, design: .monospaced)
-    static let sectionHeaderAccent = Color(red: 0.88, green: 0.33, blue: 0.98)
+    static let sectionHeaderAccent = Color(red: 0.58, green: 0.80, blue: 0.98)
     static let controlHeight: CGFloat = 38
     static let inputFieldHeight: CGFloat = 42
     static let primaryButtonTint = accent
     static let secondaryButtonTint = accentBright
     static let dangerButtonTint = error
 
-    static let primaryText = Color(red: 0.97, green: 0.99, blue: 1.00)
-    static let secondaryText = Color(red: 0.87, green: 0.93, blue: 0.98)
-    static let tertiaryText = Color(red: 0.72, green: 0.83, blue: 0.91)
+    static let primaryText = Color(red: 0.95, green: 0.97, blue: 0.99)
+    static let secondaryText = Color(red: 0.82, green: 0.89, blue: 0.95)
+    static let tertiaryText = Color(red: 0.68, green: 0.77, blue: 0.86)
 
     static let idle = Color(red: 0.72, green: 0.80, blue: 0.88)
     static let success = Color(red: 0.20, green: 0.84, blue: 0.48)
@@ -749,26 +752,26 @@ enum CuspPalette {
     static let warningBright = Color(red: 1.00, green: 0.79, blue: 0.38)
     static let error = Color(red: 0.97, green: 0.32, blue: 0.30)
     static let errorBright = Color(red: 1.00, green: 0.53, blue: 0.46)
-    static let accent = Color(red: 0.11, green: 0.76, blue: 0.96)
-    static let accentBright = Color(red: 0.36, green: 0.87, blue: 1.00)
+    static let accent = Color(red: 0.24, green: 0.66, blue: 0.86)
+    static let accentBright = Color(red: 0.40, green: 0.76, blue: 0.94)
 
     static let hairline = Color.white.opacity(0.18)
-    static let pillFill = Color(red: 0.16, green: 0.31, blue: 0.44).opacity(0.75)
-    static let sidebarItemFill = Color(red: 0.13, green: 0.26, blue: 0.39).opacity(0.52)
-    static let sidebarFill = Color(red: 0.02, green: 0.12, blue: 0.20).opacity(0.92)
-    static let sidebarCardFill = Color(red: 0.07, green: 0.23, blue: 0.34).opacity(0.86)
-    static let contentFill = Color(red: 0.05, green: 0.19, blue: 0.30).opacity(0.84)
-    static let cardFill = Color(red: 0.08, green: 0.26, blue: 0.38).opacity(0.76)
-    static let raisedCardFill = Color(red: 0.12, green: 0.34, blue: 0.49).opacity(0.88)
-    static let inputFill = Color(red: 0.16, green: 0.41, blue: 0.58).opacity(0.90)
-    static let selectionFill = Color(red: 0.11, green: 0.47, blue: 0.66).opacity(0.97)
+    static let pillFill = Color(red: 0.17, green: 0.28, blue: 0.38).opacity(0.68)
+    static let sidebarItemFill = Color(red: 0.12, green: 0.21, blue: 0.30).opacity(0.52)
+    static let sidebarFill = Color(red: 0.03, green: 0.09, blue: 0.15).opacity(0.90)
+    static let sidebarCardFill = Color(red: 0.08, green: 0.19, blue: 0.28).opacity(0.84)
+    static let contentFill = Color(red: 0.07, green: 0.15, blue: 0.23).opacity(0.84)
+    static let cardFill = Color(red: 0.09, green: 0.18, blue: 0.26).opacity(0.76)
+    static let raisedCardFill = Color(red: 0.13, green: 0.25, blue: 0.35).opacity(0.88)
+    static let inputFill = Color(red: 0.16, green: 0.30, blue: 0.42).opacity(0.90)
+    static let selectionFill = Color(red: 0.16, green: 0.38, blue: 0.53).opacity(0.95)
     static let selectionStroke = accentBright.opacity(0.38)
 
     static let windowBackground = LinearGradient(
         colors: [
-            Color(red: 0.01, green: 0.11, blue: 0.17),
-            Color(red: 0.02, green: 0.19, blue: 0.30),
-            Color(red: 0.04, green: 0.14, blue: 0.27)
+            Color(red: 0.03, green: 0.09, blue: 0.14),
+            Color(red: 0.05, green: 0.13, blue: 0.20),
+            Color(red: 0.06, green: 0.12, blue: 0.19)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
@@ -776,8 +779,8 @@ enum CuspPalette {
 
     static let ambientHighlight = RadialGradient(
         colors: [
-            success.opacity(0.20),
-            accent.opacity(0.20),
+            success.opacity(0.12),
+            accent.opacity(0.12),
             .clear
         ],
         center: .topTrailing,

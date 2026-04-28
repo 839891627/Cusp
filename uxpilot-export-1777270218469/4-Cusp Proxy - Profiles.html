@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profiles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F5F5F7',
+                            surface: 'rgba(255, 255, 255, 0.7)',
+                            surfaceDark: 'rgba(255, 255, 255, 0.9)',
+                            border: 'rgba(0, 0, 0, 0.05)',
+                            text: '#1D1D1F',
+                            textMuted: '#86868B',
+                            accent: '#007AFF',
+                            accentHover: '#0066CC',
+                        }
+                    },
+                    boxShadow: {
+                        'mac': '0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                        'mac-inner': 'inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F5F7;
+            background-image: url('data:image/svg+xml,%3Csvg width="100%25" height="100%25" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="p" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Ccircle cx="50" cy="50" r="1" fill="%23000000" fill-opacity="0.03" /%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23p)" /%3E%3C/svg%3E');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .mac-window {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #007AFF 0%, #0066CC 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .config-tile {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        /* Sidebar Item Active State */
+        .sidebar-item-active {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+            color: #007AFF;
+            border-radius: 8px;
+        }
+        .sidebar-item-active i {
+            color: #007AFF;
+        }
+
+        .profile-list-item {
+            transition: all 0.2s ease;
+        }
+        .profile-list-item.active {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1);
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dash-border {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%231D1D1F33' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="m-0 p-0 min-h-screen flex text-app-text overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-[240px] flex-shrink-0 border-r border-app-border bg-app-surface/50 mac-window flex flex-col h-screen">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-white to-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-app-accent text-[14px]"></i>
+            </div>
+            <span class="font-semibold text-[15px] tracking-tight">Cusp Proxy</span>
+        </div>
+
+        <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-[14px]"></i>
+                Dashboard
+            </a>
+            <a href="#" class="sidebar-item-active flex items-center gap-3 px-3 py-2 text-[13px] font-medium transition-colors">
+                <i class="fa-solid fa-layer-group w-5 text-center text-[14px]"></i>
+                Profiles
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-server w-5 text-center text-[14px]"></i>
+                Nodes
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-route w-5 text-center text-[14px]"></i>
+                Rules
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-terminal w-5 text-center text-[14px]"></i>
+                Logs
+            </a>
+        </nav>
+
+        <div class="p-3 mt-auto">
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-app-textMuted hover:text-app-text hover:bg-black/5 rounded-lg transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center text-[14px]"></i>
+                Settings
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Container - Centered Auth/Welcome Screen -->
+    <main id="auth-container" class="w-full max-w-[1000px] mx-auto px-6 py-12 flex items-center justify-center min-h-[100dvh]">
+        
+        <!-- Welcome Card Split Layout -->
+        <div id="welcome-card" class="w-full flex flex-col md:flex-row bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] border border-app-border overflow-hidden min-h-[600px]">
+            
+            <!-- Left Side: Content & Actions -->
+            <div class="w-full md:w-1/2 p-10 md:p-16 flex flex-col justify-center relative bg-white">
+                
+                <!-- App Icon -->
+                <div id="app-icon" class="w-16 h-16 mb-8 rounded-[16px] bg-gradient-to-br from-white to-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,1)] border border-black/5 flex items-center justify-center relative">
+                    <i class="fa-solid fa-network-wired text-2xl text-app-accent drop-shadow-sm"></i>
+                </div>
+
+                <!-- Typography -->
+                <div id="welcome-text" class="space-y-4 mb-10 w-full">
+                    <h1 class="text-[36px] font-bold tracking-tight text-app-text leading-tight">Welcome to Cusp</h1>
+                    <p class="text-[16px] text-app-textMuted leading-relaxed max-w-[320px]">
+                        A clear, stable, and high-efficiency proxy client built natively for macOS.
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div id="auth-actions" class="w-full max-w-[320px] space-y-4">
+                    <button class="btn-primary w-full py-3.5 px-4 rounded-[12px] text-white font-medium text-[16px] shadow-[0_4px_12px_rgba(0,122,255,0.2)] transition-transform active:scale-[0.98] flex items-center justify-center gap-2" onclick="window.location.href='#dashboard'">
+                        Launch Dashboard
+                        <i class="fa-solid fa-arrow-right text-sm opacity-80"></i>
+                    </button>
+                    
+                    <button class="w-full py-3.5 px-4 rounded-[12px] bg-white border border-app-border text-app-text font-medium text-[16px] hover:bg-black/5 transition-colors flex items-center justify-center gap-2" onclick="window.location.href='#initial-config'">
+                        <i class="fa-solid fa-gear text-sm text-app-textMuted"></i>
+                        Initial Configuration
+                    </button>
+                </div>
+
+                <!-- Footer Links -->
+                <div id="auth-footer" class="mt-auto pt-10 w-full">
+                    <div class="flex items-center gap-4 text-[13px] text-app-textMuted font-medium">
+                        <a href="#" class="hover:text-app-text transition-colors">Privacy</a>
+                        <span class="w-1 h-1 rounded-full bg-black/10"></span>
+                        <a href="#" class="hover:text-app-text transition-colors">Terms</a>
+                        <span class="w-1 h-1 rounded-full bg-black/10"></span>
+                        <a href="#" class="hover:text-app-text transition-colors">Help</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Illustration / Graphic -->
+            <div class="w-full md:w-1/2 bg-[#F5F5F7] p-10 flex flex-col items-center justify-center relative overflow-hidden border-l border-app-border hidden md:flex">
+                <!-- Decorative background elements -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-white/40 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative w-full max-w-[380px] aspect-square flex flex-col items-center justify-center">
+                    <img class="w-full h-full object-contain drop-shadow-2xl z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/8e53a58afe-e2efb6a9ba324f318575.png" alt="Minimalist flat line illustration of network nodes connecting, clean macOS style proxy theme, subtle blue accents on light gray background" />
+                    
+                    <!-- Floating stat card -->
+                    <div class="absolute bottom-10 left-0 bg-white/90 backdrop-blur-md rounded-[16px] p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-white/50 flex items-center gap-4 z-20 transform -translate-x-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="text-[13px] font-semibold text-app-text">High Efficiency</div>
+                            <div class="text-[11px] text-app-textMuted">Native Performance</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center relative z-10">
+                    <h3 class="text-[20px] font-semibold text-app-text mb-2">Seamless Network Control</h3>
+                    <p class="text-[14px] text-app-textMuted max-w-[280px] mx-auto">Manage your profiles, rules, and nodes with an intuitive interface.</p>
+                </div>
+                
+                <!-- Pagination Dots -->
+                <div class="flex items-center justify-center gap-2 mt-8 z-10">
+                    <div class="w-6 h-1.5 rounded-full bg-app-text"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-black/10"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-black/10"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Version Info -->
+        <div class="absolute bottom-6 text-[12px] text-app-textMuted font-medium tracking-wide">
+            Version 1.0.0 (Build 42)
+        </div>
+
+    </main>
+
+</body>
+</html>
